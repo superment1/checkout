@@ -1,0 +1,46 @@
+# Ambiente virtual (não usado com Docker, mas pode existir localmente)
+venv/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Arquivos de upload (se existirem)
+uploads/
+instance/
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# Docker
+*.tar
+*.img
+*.pid
+
+# Node (se usar npm no front ou Stripe CLI)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build de frontend
+frontend/dist/
+frontend/node_modules/
+
+# IDEs
+.idea/
+.DS_Store
+
+# Backup do sistema
+Thumbs.db

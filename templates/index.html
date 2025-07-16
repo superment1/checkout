@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Superment Checkout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="checkout-container">
+        <div class="checkout-left">
+            <div class="product-sumary">
+                <div class="logo1">
+                    <a href="https://superment.co/sandbox/" class="back-button">
+                        <img src="/static/img/seta-esquerda.png" class="arrow"></img>
+                        <span class="logo-superment">
+                            <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
+                            <span class="superment">Superment</span>
+                        </span>
+                        <span class="voltar">Voltar</span>
+                    </a>
+                </div>
+
+                <img src="{{ product.images[0] }}" alt="Imagem do Produto" width="100">
+                <h2>{{ product.name }}</h2>
+                <p class="description">{{ product.description }}</p>
+                <p class="price">R$ {{ "%.2f"|format(price.unit_amount / 100) }}</p>
+
+            </div>
+        </div>
+        <div class="checkout-right">
+            <form id="payment-form">
+                <label class="title"><strong> Dados de envio</strong></label>
+                <label class="title" for="email">E-mail</label>
+                <input id="email" name="email" type="email" placeholder="e-mail@example.com" required />
+                <label class="title">Endereço de entrega</label>
+                <div class="groupShipping">
+                    <input id="name" name="name" class="InputContainer" placeholder="Name" type="text" required />
+                    <input id="shippingAddressLine1" class="InputContainer" InputContainer name="line1"
+                        placeholder="Informe um endereço" type="text" required />
+                    <input id="shippingAddressLine2" class="InputContainer" name="shippingAddressLine2"
+                        placeholder="Endereço, linha 2" type="text" />
+                    <div class="InputGroup">
+                        <input id="shippingLocality" class="InputContainer" name="shippingLocality" placeholder="Cidade"
+                            type="text" required />
+                        <input id="shippingPostalCode" class="InputContainer" name="shippingPostalCode"
+                            placeholder="CEP" type="text" required />
+                    </div>
+                    <select id="shippingAdministrativeArea" class="Select-source Select-source--empty"
+                        name="shippingAdministrativeArea" placeholder="Estado" required>
+                        <option value="" disabled selected>Estado</option>
+                        <option value="1">Teste</option>
+
+                    </select>
+                </div>
+                <div id="card-element"></div>
+                <button class="card-element" type="submit">Pagar</button>
+                <div id="payment-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.publishableKey = "{{ publishable_key }}";
+    </script>
+    <script src="/static/js/checkout.js"></script>
+</body>
+
+</html>

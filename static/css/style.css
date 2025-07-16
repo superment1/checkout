@@ -1,0 +1,199 @@
+html, body {
+  margin: 0;
+  font-family: sans-serif;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.checkout-container {
+  display: flex;
+  max-width: 100%;
+  min-height: 100%;
+}
+.checkout-left {
+  background: rgb(55, 15, 30);
+  color: white;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.checkout-right {
+  background: white;
+  display: flex;
+  align-items: center;
+}
+
+.checkout-left,
+.checkout-right {
+  flex: 1 1 100%;
+  flex-direction: column;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+.checkout-left h2 {
+  margin-top: 0;
+}
+
+.checkout-left .price {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.product-sumary{
+    width: 365px;
+    margin-top: 30px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+input, select, button {
+  padding: 0.8rem;
+  border: none;
+  border-top: 1px solid #ccc;
+  border-radius: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+.InputGroup{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#name {
+    border-left: 1px solid #ccc;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+input, select {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;;
+  border-right: 1px solid #ccc;
+  border-bottom: none;
+}
+#shippingAdministrativeArea{
+    border-bottom: 1px solid #ccc;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: #ccc;
+}
+#payment-form {
+  width: 380px;
+  margin: 0 auto;
+  margin-top: 30px;
+}
+
+#payment-message {
+  color: red;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .checkout-container {
+    flex-direction: column;
+  }
+  .checkout-left{
+    height: auto; 
+    padding: 20px;
+  }
+  .checkout-right {
+    height: auto; 
+    padding: 20px;
+  }
+  #payment-form{
+    width: 360px;
+  }
+
+}
+#card-element{
+    border-radius: 20px;
+    margin-top: 20px;
+}
+.back-button {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  gap: 4px;
+  position: relative;
+  height: 40px;
+}
+#email {
+    border-radius: 15px;
+    box-shadow: black;
+    border-bottom: 1px solid #ccc;
+}
+.title{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.arrow {
+  width: 20px;
+  height: 20px;
+}
+.logo-superment, .voltar {
+  font-size: 16px;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+.logo-superment {
+  gap: 16px;
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 20px;
+}
+.logo {
+  width: 40px;
+  height: 40px;
+}
+.superment {
+  font-size: 16px;
+}
+.voltar {
+  opacity: 0;
+  left: 40px;
+  position: absolute;
+}
+.back-button:hover .logo-superment {
+  opacity: 0;
+}
+.back-button:hover .voltar {
+  opacity: 1;
+}
+@media (max-width: 768px) {
+    .logo1 {
+        align-self: self-start;
+    }
+    .logo {
+        width: 30px;
+        height: 30px;
+    }
+    .logo-superment {
+        gap: 16px;
+        width: 30px;
+        height: 30px;
+        background-color: #fff;
+        border-radius: 20px;
+    }
+    .superment {
+        font-size: 12px;
+    }
+}
+button {
+  background: #38bdf8;
+  color: #1a1a1ae6;
+  font-weight: bold;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
