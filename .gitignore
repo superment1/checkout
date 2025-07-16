@@ -44,3 +44,5 @@ frontend/node_modules/
 
 # Backup do sistema
 Thumbs.db
+.env
+.env
