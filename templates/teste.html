@@ -6,6 +6,27 @@
     <title>TESTE</title>
 </head>
 <body>
-    
+    <button href="/get-price-id?" id="buy-button" data-product-id="prod_ScV0CEYhFRKr6v">
+        Comprar agora
+    </button>
 </body>
 </html>
+
+<script>
+document.getElementById("buy-button").addEventListener("click", async () => {
+  const productId = document.getElementById("buy-button").dataset.productId;
+
+  try {
+    const res = await fetch(`/get-price-id?product_id=${productId}`);
+    const data = await res.json();
+    if (!data.price_id) {
+      alert("Erro ao buscar preço: " + data.error);
+      return;
+    }
+    window.location.href = `/checkout?price_id=${data.price_id}`;
+  } catch (err) {
+    alert("Erro na requisição.");
+    console.error(err);
+  }
+});
+</script>

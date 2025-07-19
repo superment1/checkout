@@ -5,68 +5,181 @@
     <meta charset="UTF-8">
     <title>Superment Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
-</head>
 
+    <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-T6Z2ZN9H');</script>
+    <!-- End Google Tag Manager -->
+</head>
 <body>
+    <header>
+        <div>
+            <a href="https://superment.co/" class="back-button">
+                <div class="arrow-left"></div>
+                <span class="logo-superment">
+                    <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
+                    <span class="superment">Superment</span>
+                </span>
+                <span class="voltar">Voltar</span>
+            </a>
+        </div>
+        <div id="details" class="details">
+            <a href="#">Detalhes</a>
+            <div class="arrow-down "></div>
+        </div>
+    </header>
+    <div class="head-desk">
+        <a href="https://superment.co/" class="back-button">
+            <div class="arrow-left"></div>
+            <span class="logo-superment">
+                <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
+                <span class="superment">Superment</span>
+            </span>
+            <span class="voltar">Voltar</span>
+        </a>
+    </div>
     <div class="checkout-container">
         <div class="checkout-left">
-            <div class="product-sumary">
-                <div class="logo1">
-                    <a href="https://superment.co/sandbox/" class="back-button">
-                        <img src="/static/img/seta-esquerda.png" class="arrow"></img>
-                        <span class="logo-superment">
-                            <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
-                            <span class="superment">Superment</span>
-                        </span>
-                        <span class="voltar">Voltar</span>
-                    </a>
+            <div class="product-summary">
+                <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="100" />
+
+                <div class="product-description">
+                    <h2>{{ product.name }}</h2>
+                    <p class="description">{{ product.description }}</p>
                 </div>
 
-                <img src="{{ product.images[0] }}" alt="Imagem do Produto" width="100">
-                <h2>{{ product.name }}</h2>
-                <p class="description">{{ product.description }}</p>
                 <p class="price">R$ {{ "%.2f"|format(price.unit_amount / 100) }}</p>
 
+                <div id="details-toggle" class="details-trigger">Detalhes ▾</div>
+
+                <div id="product-details" class="product-details">
+                    <p><strong>Preço base:</strong> R$ 100,00</p>
+                    <p><strong>Desconto:</strong> R$ 10,00</p>
+                    <p><strong>Total:</strong> R$ 90,00</p>
+                </div>
             </div>
         </div>
+        <!-- PAYMENT -->
         <div class="checkout-right">
             <form id="payment-form">
-                <label class="title"><strong> Dados de envio</strong></label>
-                <label class="title" for="email">E-mail</label>
-                <input id="email" name="email" type="email" placeholder="e-mail@example.com" required />
+                <div class="email-form">
+                    <h2 class="title1"> Dados de envio</h2>
+                    <label class="title" for="email">E-mail</label>
+                    <input id="email" name="email" type="email" placeholder="e-mail@example.com" required />
+                </div>
                 <label class="title">Endereço de entrega</label>
                 <div class="groupShipping">
                     <input id="name" name="name" class="InputContainer" placeholder="Name" type="text" required />
+                    <input id="country" class="InputContainer" name="country" value="Brasil" disabled />
                     <input id="shippingAddressLine1" class="InputContainer" InputContainer name="line1"
-                        placeholder="Informe um endereço" type="text" required />
-                    <input id="shippingAddressLine2" class="InputContainer" name="shippingAddressLine2"
-                        placeholder="Endereço, linha 2" type="text" />
-                    <div class="InputGroup">
-                        <input id="shippingLocality" class="InputContainer" name="shippingLocality" placeholder="Cidade"
-                            type="text" required />
-                        <input id="shippingPostalCode" class="InputContainer" name="shippingPostalCode"
-                            placeholder="CEP" type="text" required />
-                    </div>
-                    <select id="shippingAdministrativeArea" class="Select-source Select-source--empty"
-                        name="shippingAdministrativeArea" placeholder="Estado" required>
-                        <option value="" disabled selected>Estado</option>
-                        <option value="1">Teste</option>
-
-                    </select>
+                        placeholder="Informe um endereço" type="text" required />                    
+                    <div id="extraFields" style="display: none;">
+                        <input id="shippingAddressLine2" class="InputContainer" name="shippingAddressLine2" placeholder="Endereço, linha 2" type="text" />
+                        <div class="InputGroup">
+                            <input id="shippingLocality" class="InputContainer" name="shippingLocality" placeholder="Cidade" type="text" />
+                            <input id="shippingPostalCode" class="InputContainer" name="shippingPostalCode" placeholder="CEP" type="text" />
+                        </div>
+                        <select id="shippingAdministrativeArea" class="Select-source Select-source--empty"
+                            name="shippingAdministrativeArea" placeholder="Estado" required>
+                            <option value="" disabled selected>Estado</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                        </select>
+                    </div>                   
                 </div>
-                <div id="card-element"></div>
-                <button class="card-element" type="submit">Pagar</button>
-                <div id="payment-message"></div>
+                 <a href="#" id="showMoreFields" style="display: block; margin-top: 8px;"> Preencha o endereço manualmente</a>
+                <label class="title1">Formas de pagamento</label>              
+                <div id="card-elements" class="card-elements">
+
+                    <!-- Cartão -->
+                    <div class="payment-option">
+                        <label for="payment-method-card" class="payment-label">
+                            <input type="radio" name="payment-method" id="payment-method-card" class="RadioButton" checked>
+                            <img class="icon" src="/static/img/card.svg">
+                            Cartão
+                        </label>
+
+                        <div class="card-details">
+                            <label class="title">Dados do cartão</label>
+
+                            <div id="card-number-element" class="StripeInput"></div>
+                            <div class="card-expiry">
+                                <div id="card-expiry-element" class="StripeInput"></div>
+                                <div id="card-cvc-element" class="StripeInput"></div>
+                            </div>
+
+                            <div class="checkbox">
+                                <input type="checkbox" id="billing-same" class="custom-checkbox" checked>
+                                <label for="billing-same">Os dados de faturamento são iguais aos de envio</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Pay -->
+                    <div class="payment-option">
+                        
+                        <label for="payment-method-google" class="payment-label">
+                            <input type="radio" name="payment-method" id="payment-method-google" class="RadioButton">
+                            <img class="icon" src="/static/img/googlePay.svg">
+                            Google Pay
+                        </label>
+
+                        <div class="google-pay-details">
+                            Outra etapa aparecerá após o envio do pedido para finalizar os detalhes da compra.
+                        
+                        </div>
+                    </div>
+                </div>              
+                <p id="payment-message"></p>
+                <div id="google-pay-button"></div>
+                <button class="btn-pay" type="submit" id="submit">Pagar</button>
             </form>
         </div>
     </div>
-
     <script>
         window.publishableKey = "{{ publishable_key }}";
+        window.clientSecret = "{{ client_secret }}";
     </script>
     <script src="/static/js/checkout.js"></script>
 </body>
 
 </html>
+
+ <!-- <div class="card-elements" id="card-elements">
+                    <div class="btn-radio">
+                        <input id="payment-method-accordion-item-title-card" 
+                            class="RadioButton"
+                            name="payment-method"
+                            type="radio" 
+                            >
+                        <img class="icon" src="/static/img/card.svg">
+                        <div> Cartão</div>
+                    </div>   
+                    <div class="data-card">                    
+                        <div id="card-number-element" class="StripeInput">
+                        </div>
+                        <div class="card-expiry">
+                            <div id="card-expiry-element" class="StripeInput"></div>
+                            <div id="card-cvc-element" class="StripeInput"></div>
+                        </div>      
+                    </div>                
+                    <div class="checkbox">
+                        <input type="checkbox" id="billing-same" class="custom-checkbox" checked />
+                        <label for="billing-same">
+                            Os dados de faturamento são iguais aos de envio
+                        </label> 
+                    </div>
+                </div>
+                <div class="teste">
+                    <button class="btn-google-pay" label="Pagar com Google Pay">
+                        <img class="icon" src="/static/img/googlePay.svg">
+                        <h3 style="margin-top: 1em;"> Google Pay</h3>
+                        <div id="google-pay-button"></div>
+                    </button>    
+                </div> -->
