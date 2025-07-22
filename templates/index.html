@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ Maps_API_KEY}}&libraries=places&callback=initAutocomplete" async defer></script>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/static/img/favicon.ico">
@@ -392,6 +392,7 @@
     </div>
     <script>
         window.publishableKey = "{{ publishable_key }}";
+        window.Maps_API_KEY = "{{ Maps_API_KEY }}";
         window.clientSecret = "{{ client_secret }}";
         window.productPrice = "{{ (price.unit_amount + 490) | int }}";
         window.productCurrency = "{{ product.currency }}";

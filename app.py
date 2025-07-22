@@ -9,12 +9,14 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
 DOMAIN = os.getenv("DOMAIN", "http://localhost:5000")
+Maps_API_KEY = os.getenv('Maps_API_KEY')
 
 @app.route('/')
 def index():
     return render_template(
         'teste.html',
         publishable_key=PUBLISHABLE_KEY,
+        Maps_API_KEY= Maps_API_KEY,
         product=None,
         price=None
     )
