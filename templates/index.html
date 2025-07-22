@@ -7,31 +7,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete" async defer></script>
     <link rel="stylesheet" href="/static/css/style.css">
-
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/static/img/favicon.ico">
+    <!-- <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/static/js/service-worker.js")
+            .then(reg => console.log("SW registered ✅"))
+            .catch(err => console.warn("SW failed ❌", err));
+        }
+    </script> -->
     <!-- Google Tag Manager -->
-        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-T6Z2ZN9H');</script>
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-T6Z2ZN9H');</script>
     <!-- End Google Tag Manager -->
 </head>
 <body>
     <header>
         <div>
-            <a href="https://superment.co/" class="back-button">
+            <a href="https://superment.co/sleepbetter" class="back-button">
                 <div class="arrow-left"></div>
                 <span class="logo-superment">
                     <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
-                    <span class="superment">Superment</span>
+                    <span class="superment checkout-text-font-family">Superment</span>
                 </span>
-                <span class="voltar">Voltar</span>
+                <span class="voltar">Back</span>
             </a>
         </div>
-        <div id="details" class="details">
-            <a href="#">Detalhes</a>
-            <div class="arrow-down "></div>
+        <div id="details-toggle" class="details-trigger">Details ▾</div>
         </div>
     </header>
     <div class="head-desk">
@@ -41,110 +51,450 @@
                 <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
                 <span class="superment">Superment</span>
             </span>
-            <span class="voltar">Voltar</span>
+            <span class="voltar">Back</span>
         </a>
-    </div>
+    </div>  
     <div class="checkout-container">
         <div class="checkout-left">
             <div class="product-summary">
-                <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="100" />
-
-                <div class="product-description">
-                    <h2>{{ product.name }}</h2>
-                    <p class="description">{{ product.description }}</p>
+                <!-- ACCORDION -->
+                <div class="accordion-overlay" id="accordionOverlay">
+                    <div id="product-details" class="product-details mobile-only accordion-content">
+                        <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
+                        <div class="sumary-product">
+                            <div class="product-row-mobile">
+                                <div class="product-info">
+                                    <div class="product-col">
+                                        <p> {{product.name}} </p>
+                                        <p> {{product.description}}</p>
+                                    </div>
+                                    <span class="product-price">
+                                        {{"R$" if product.currency == "brl" else "$" }} {{
+                                        "%.2f"|format(price.unit_amount /
+                                        100) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="product-row">
+                                <div class="product-col-2">
+                                    <div class="product-row">
+                                        <p class="product-text">Subtotal</p>
+                                        <span class="product-price">
+                                            {{"R$" if product.currency == "brl" else "$" }} {{
+                                            "%.2f"|format(price.unit_amount / 100) }}
+                                        </span>
+                                    </div>
+                                    <div class="product-row">
+                                        <div class="product-col shipping">
+                                            <p class="product-col shipping">Shipping</p>
+                                            <p>U.S. Shipping (Up to 7 days)</p>
+                                        </div>
+                                        <span class="value-shipping">$ 4,90</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-row product-text">
+                                <p class="product-text">Total Due</p>
+                                <span>
+                                    {{"R$" if product.currency == "brl" else "$" }} {{
+                                    "%.2f"|format((price.unit_amount +
+                                    490) / 100 )}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="desk-header">
+                    <a href="https://superment.co/" class="back-button">
+                        <div class="back-content">
+                            <div class="arrow-left"></div>
+                            <span class="logo-superment">
+                                <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
+                                <span class="superment">Superment</span>
+                            </span>
+                            <span class="voltar">Back</span>
+                        </div>
+                    </a>
                 </div>
 
-                <p class="price">R$ {{ "%.2f"|format(price.unit_amount / 100) }}</p>
-
-                <div id="details-toggle" class="details-trigger">Detalhes ▾</div>
-
-                <div id="product-details" class="product-details">
-                    <p><strong>Preço base:</strong> R$ 100,00</p>
-                    <p><strong>Desconto:</strong> R$ 10,00</p>
-                    <p><strong>Total:</strong> R$ 90,00</p>
+                <!-- HERO MOBILE  -->
+                <div class="mobile-hero">
+                    <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
+                    <h2> {{product.name}} </h2>
+                    <span class="title-price">
+                        {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount + 490) /
+                        100
+                        )}}
+                    </span>
+                    <div id="details-toggle" class="details-trigger">View details ▾</div>
+                </div>
+                <!-- DETAILS DESKTOP -->
+                <div class="desktop-only-title">
+                    <p class="desktop-only-title"> Pay Superment</p>
+                    <span class="title-price">
+                        {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount + 490) /
+                        100
+                        )}}
+                    </span>
+                </div>
+                <div id="product-details" class="product-details desktop-only">
+                    <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
+                    <div class="sumary-product">
+                        <div class="product-row">
+                            <div class="product-col">
+                                <p> {{product.name}} </p>
+                                <p> {{product.description}}</p>
+                            </div>
+                            <span class="product-price">
+                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format(price.unit_amount /
+                                100) }}
+                            </span>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-col-2">
+                                <div class="product-row">
+                                    <p class="product-text">Subtotal</p>
+                                    <span class="product-price">
+                                        {{"R$" if product.currency == "brl" else "$" }} {{
+                                        "%.2f"|format(price.unit_amount / 100) }}
+                                    </span>
+                                </div>
+                                <div class="product-row">
+                                    <div class="product-col shipping">
+                                        <p class="product-col shipping">Shipping</p>
+                                        <p>U.S. Shipping (At most 7 days)</p>
+                                    </div>
+                                    <span class="value-shipping">$ 4,90</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-row product-text">
+                            <p class="product-text">Total due</p>
+                            <span>
+                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount +
+                                490) / 100 )}}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <!-- PAYMENT -->
         <div class="checkout-right">
+            <div id="smart-pay-button" class="google-pay-details only-mobile" style="display: none;"></div>
+            <div id="link-button" class="link-pay-details only-mobile" style="display: none;"></div>
             <form id="payment-form">
+                <div class="custom-divider"><span>Or</span></div>
+                <div class="title1"> Shipping information</div>
                 <div class="email-form">
-                    <h2 class="title1"> Dados de envio</h2>
                     <label class="title" for="email">E-mail</label>
-                    <input id="email" name="email" type="email" placeholder="e-mail@example.com" required />
+                    <input id="email" class="input-field" name="email" type="email" placeholder="email@example.com" required />
                 </div>
-                <label class="title">Endereço de entrega</label>
+                <label class="title">Shipping Address</label>
                 <div class="groupShipping">
-                    <input id="name" name="name" class="InputContainer" placeholder="Name" type="text" required />
-                    <input id="country" class="InputContainer" name="country" value="Brasil" disabled />
-                    <input id="shippingAddressLine1" class="InputContainer" InputContainer name="line1"
-                        placeholder="Informe um endereço" type="text" required />                    
+                    <div class="input-wrapper">
+                        <input id="name" name="name" class="input-field" placeholder="Name" type="text" required />
+                    </div>
+                    <div class="input-wrapper">
+                        <input id="country" class="input-field" name="country" value="United States" disabled />
+                    </div>
+                    <div class="input-wrapper">
+                        <input id="shippingAddressLine1" class="input-field" name="line1" placeholder="Enter an address"
+                            type="text" required />
+                    </div>
                     <div id="extraFields" style="display: none;">
-                        <input id="shippingAddressLine2" class="InputContainer" name="shippingAddressLine2" placeholder="Endereço, linha 2" type="text" />
-                        <div class="InputGroup">
-                            <input id="shippingLocality" class="InputContainer" name="shippingLocality" placeholder="Cidade" type="text" />
-                            <input id="shippingPostalCode" class="InputContainer" name="shippingPostalCode" placeholder="CEP" type="text" />
+                        <div class="input-wrapper">
+                            <input id="shippingAddressLine2" class="input-field" name="shippingAddressLine2" placeholder="Address, line 2" type="text" />
                         </div>
-                        <select id="shippingAdministrativeArea" class="Select-source Select-source--empty"
-                            name="shippingAdministrativeArea" placeholder="Estado" required>
-                            <option value="" disabled selected>Estado</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                        </select>
-                    </div>                   
-                </div>
-                 <a href="#" id="showMoreFields" style="display: block; margin-top: 8px;"> Preencha o endereço manualmente</a>
-                <label class="title1">Formas de pagamento</label>              
-                <div id="card-elements" class="card-elements">
-
-                    <!-- Cartão -->
-                    <div class="payment-option">
-                        <label for="payment-method-card" class="payment-label">
-                            <input type="radio" name="payment-method" id="payment-method-card" class="RadioButton" checked>
-                            <img class="icon" src="/static/img/card.svg">
-                            Cartão
-                        </label>
-
-                        <div class="card-details">
-                            <label class="title">Dados do cartão</label>
-
-                            <div id="card-number-element" class="StripeInput"></div>
-                            <div class="card-expiry">
-                                <div id="card-expiry-element" class="StripeInput"></div>
-                                <div id="card-cvc-element" class="StripeInput"></div>
+                        <div class="InputGroup">
+                            <div class="input-wrapper">
+                                <input id="shippingLocality" class="input-field" name="shippingLocality"
+                                    placeholder="City" type="text" />
                             </div>
-
-                            <div class="checkbox">
-                                <input type="checkbox" id="billing-same" class="custom-checkbox" checked>
-                                <label for="billing-same">Os dados de faturamento são iguais aos de envio</label>
+                            <div class="input-wrapper">
+                                <input id="shippingPostalCode" class="input-field" name="shippingPostalCode"
+                                    placeholder="ZIP code" type="text" />
                             </div>
+                        </div>
+                        <div class="input-wrapper">
+                            <select id="shippingAdministrativeArea" class="Select-source input-field"
+                                name="shippingAdministrativeArea" placeholder="State" required>
+                                <option value="" disabled selected>Select a state</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DE">Delaware</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NY">New York</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VT">Vermont</option>
+                                <option value="VA">Virginia</option>
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
                         </div>
                     </div>
+                </div>
+                <a href="#" id="showMoreFields" style="display: block; margin-top: 8px;"> Fill in the address
+                    manually</a>
+                <label class="title1">Payment Methods</label>
+                <div id="card-elements" class="card-elements">
+                    <!-- Cartão -->
+                    <!-- <div class="payment-option"> -->
+                    <!-- <label for="payment-method-card" class="payment-label">
+                            <input type="radio" name="payment-method" id="payment-method-card" class="RadioButton"
+                                checked>
+                            <img class="icon" src="/static/img/card.svg">
+                            Card
+                        </label> -->
+                    <div class="card-details">
+                        <div class="card-title">
+                            <label class="title card-title">Card information</label>
+                        </div>
 
-                    <!-- Google Pay -->
-                    <div class="payment-option">
-                        
-                        <label for="payment-method-google" class="payment-label">
+                        <div id="card-number-element" class="StripeInput"> </div>
+                        <div class="card-expiry">
+                            <div id="card-expiry-element" class="StripeInput"></div>
+                            <div id="card-cvc-element" class="StripeInput"></div>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" id="billing-same" class="custom-checkbox" checked>
+                            <label for="billing-same">Billing info is same as shipping</label>
+                        </div>
+                    </div>
+                    <!-- <div class="save-information">
+                        <input class="custom-checkbox" type="checkbox">
+                        <div class="text-informations">
+                            <p class="info">Save my information for faster Checkout</p>
+                            <p class="info2">Pay faster on Superment and everywhere Link is accepted</p>
+                        </div>
+                    </div> -->
+                </div>
+               
+                <div id="payment-buttons">
+                    <!-- <p id="payment-message"></p> -->
+                    <button class="btn-pay" type="submit" id="submit">Pay</button>
+                </div>
+                <!-- FOOTER -->
+
+                <div id="smart-pay-button" class="google-pay-details desktop-only" style="display: none;"></div>
+                <div id="link-button" class="link-pay-details desktop-only" style="display: none;"></div>    
+                
+                <div class="stripe-footer">
+                    <a href="https://stripe.com/"><strong>stripe</strong></span>
+                    <span class="divider">|</span>
+                    <a href="https://stripe.com/legal/end-users" target="_blank" rel="noopener noreferrer">Terms</a>
+                    <a href="https://stripe.co/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
+                </div>
+            </form>
+            
+        </div>
+
+
+        <!-- Google Pay -->
+        <!-- <div class="payment-option"> -->
+        <!-- <label for="payment-method-google" class="payment-label">
                             <input type="radio" name="payment-method" id="payment-method-google" class="RadioButton">
-                            <img class="icon" src="/static/img/googlePay.svg">
+                            <img class="icon icon-google" src="/static/img/googlePay.svg">
                             Google Pay
                         </label>
+                    </div> -->
 
-                        <div class="google-pay-details">
-                            Outra etapa aparecerá após o envio do pedido para finalizar os detalhes da compra.
-                        
+
+        <!-- <p class="title-details">Order details</p> -->
+        <!-- MOBILE DETAILS -->
+        <!-- <div id="product-details" class="product-details mobile-only">                    
+                    <div class="sumary-product">
+                        <div class="product-row-mobile">
+                            <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="100" />
+                            <div class="product-info">
+                                <div class="product-col">
+                                    <p> {{product.name}} </p>
+                                    <p> {{product.description}}</p>
+                                </div>                            
+                                <span class="product-price">
+                                    {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format(price.unit_amount /
+                                    100) }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-col-2">
+                                <div class="product-row">
+                                    <p class="product-text">Subtotal</p>
+                                    <span class="product-price">
+                                        {{"R$" if product.currency == "brl" else "$" }} {{
+                                        "%.2f"|format(price.unit_amount / 100) }}
+                                    </span>
+                                </div>
+                                <div class="product-row">
+                                    <div class="product-col shipping">
+                                        <p class="product-col shipping">Shipping</p>
+                                        <p>U.S. Shipping (Up to 7 days)</p>
+                                    </div>
+                                    <span class="value-shipping">$ 4,90</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-row product-text">
+                            <p class="product-text">Total due</p>
+                            <span>
+                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount +
+                                490) / 100 )}}
+                            </span>
                         </div>
                     </div>
-                </div>              
-                <p id="payment-message"></p>
-                <div id="google-pay-button"></div>
-                <button class="btn-pay" type="submit" id="submit">Pagar</button>
-            </form>
-        </div>
+                </div>
+                <div id="mobile-product-details-placeholder"></div> -->
+
+
+    </div>
     </div>
     <script>
         window.publishableKey = "{{ publishable_key }}";
         window.clientSecret = "{{ client_secret }}";
+        window.productPrice = "{{ (price.unit_amount + 490) | int }}";
+        window.productCurrency = "{{ product.currency }}";
+
+        function initAutocomplete() {
+            const input = document.getElementById('shippingAddressLine1');
+            const extraFieldsContainer = document.getElementById('extraFields');
+            const shippingAddressLine2 = document.getElementById('shippingAddressLine2');
+            const shippingLocality = document.getElementById('shippingLocality');
+            const shippingPostalCode = document.getElementById('shippingPostalCode');
+            const shippingAdministrativeArea = document.getElementById('shippingAdministrativeArea');
+            const countryInput = document.getElementById('country');
+            const usStates = {
+                "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+                "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+                "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+                "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+                "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+                "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+                "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+                "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+                "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+                "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+            };
+            for (const abbreviation in usStates) {
+                if (usStates.hasOwnProperty(abbreviation)) {
+                    const option = document.createElement('option');
+                    option.value = abbreviation;
+                    option.textContent = usStates[abbreviation];
+                    shippingAdministrativeArea.appendChild(option);
+                }
+            }
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['address'], 
+                componentRestrictions: { country: ['us'] },
+                fields: ['address_components', 'geometry', 'formatted_address']
+            });
+
+            autocomplete.addListener('place_changed', function () {
+                const place = autocomplete.getPlace();
+                shippingAddressLine2.value = '';
+                shippingLocality.value = '';
+                shippingPostalCode.value = '';
+                shippingAdministrativeArea.value = '';
+
+                if (!place.geometry) {
+
+                    console.error("Nenhum detalhe de endereço disponível para: " + place.name);
+                    extraFieldsContainer.style.display = 'none';
+                    return;
+                }  
+                extraFieldsContainer.style.display = 'block';
+
+                console.log("Endereço completo selecionado:", place.formatted_address);
+                console.log("Latitude:", place.geometry.location.lat());
+                console.log("Longitude:", place.geometry.location.lng());
+                let streetNumber = '';
+                let streetName = '';
+                let city = '';
+                let stateAbbreviation = '';
+                let state = '';
+                let postalCode = '';
+
+                for (const component of place.address_components) {
+                    const type = component.types[0];
+
+                    if (type === 'street_number') {
+                        streetNumber = component.long_name;
+                    } else if (type === 'route') {
+                        streetName = component.long_name;
+                    } else if (type === 'locality') { // Cidade
+                        city = component.long_name;
+                    } else if (type === 'administrative_area_level_1') { // Estado/Província
+                        stateAbbreviation = component.short_name; // Ex: "CA" para Califórnia
+                    } else if (type === 'postal_code') { // CEP
+                        postalCode = component.long_name;
+                    }
+                    // Você pode adicionar mais condições para outros tipos, como 'sublocality' para bairro
+                }
+                // Preenche os campos do formulário
+                input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`; // Linha 1: Número + Rua
+                shippingLocality.value = city;
+                shippingPostalCode.value = postalCode;
+
+                // Seleciona a opção correta no dropdown de estado
+                if (stateAbbreviation) {
+                    shippingAdministrativeArea.value = stateAbbreviation;
+                }
+
+
+                console.log("Rua:", streetName);
+                console.log("Número:", streetNumber);
+                console.log("Cidade:", city);
+                console.log("Estado:", state);
+                console.log("CEP:", postalCode);
+
+                // Se você tiver outros campos, por exemplo:
+                // document.getElementById('shippingStreetName').value = streetName;
+                // document.getElementById('shippingStreetNumber').value = streetNumber;
+                // ... e assim por diante
+            });
+        }
+    </script>
     </script>
     <script src="/static/js/checkout.js"></script>
 </body>

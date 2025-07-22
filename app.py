@@ -1,12 +1,10 @@
 import os
-from flask import Flask, render_template, redirect, request, jsonify
+from flask import Flask, render_template, redirect, request, jsonify, send_from_directory
 import stripe
 from dotenv import load_dotenv
 
 load_dotenv()
-
 app = Flask(__name__)
-
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
@@ -20,6 +18,9 @@ def index():
         product=None,
         price=None
     )
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('.', 'manifest.json', mimetype='application/manifest+json')
 
 @app.route("/checkout")
 def checkout():
@@ -29,14 +30,11 @@ def checkout():
     try:
         price = stripe.Price.retrieve(price_id)
         product = stripe.Product.retrieve(price.product)
-
-        # Criação imediata do PaymentIntent
         intent = stripe.PaymentIntent.create(
             amount=price.unit_amount,
             currency=price.currency,
             automatic_payment_methods={"enabled": True}
         )
-        print(f"[DEBUG] AQUI client_secret gerado: {intent.client_secret}")
         return render_template(
             "index.html", 
             price=price,
@@ -52,7 +50,6 @@ def get_price_id():
     product_id = request.args.get("product_id")
     if not product_id:
         return jsonify({"error": "product_id is required"}), 400
-
     try:
         prices = stripe.Price.list(product=product_id, active=True, limit=1)
         if not prices.data:
@@ -139,4 +136,4 @@ def cancel():
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)
