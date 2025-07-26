@@ -1,13 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Superment Checkout</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Superment | Thanks</title>
+  <style>
+    @font-face {
+        font-family: 'Gelasio';
+        src: url('/static/fonts/Fontes/Gelasio/Gelasio-VariableFont_wght.ttf') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'Gelasio';
+        src: url('/static/fonts/Fontes/Gelasio/Gelasio-Italic-VariableFont_wght.ttf') format('woff2');
+        font-style: italic;
+        font-weight: 100 900;
+    }
+       @font-face {
+        font-family: 'Crossfit';
+        src: url('/static/fonts/Fontes/Crossfit-Black/Crossfit-Black.otf') format('woff2');
+        font-style: italic;
+        font-weight: 100 900;
+    }
+     @font-face {
+        font-family: 'Crossfit';
+        src: url('/static/fonts/Fontes/Crossfit-Black/Crossfit-Black.otf') format('woff2');
+        font-style: normal;
+        font-weight: 100 900;
+    }
+    body, html {
+        padding: 0;
+        height: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        font-family: 'Crossfit', serif;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+    }
+    main {
+        flex: 1;
+        padding-top: 120px; 
+        padding-bottom: 130px; 
+        box-sizing: border-box;
+        margin: 0 11%;
+    }
+    
+    main.thanks-body {
+        flex: 1;
+        padding: 100px 40px 140px; 
+        text-align: left;
+        align-items: flex-start;
+        max-width: 800px;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 120px;
+        background: rgb(55, 15, 30);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+   
+    footer {
+        width: 100%;
+        height: 130px;
+        background-color: rgb(55, 15, 30);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Crossfit', serif;       
+    }
+    img{
+        max-width: 100%;    
+    }
+    .container img{
+        max-width: 150px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    h1 {
+        font-family: 'Crossfit', serif;
+        font-weight: 500;
+        font-size: 3.125rem;
+        color: #6ec8f0;
+        margin: 0;
+        line-height: 1;
+    }
+    .logo-superment{
+        max-width: 120px;
+        padding-left: 10px;
+        top: -35px;
+        position: relative;        
+    }
+    p {
+      font-size: 1.1rem;
+      color: rgb(55, 15, 30);
+      max-width: 94%;
+    }
+
+    footer p{
+        color: #fef9f1 !important;
+        font-style: italic;
+        font-family: 'Gelasio', serif;
+        margin: 0;
+        font-size: 0.8rem;
+    }
+    footer h1{
+        margin: 0;
+        color: #fef9f1;
+    }
+    .thanks-body{
+        align-items: center;
+        text-align: start;
+        padding-left: 25px;
+        flex-grow: 1;
+        display: flex;
+        margin-top: 50px;
+    }
+    .container {
+        max-width: 80%;
+        margin: 0 11%;
+        height: 120px;
+    }
+  
+    .thanks-text p{
+        font-family: 'Gelasio', serif;
+    }
+    .foot{
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        width: 100%;
+    }
+
+    .text{
+        margin-top: 10px;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #370f1e9e;
+    }
+    @media (max-width: 768px) {    
+        main{
+            margin-top: 90px;
+            margin-right: 30px;
+            margin-left: 30px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .thanks-body {
+            margin: 0;
+            padding: 0;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .thanks-text{
+            padding-top: 40px;
+        }
+        body {
+            width: 100%
+
+        }
+        .container{
+            margin: 0;
+        }
+        .container img{
+            max-width: 100px;
+
+        }
+        .logo-superment{
+            padding: 0;
+            top: 10px;
+        }
+        header{
+            padding-left: 20px;
+            height: 90px;
+        }
+        h1 {
+            font-size: 2.75rem;
+            line-height: 1;
+        }
+        .text p{
+            margin-bottom: 5px;
+        }
+        .text{
+            padding-bottom: 30px;
+        }
+        p {
+            font-size: 1.25rem;
+        }
+        .thanks-body img{
+            max-width: 80px;
+        }
+        footer h1{
+            font-size: 3rem;
+            gap: 6px;
+            
+        }
+    }
+  </style>
 </head>
 <body>
-    <div>
-        
-    </div>
+    <header>
+        <div class="container">
+            <span class="logo-superment">
+            <img src="/static/img/logo-thanks.png" alt="logo" class="logo">
+        </span>
+
+        </div>
+
+    </header>
+    <main>
+        <div class="thanks-body">                          
+            <div class="thanks-text">    
+                <span>
+                    <img src="/static/img/icon-hands.gif"></img>
+                </span>
+                <div class="text">
+                    <h1>THANK YOU FOR TRUSTING SUPER NATURAL SLEEP!</h1>
+                    <p>We're so happy to welcome you to the Super Natural Sleep family.</p>
+                    <p>You didn't just place an order - you chose a partner who's here to help you sleep deeper, wake up brighter, and feel better every single day.</p>
+                </div>
+                <div>
+                    <h1>WHAT'S NEXT?</h1>
+                    <p>
+                        We're packing up your order right now! Watch your inbox for the tracking link - and get ready to meet your best, most rested self.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="foot">
+            <h1>
+                SUPERMENT
+            </h1>
+            <p> &copy; Supersleep Research 2025. All Rights Reserved.</p>
+        </div>
+    </footer> 
 </body>
 </html>

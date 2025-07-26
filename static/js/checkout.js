@@ -1,24 +1,63 @@
-
-
 document.addEventListener("DOMContentLoaded", async () => {
   const stripe = Stripe(window.publishableKey);
   const form = document.getElementById("payment-form");
   const message = document.getElementById("payment-message");
   const submitBtn = document.getElementById("submit");
+  const price = parseInt(window.productPrice || 0);
+  const shippingAmount = 490;
+  const totalAmount = price + shippingAmount;
+  const currency = window.productCurrency;
 
+  const appearance = {
+    theme: "stripe",
+    variables: {
+      borderRadius: "36px",
+    },
+  };
   const elements = stripe.elements({
     clientSecret: window.clientSecret,
-    appearance: {
-      theme: 'none',
-      variables: {
-        colorPrimary: '#000000',
-        colorBackground: '#ffffff',
-        colorText: '#333333',
-        borderRadius: '8px',
-        fontFamily: 'Inter, sans-serif',
-      },
-    },
+    appearance,
+    locale: "en",
   });
+
+  const expressCheckoutElement = elements.create("expressCheckout", {
+    buttonType: {
+      applePay: "buy",
+      googlePay: "buy",
+      link: "buy",
+    },
+    buttonTheme: {
+      applePay: "black",
+    },
+    buttonHeight: 48,
+    layout: {
+      maxRows: 2,
+      maxColumns: 2,
+    },
+    collectShippingAddress: true,
+  });
+
+  expressCheckoutElement.mount("#express-checkout-element");
+  expressCheckoutElement.on('ready', () => {
+  });
+  expressCheckoutElement.on('confirm', async (event) => {
+  try {
+    const {error} = await stripe.confirmPayment({
+      elements,
+      clientSecret: window.clientSecret,
+      confirmParams: {
+        return_url:"https://superment.co/supersleep/sucess/"
+      },
+    });
+
+    if (error) {
+      console.error("Erro ao confirmar pagamento:", error.message);
+     } 
+    } catch (err) {
+      console.error("Erro no handler confirm:", err);
+    }
+  });
+
 
   const style = {
     base: {
@@ -51,98 +90,194 @@ document.addEventListener("DOMContentLoaded", async () => {
   cardExpiry.mount('#card-expiry-element');
   cardCvc.mount('#card-cvc-element');
 
-  const price = parseInt(window.productPrice || 0);
-  const currency = window.productCurrency || "usd";
+  // const paymentElement = elements.create('payment', {
+  //   fields: {
+  //     billingDetails: {
+  //       name: 'auto',
+  //       email: 'auto',
+  //       address: 'auto',
+  //     }
+  //   }
+  // });
 
-  if (price <= 0) {
-    console.error("Valor inválido para o produto. Abortando Google Pay.");
-  } else {
-    const paymentRequest = stripe.paymentRequest({
-      country: "US",
-      currency: currency,
-      total: {
-        label: "Total",
-        amount: price,
-      },
-      requestPayerName: true,
-      requestPayerEmail: true,
-      requestShipping: false,
-    });
+  // const price = parseInt(window.productPrice || 0);
+  // const shippingAmount = 490;
+  
+  
+  // if (price <= 0) {
+  //   console.error("Valor inválido para o produto. Abortando Google Pay.");
+  // } else {
+  //   const paymentRequest = stripe.paymentRequest({
+  //     country: "US",
+  //     currency: currency,
+  //     total: {
+  //       label: "Total",
+  //       amount: totalAmount,
+  //     },
+  //     requestPayerName: true,
+  //     requestPayerEmail: true,
+  //     requestShipping: true,
+  //     shippingOptions: [
+  //       {
+  //         id: 'us-shipping',
+  //         label: 'U.S. Shipping (At most 7 days)',
+  //         detail: '',
+  //         amount: shippingAmount,
+  //       },
+  //     ],
+  //   });
 
-    const smartPayButton = elements.create("paymentRequestButton", {
-      paymentRequest,
-      style: {
-        paymentRequestButton: {
-          type: "default",
-          theme: "dark",
-          borderRadius: "20px",
-          height: "40px"
-        }
-      }
-    });
-    const smartPayContainer = document.getElementById("smart-pay-button");
+  //   const smartPayButton = elements.create("paymentRequestButton", {
+  //     paymentRequest,
+  //     style: {
+  //       paymentRequestButton: {
+  //         type: "default",
+  //         theme: "dark",
+  //         borderRadius: "20px",
+  //         height: "40px"
+  //       }
+  //     }
+  //   });
+  //   const smartPayContainer = document.getElementById("smart-pay-button");
 
-    paymentRequest.canMakePayment().then((result) => {
-      console.log("canMakePayment", result);
-      if (result && (result.googlePay || result.applePay)) {
-        if (smartPayContainer.children.length === 0) {
-          smartPayButton.mount("#smart-pay-button");
-        }
-        smartPayContainer.style.display = "block";
-      } else {
-        smartPayContainer.style.display = "none";
-      }
-    });
+  //   paymentRequest.canMakePayment().then((result) => {
+  //     console.log("canMakePayment result:", result);
+  //     if (result && (result.googlePay || result.applePay)) {
+  //       if (smartPayContainer.children.length === 0) {
+  //         smartPayButton.mount("#smart-pay-button");
+  //       }
+  //       smartPayContainer.style.display = "block";
+  //     } else {
+  //       smartPayContainer.style.display = "none";
+  //     }
+  //   });
+  //   paymentRequest.on("paymentmethod", async (ev) => {
+  //     console.log("Shipping address fornecido pelo Google/Apple Pay:", ev.shippingAddress);
+  //     if (!ev.paymentMethod || !ev.paymentMethod.id) {
+  //       console.error("paymentMethod ID ausente");
+  //       ev.complete("fail");
+  //       if (message) message.textContent = "Erro ao processar o pagamento.";
+  //       return;
+  //     }
 
-    // paymentRequest.canMakePayment().then( result => {
-    //   console.log("canMakePayment", result)
-    //    if (result && (result.applePay || result.googlePay)) {
-    //     smartPayButton.mount("#smart-pay-button");
-    //     document.querySelector(".google-pay-details").style.display = "block";
-    //    } else {
-    //      document.querySelector(".google-pay-details").style.display = "none";
-    //   }
-    //   if (result && result.link) {
-    //     const payBtn = document.getElementById("submit");
-    //     smartPayButton.mount("#link-button");
-    //     document.getElementById("link-button").style.display = "block";
-    //   }
-    // })
-    
-    // paymentRequest.canMakePayment().then((result) => {
-    //   console.log("canMakePayment result:", result);
-    //   const payBtn = document.getElementById("submit");
+  //     const shipping = {
+  //       name: ev.payerName || ev.shippingAddress.recipient || "Cliente",
+  //       address: {
+  //         line1: ev.shippingAddress.addressLine?.[0] || "",
+  //         city: ev.shippingAddress.city || "",
+  //         state: ev.shippingAddress.region || "",
+  //         postal_code: ev.shippingAddress.postalCode || "",
+  //         country: ev.shippingAddress.country || "US"
+  //       }
+  //     };
 
-    //   if (result && (result.applePay || result.googlePay)) {
-    //     smartPayButton.mount("#smart-pay-button");
-    //     document.querySelector(".google-pay-details").style.display = "block";
-    //   } else {
-    //     document.querySelector(".google-pay-details").style.display = "none";
-    //   }
-    //   if (result && result.link) {
-    //     const payBtn = document.getElementById("submit");
-    //     smartPayButton.mount("#link-button");
-    //     document.getElementById("link-button").style.display = "block";
-    //   }
-    // });
-    paymentRequest.on("paymentmethod", async (ev) => {
-      const { error } = await stripe.confirmCardPayment(window.clientSecret, {
-        payment_method: ev.paymentMethod.id,
-        shipping: {
-          name: ev.payerName,
-        },
-        receipt_email: ev.payerEmail
-      });
+  //     const email = ev.payerEmail || "";
+  //     await fetch("/update-payment-intent", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         payment_intent_id: window.clientSecret.split("_secret")[0],
+  //         email,
+  //         shipping
+  //       })
+  //     });
 
-      if (error) {
-        ev.complete("fail");
-        message.textContent = error.message;
-      } else {
-        ev.complete("success");
-        window.location.href = "https://superment.co/supersleep/sucess/";
-      }
-    });
-  }
+
+  //     console.log("Dados do pagamento:");
+  //     console.log("Email:", email);
+  //     console.log("Nome:", shipping.name);
+  //     console.log("Endereço:", shipping.address);
+
+  //     const { error } = await stripe.confirmCardPayment(window.clientSecret, {
+  //       payment_method: ev.paymentMethod.id
+  //     });
+
+  //     if (error) {
+  //       ev.complete("fail");
+  //       if (message) message.textContent = error.message;
+  //     } else {
+  //       ev.complete("success");
+  //       window.location.href = "https://superment.co/supersleep/sucess/";
+  //     }
+  //   });
+  // }
+
+  //   paymentRequest.on("paymentmethod", async (ev) => {
+  //     if (!ev.paymentMethod || !ev.paymentMethod.id) {
+  //       console.error("paymentMethod ID ausente");
+  //       ev.complete("fail");
+  //       if (message) message.textContent = "Erro ao processar o pagamento.";
+  //       return;
+  //     }
+  //     const email = document.getElementById("email")?.value || "";
+  //     const name = document.getElementById("name")?.value || "Cliente";
+  //     const shipping = {
+  //       name,
+  //       address: {
+  //         line1: document.getElementById("shippingAddressLine1")?.value || "",
+  //         city: document.getElementById("shippingLocality")?.value || "",
+  //         state: document.getElementById("shippingAdministrativeArea")?.value || "",
+  //         postal_code: document.getElementById("shippingPostalCode")?.value || "",
+  //         country: "US"
+  //       }
+  //     };
+  //     console.log("Dados do pagamento:");
+  //     console.log("Email:", email);
+  //     console.log("Nome:", name);
+  //     console.log("Endereço:", shipping.address);
+
+  //     const { error } = await stripe.confirmCardPayment(window.clientSecret, {
+  //       payment_method: ev.paymentMethod.id,
+  //       shipping,
+  //       receipt_email: email,
+  //     });
+
+  //     if (error) {
+  //       ev.complete("fail");
+  //       if (message) message.textContent = error.message;
+  //     } else {
+  //       ev.complete("success");
+  //       window.location.href = "https://superment.co/supersleep/sucess/";
+  //     }
+  //   });
+  // }
+//     const smartPayContainer = document.getElementById("smart-pay-button");
+
+//     paymentRequest.canMakePayment().then((result) => {
+//       console.log("canMakePayment result:", result);
+//       if (result && (result.googlePay || result.applePay)) {
+//         if (smartPayContainer.children.length === 0) {
+//           smartPayButton.mount("#smart-pay-button");
+//         }
+//         smartPayContainer.style.display = "block";
+//       } else {
+//         smartPayContainer.style.display = "none";
+//       }
+//     });
+//     if (!ev.paymentMethod || !ev.paymentMethod.id) {
+//       console.error("paymentMethod ID ausente");
+//       ev.complete("fail");
+//       message.textContent = "Erro ao processar o pagamento.";
+//       return;
+// }
+//     paymentRequest.on("paymentmethod", async (ev) => {
+//       const { error } = await stripe.confirmCardPayment(window.clientSecret, {
+//         payment_method: ev.paymentMethod.id,
+//         shipping: {
+//           name: ev.payerName,
+//         },
+//         receipt_email: ev.payerEmail
+//       });
+
+//       if (error) {
+//         ev.complete("fail");
+//         message.textContent = error.message;
+//       } else {
+//         ev.complete("success");
+//         window.location.href = "https://superment.co/supersleep/sucess/";
+//       }
+//     });
+//   }
 
   // === Alternância UI ===
   // const cardRadio = document.getElementById("payment-method-card");
@@ -200,14 +335,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // === SUBMIT com Cartão ===
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    // if (googleRadio.checked) {
-    //   // Google Pay não precisa de submit manual
-    //   message.textContent = "Finalize o pagamento com o botão do Google acima.";
-    //   return;
-    // }
-
     const email = document.getElementById("email").value;
+
     const shipping = {
       name: document.getElementById("name").value,
       address: {
@@ -218,13 +347,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         country: "US"
       }
     };
+    
+    const billing = {
+      name: document.getElementById("billing-name")?.value || shipping.name,
+      address: {
+        line1: document.getElementById("billing-line1")?.value || "",
+        line2: document.getElementById("billing-line2")?.value || "",
+        city: document.getElementById("billing-city")?.value || "",
+        state: document.getElementById("billing-state")?.value || "",
+        postal_code: document.getElementById("billing-postal")?.value || "",
+        country: document.getElementById("billing-country").value
+      }
+    };
+    console.log("BILLING", billing)
+
     const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
       type: 'card',
       card: cardNumber,
       billing_details: {
         email: email,
-        name: shipping.name,
-        address: shipping.address
+        name: billing.name,
+        address: billing.address
       }
     });
     if (paymentMethodError) {
@@ -240,13 +383,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (confirmError) {
       message.textContent = confirmError.message;
     } else {
-      window.location.href = "https://superment.co/supersleep/sucess/";
+      window.location.href = "https://checkout.superment.co/thanks";
     }
   });
+
   // PRODUCT
-  const triggers = document.querySelectorAll('.details-trigger');
-  const details = document.getElementById('product-details');
   const overlay = document.getElementById('accordionOverlay');
+  const details = document.getElementById('product-details');
+  const triggers = document.querySelectorAll('.details-trigger');
 
   if (window.innerWidth < 769) {
     triggers.forEach(trigger => {
@@ -254,19 +398,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const isOpen = overlay.classList.toggle('show');
         details.classList.toggle('open');
 
-        // Atualiza texto de todos os botões
+        // Atualiza o texto em todos os botões
         triggers.forEach(btn => {
           btn.textContent = isOpen ? 'Close ▴' : 'View details ▾';
         });
       });
     });
 
-    // Clicar fora fecha
     overlay.addEventListener('click', (e) => {
       if (!details.contains(e.target)) {
         overlay.classList.remove('show');
         details.classList.remove('open');
-
         triggers.forEach(btn => {
           btn.textContent = 'View details ▾';
         });
@@ -276,27 +418,81 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //Shipping
 
-  const toggleLink = document.getElementById("showMoreFields");
-  const extraFields = document.getElementById("extraFields");
-  const addressLine1 = document.getElementById("shippingAddressLine1");
+  // === BILLING ===
+  const billingCheckbox = document.getElementById("showBillingFields");
+  const billingContainer = document.getElementById("groupShipping-billing");
+  const billingExtraFields = document.getElementById("billingExtraFields");
+  const billingToggleLink = document.getElementById("showMoreFields-billing");
+  const billingLine1 = document.getElementById("billing-line1");
 
-
-  function expandAddressFields() {
-    if (extraFields && toggleLink) {
-      extraFields.style.display = "block";
-      toggleLink.style.display = "none";
-      addressLine1.classList.add("expanded");
+  function initializeBillingFields() {
+    if (billingCheckbox.checked) {
+      billingContainer.style.display = "none";
     }
   }
-  if (toggleLink && extraFields && addressLine1) {
-    toggleLink.addEventListener("click", (e) => {
+
+  function toggleBillingFieldsFromCheckbox() {
+    if (billingCheckbox.checked) {
+      billingContainer.style.display = "none";
+      billingExtraFields.style.display = "none";
+      billingToggleLink.style.display = "none";
+      billingLine1.classList.remove("expanded");
+    } else {
+      billingContainer.style.display = "block";
+      billingExtraFields.style.display = "none";
+      billingToggleLink.style.display = "block";
+      billingLine1.classList.remove("expanded");
+    }
+  }
+
+  function toggleBillingFieldsFromLink(e) {
+    e.preventDefault();
+    billingExtraFields.style.display = "block";
+    billingToggleLink.style.display = "none";
+    billingLine1.classList.add("expanded");
+    billingLine1.classList.add("expanded")
+
+  }
+
+  billingCheckbox.addEventListener("change", toggleBillingFieldsFromCheckbox);
+  billingToggleLink.addEventListener("click", toggleBillingFieldsFromLink);
+  initializeBillingFields();
+
+
+  // === SHIPPING ===
+  const shippingToggleLink = document.getElementById("showMoreFields");
+  const shippingExtraFields = document.getElementById("extraFields");
+  const shippingLine1 = document.getElementById("shippingAddressLine1");
+
+  function expandShippingAddressFields() {
+    if (shippingExtraFields && shippingToggleLink) {
+      shippingExtraFields.style.display = "block";
+      shippingToggleLink.style.display = "none";
+      shippingLine1.classList.add("expanded");
+    }
+  }
+
+  if (shippingToggleLink && shippingExtraFields && shippingLine1) {
+    shippingToggleLink.addEventListener("click", (e) => {
       e.preventDefault();
-      expandAddressFields();
+      expandShippingAddressFields();
     });
-    addressLine1.addEventListener("blur", () => {
-      if (addressLine1.value.trim().length > 3) {
-        expandAddressFields();
+
+    shippingLine1.addEventListener("blur", () => {
+      if (shippingLine1.value.trim().length > 3) {
+        expandShippingAddressFields();
       }
     });
   }
-});
+
+  async function goToCheckout(productId) {
+  const res = await fetch(`/get-price-id?product_id=${productId}`);
+  const data = await res.json();
+  
+    if (data.price_id) {
+      window.location.href = `/checkout?price_id=${data.price_id}`;
+    } else {
+      alert("Erro ao obter preço.");
+    }
+  }
+})

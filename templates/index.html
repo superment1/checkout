@@ -1,23 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Superment Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/basil/stripe.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ Maps_API_KEY}}&libraries=places&callback=initAutocomplete" async defer></script>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json">    
     <link rel="icon" href="/static/img/favicon.ico">
-    <!-- <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/static/js/service-worker.js")
-            .then(reg => console.log("SW registered ✅"))
-            .catch(err => console.warn("SW failed ❌", err));
-        }
-    </script> -->
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
@@ -41,7 +33,7 @@
                 <span class="voltar">Back</span>
             </a>
         </div>
-        <div id="details-toggle" class="details-trigger">Details ▾</div>
+        <div class="details-trigger">Details ▾</div>
         </div>
     </header>
     <div class="head-desk">
@@ -60,18 +52,16 @@
                 <!-- ACCORDION -->
                 <div class="accordion-overlay" id="accordionOverlay">
                     <div id="product-details" class="product-details mobile-only accordion-content">
-                        <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
+                        <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
                         <div class="sumary-product">
                             <div class="product-row-mobile">
                                 <div class="product-info">
                                     <div class="product-col">
-                                        <p> {{product.name}} </p>
-                                        <p> {{product.description}}</p>
+                                        <p> Super Natural Sleep BR </p>
+                                        <p> None</p>
                                     </div>
                                     <span class="product-price">
-                                        {{"R$" if product.currency == "brl" else "$" }} {{
-                                        "%.2f"|format(price.unit_amount /
-                                        100) }}
+                                        $ 250.00
                                     </span>
                                 </div>
                             </div>
@@ -80,8 +70,7 @@
                                     <div class="product-row">
                                         <p class="product-text">Subtotal</p>
                                         <span class="product-price">
-                                            {{"R$" if product.currency == "brl" else "$" }} {{
-                                            "%.2f"|format(price.unit_amount / 100) }}
+                                            $ 250.00
                                         </span>
                                     </div>
                                     <div class="product-row">
@@ -96,9 +85,7 @@
                             <div class="product-row product-text">
                                 <p class="product-text">Total Due</p>
                                 <span>
-                                    {{"R$" if product.currency == "brl" else "$" }} {{
-                                    "%.2f"|format((price.unit_amount +
-                                    490) / 100 )}}
+                                    $ 254.90
                                 </span>
                             </div>
                         </div>
@@ -119,35 +106,30 @@
 
                 <!-- HERO MOBILE  -->
                 <div class="mobile-hero">
-                    <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
-                    <h2> {{product.name}} </h2>
+                    <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
+                    <h2> Super Natural Sleep BR </h2>
                     <span class="title-price">
-                        {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount + 490) /
-                        100
-                        )}}
+                        $ 254.90
                     </span>
-                    <div id="details-toggle" class="details-trigger">View details ▾</div>
+                <div class="details-trigger">View details ▾</div>
                 </div>
                 <!-- DETAILS DESKTOP -->
                 <div class="desktop-only-title">
                     <p class="desktop-only-title"> Pay Superment</p>
                     <span class="title-price">
-                        {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount + 490) /
-                        100
-                        )}}
+                        $ 254.90
                     </span>
                 </div>
                 <div id="product-details" class="product-details desktop-only">
-                    <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="160" />
+                    <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
                     <div class="sumary-product">
                         <div class="product-row">
                             <div class="product-col">
-                                <p> {{product.name}} </p>
-                                <p> {{product.description}}</p>
+                                <p> Super Natural Sleep BR </p>
+                                <p> None</p>
                             </div>
                             <span class="product-price">
-                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format(price.unit_amount /
-                                100) }}
+                                $ 250.00
                             </span>
                         </div>
                         <div class="product-row">
@@ -155,8 +137,7 @@
                                 <div class="product-row">
                                     <p class="product-text">Subtotal</p>
                                     <span class="product-price">
-                                        {{"R$" if product.currency == "brl" else "$" }} {{
-                                        "%.2f"|format(price.unit_amount / 100) }}
+                                        $ 250.00
                                     </span>
                                 </div>
                                 <div class="product-row">
@@ -171,8 +152,7 @@
                         <div class="product-row product-text">
                             <p class="product-text">Total due</p>
                             <span>
-                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount +
-                                490) / 100 )}}
+                                $ 254.90
                             </span>
                         </div>
                     </div>
@@ -180,12 +160,12 @@
             </div>
         </div>
         <!-- PAYMENT -->
-        <div class="checkout-right">
-            <div id="smart-pay-button" class="google-pay-details only-mobile" style="display: none;"></div>
-            <div id="link-button" class="link-pay-details only-mobile" style="display: none;"></div>
+        <div class="checkout-right">           
+            <div id="express-checkout-element" class="google-pay-details only-mobile" ></div>            
             <form id="payment-form">
+                <!-- No seu HTML -->          
                 <div class="custom-divider"><span>Or</span></div>
-                <div class="title1"> Shipping information</div>
+                <div class="title3"> Shipping information</div>
                 <div class="email-form">
                     <label class="title" for="email">E-mail</label>
                     <input id="email" class="input-field" name="email" type="email" placeholder="email@example.com" required />
@@ -216,7 +196,7 @@
                                     placeholder="ZIP code" type="text" />
                             </div>
                         </div>
-                        <div class="input-wrapper">
+                        <div class="select-wrapper">
                             <select id="shippingAdministrativeArea" class="Select-source input-field"
                                 name="shippingAdministrativeArea" placeholder="State" required>
                                 <option value="" disabled selected>Select a state</option>
@@ -290,17 +270,52 @@
                         <div class="card-title">
                             <label class="title card-title">Card information</label>
                         </div>
-
                         <div id="card-number-element" class="StripeInput"> </div>
                         <div class="card-expiry">
                             <div id="card-expiry-element" class="StripeInput"></div>
                             <div id="card-cvc-element" class="StripeInput"></div>
                         </div>
 
-                        <div class="checkbox">
-                            <input type="checkbox" id="billing-same" class="custom-checkbox" checked>
-                            <label for="billing-same">Billing info is same as shipping</label>
+                        <div class="checkbox">                           
+                            <input type="checkbox" id="showBillingFields" class="custom-checkbox" checked>   
+                             <label class="title-billing">Shipping Address</label>                        
                         </div>
+                        <div id="groupShipping-billing">
+                            <div class="input-wrapper">
+                                 <label class="title billing" for="billing-same">Name</label>
+                                <input class="input-field" type="text" id="billing-name" name="billing_name" placeholder="Full name" required>
+                            </div>                            
+                            <div id="groupShipping">
+                                <label class="title billing">Billing address</label>    
+                            </div>      
+                            <div class="groupShipBilling">
+                                <div id="Country-adress">
+                                    <div class="select-wrapper">
+                                        <select  class="Select-source input-field" id="billing-country" name="billing-country" placeholder="Country" required>
+                                            <option value="" disabled selected>Select a country</option>
+                                        </select>
+                                    </div>                                                                              
+                                    <div class="input-wrapper">
+                                        <input class="input-field" type="text" id="billing-line1" name="billing_line1" placeholder="Street address" required>
+                                    </div>
+                                </div>                             
+                                <div id="billingExtraFields" style="display: none;">
+                                    <div class="input-wrapper">
+                                        <input class="input-field" type="text" id="billing-line2" name="billing_line2" placeholder="Address line 2 (optional)">
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input class="input-field" type="text" id="billing-city" name="billing_city" placeholder="City" required>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input  class="input-field" id="billing-state" name="billing_state" placeholder="State" required>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <input class="input-field" type="text" id="billing-postal" name="billing_postal" placeholder="Postal Code" required>
+                                    </div>     
+                                </div>                                                   
+                            </div>           
+                            <a href="#" id="showMoreFields-billing" style="display: none; margin-top: 8px;"> Fill in the address manually</a>       
+                        </div>                                   
                     </div>
                     <!-- <div class="save-information">
                         <input class="custom-checkbox" type="checkbox">
@@ -312,13 +327,10 @@
                 </div>
                
                 <div id="payment-buttons">
-                    <!-- <p id="payment-message"></p> -->
+                    <div id="payment-message" style="color: red; margin-top: 10px;"></div>
                     <button class="btn-pay" type="submit" id="submit">Pay</button>
                 </div>
-                <!-- FOOTER -->
-
-                <div id="smart-pay-button" class="google-pay-details desktop-only" style="display: none;"></div>
-                <div id="link-button" class="link-pay-details desktop-only" style="display: none;"></div>    
+                <!-- FOOTER -->          
                 
                 <div class="stripe-footer">
                     <a href="https://stripe.com/"><strong>stripe</strong></span>
@@ -342,19 +354,18 @@
 
 
         <!-- <p class="title-details">Order details</p> -->
-        <!-- MOBILE DETAILS -->
+        <!-- MOBILE DETAILS  AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA -->
         <!-- <div id="product-details" class="product-details mobile-only">                    
                     <div class="sumary-product">
                         <div class="product-row-mobile">
-                            <img src="{{ product.images[0] }}" class="img-product" alt="Imagem do Produto" width="100" />
+                            <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="100" />
                             <div class="product-info">
                                 <div class="product-col">
-                                    <p> {{product.name}} </p>
-                                    <p> {{product.description}}</p>
+                                    <p> Super Natural Sleep BR </p>
+                                    <p> None</p>
                                 </div>                            
                                 <span class="product-price">
-                                    {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format(price.unit_amount /
-                                    100) }}
+                                    $ 250.00
                                 </span>
                             </div>
                         </div>
@@ -363,8 +374,7 @@
                                 <div class="product-row">
                                     <p class="product-text">Subtotal</p>
                                     <span class="product-price">
-                                        {{"R$" if product.currency == "brl" else "$" }} {{
-                                        "%.2f"|format(price.unit_amount / 100) }}
+                                        $ 250.00
                                     </span>
                                 </div>
                                 <div class="product-row">
@@ -379,8 +389,7 @@
                         <div class="product-row product-text">
                             <p class="product-text">Total due</p>
                             <span>
-                                {{"R$" if product.currency == "brl" else "$" }} {{ "%.2f"|format((price.unit_amount +
-                                490) / 100 )}}
+                                $ 254.90
                             </span>
                         </div>
                     </div>
@@ -391,13 +400,13 @@
     </div>
     </div>
     <script>
-        window.publishableKey = "{{ publishable_key }}";
-        window.Maps_API_KEY = "{{ Maps_API_KEY }}";
-        window.clientSecret = "{{ client_secret }}";
-        window.productPrice = "{{ (price.unit_amount + 490) | int }}";
-        window.productCurrency = "{{ product.currency }}";
+        window.publishableKey = "pk_live_51RdY7XJCTsFya4e2zTbX2ewLbFjPdtBv7x1OZBsqxQAqqyJ5tPvsFV4ETsUSCmvucmtVFh2WpCKSqSTQy0C7Cxnz00yRJZqr4D";
+        window.clientSecret = "pi_3Rp8fMJCTsFya4e20WOAB2xN_secret_7cIxWCNMAedEr4zYNSNGEi3W5";
+        window.productPrice = "25000";
+        window.productCurrency = "";
+        window.api_key = "AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA"
 
-        function initAutocomplete() {
+        function initShippingAutocomplete() {
             const input = document.getElementById('shippingAddressLine1');
             const extraFieldsContainer = document.getElementById('extraFields');
             const shippingAddressLine2 = document.getElementById('shippingAddressLine2');
@@ -445,10 +454,7 @@
                     return;
                 }  
                 extraFieldsContainer.style.display = 'block';
-
-                console.log("Endereço completo selecionado:", place.formatted_address);
-                console.log("Latitude:", place.geometry.location.lat());
-                console.log("Longitude:", place.geometry.location.lng());
+               
                 let streetNumber = '';
                 let streetName = '';
                 let city = '';
@@ -463,39 +469,105 @@
                         streetNumber = component.long_name;
                     } else if (type === 'route') {
                         streetName = component.long_name;
-                    } else if (type === 'locality') { // Cidade
+                    } else if (type === 'locality') {
                         city = component.long_name;
-                    } else if (type === 'administrative_area_level_1') { // Estado/Província
-                        stateAbbreviation = component.short_name; // Ex: "CA" para Califórnia
-                    } else if (type === 'postal_code') { // CEP
+                    } else if (type === 'administrative_area_level_1') { 
+                        stateAbbreviation = component.short_name; 
+                    } else if (type === 'postal_code') { 
                         postalCode = component.long_name;
                     }
-                    // Você pode adicionar mais condições para outros tipos, como 'sublocality' para bairro
+                   
                 }
-                // Preenche os campos do formulário
-                input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`; // Linha 1: Número + Rua
+              
+
+                input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
                 shippingLocality.value = city;
                 shippingPostalCode.value = postalCode;
 
-                // Seleciona a opção correta no dropdown de estado
                 if (stateAbbreviation) {
                     shippingAdministrativeArea.value = stateAbbreviation;
                 }
 
-
-                console.log("Rua:", streetName);
-                console.log("Número:", streetNumber);
-                console.log("Cidade:", city);
-                console.log("Estado:", state);
-                console.log("CEP:", postalCode);
-
-                // Se você tiver outros campos, por exemplo:
-                // document.getElementById('shippingStreetName').value = streetName;
-                // document.getElementById('shippingStreetNumber').value = streetNumber;
-                // ... e assim por diante
             });
         }
+        function initBillingAutocomplete() {
+            const input = document.getElementById('billing-line1');
+            const extraFieldsContainer = document.getElementById('billingExtraFields');
+            const billingLine2 = document.getElementById('billing-line2');
+            const billingCity = document.getElementById('billing-city');
+            const billingPostalCode = document.getElementById('billing-postal');
+            const billingState = document.getElementById('billing-state');
+            const billingCountry = document.getElementById('billing-country');
+
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['address'],
+                componentRestrictions: { country: ['us'] },
+                fields: ['address_components', 'geometry', 'formatted_address']
+            });
+
+            autocomplete.addListener('place_changed', function () {
+                const place = autocomplete.getPlace();
+
+                billingLine2.value = '';
+                billingCity.value = '';
+                billingPostalCode.value = '';
+                billingState.value = '';
+                extraFieldsContainer.style.display = 'block';
+                
+                let country = '';
+                let streetNumber = '';
+                let streetName = '';
+                let city = '';
+                let stateAbbreviation = '';
+                let postalCode = '';
+
+                for (const component of place.address_components) {
+                    const type = component.types[0];
+                    if (type === 'country') {
+                        country = component.long_name;     
+                    } else if(type === 'street_number') {
+                        streetNumber = component.long_name;
+                    } else if (type === 'route') {
+                        streetName = component.long_name;
+                    } else if (type === 'locality') {
+                        city = component.long_name;
+                    } else if (type === 'administrative_area_level_1') {
+                        stateAbbreviation = component.short_name;
+                    } else if (type === 'postal_code') {
+                        postalCode = component.long_name;
+                    }
+                }
+                
+
+                input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
+                billingCity.value = city;
+                billingPostalCode.value = postalCode;
+                if (stateAbbreviation) billingState.value = stateAbbreviation;   
+                const billingLine1 = document.getElementById("billing-line1");      
+                if (billingLine1){
+                    billingLine1.classList.add("expanded");
+                }       
+
+            });
+        }
+        function initAutocomplete() {
+            initShippingAutocomplete();
+            initBillingAutocomplete();
+        }
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete&loading=async" async defer></script>
+    <script src="/static/js/data/country.js"></script>
+        <script>
+        const select = document.getElementById("billing-country");
+            if (select && window.countryList) {
+                window.countryList.forEach(country => {
+                    const option = document.createElement("option");
+                    option.value = country.value;
+                    option.textContent = country.label;
+                    select.appendChild(option);
+                });               
+            }               
+        </script> 
     </script>
     <script src="/static/js/checkout.js"></script>
 </body>

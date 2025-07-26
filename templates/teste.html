@@ -9,74 +9,20 @@
     <button href="/get-price-id?" id="buy-button" data-product-id="prod_ScV0CEYhFRKr6v">
         Comprar agora
     </button>
-<!-- 
+    <div id="smart-pay-button" class="google-pay-details only-mobile" style="display: block;"></div>
+
+
+    <!-- 
          <label class="title">Dados do cartão</label>
-                            <div class="card-wrapper">
-                                <div class="card-icons">
-                                <img src="../static/img/visa.svg" alt="visa">
-                                <img src="../static/img/mastercard.svg" alt="mastercard">
-                                 <div id="card-number-element" class="StripeInput"> </div>
-                            </div>
-                            -->
+          <div class="card-wrapper">
+              <div class="card-icons">
+              <img src="../static/img/visa.svg" alt="visa">
+              <img src="../static/img/mastercard.svg" alt="mastercard">
+                <div id="card-number-element" class="StripeInput"> </div>
+          </div>
+          -->
 </body>
 </html>
-
-  <!-- // const price = parseInt(window.productPrice || 0);
-  // const currency = window.productCurrency || "usd";
-  // if (price <= 0) {
-  //   console.error("⚠️ Valor inválido para o produto. Abortando Google Pay.");
-  // } else {
-  //   const paymentRequest = stripe.paymentRequest({
-  //     country: "US",
-  //     currency: currency,
-  //     total: {
-  //       label: "Total",
-  //       amount: price,
-  //     },
-  //     requestPayerName: true,
-  //     requestPayerEmail: true,
-  //     requestShipping: false,
-  //   });
-  // }
-
-  // const smartPayButton = elements.create("paymentRequestButton", {
-  //   paymentRequest,
-  //   style: {
-  //     paymentRequestButton: {
-  //       type: "default",
-  //       theme: "dark",
-  //       height: "40px"
-  //     }
-  //   }
-  // });
-
-  // paymentRequest.canMakePayment().then((result) => {
-  //   console.log("canMakePayment result:", result);
-  //   if (result) {
-  //     smartPayButton.mount("#smart-pay-button");
-  //   } else {
-  //     document.querySelector(".google-pay-details").style.display = "none";
-  //   }
-
-  // });
-
-  // paymentRequest.on("paymentmethod", async (ev) => {
-  //   const { error } = await stripe.confirmCardPayment(window.clientSecret, {
-  //     payment_method: ev.paymentMethod.id,
-  //     shipping: {
-  //       name: ev.payerName,
-  //     },
-  //     receipt_email: ev.payerEmail
-  //   });
-
-  //   if (error) {
-  //     ev.complete("fail");
-  //     message.textContent = error.message;
-  //   } else {
-  //     ev.complete("success");
-  //     window.location.href = "https://superment.co/supersleep/sucess/";
-  //   }
-  // }); -->
 
 <script>
 document.getElementById("buy-button").addEventListener("click", async () => {

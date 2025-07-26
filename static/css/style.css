@@ -66,7 +66,23 @@ h1{
   padding-top: 0.75rem;
   padding-bottom: 0.25rem;
 }
-
+.title-billing {
+  font-size: 13px;
+  color: #1a1a1ab2;
+  font-weight: 500;
+  padding-bottom: 0.25rem;
+}
+.title3 {
+  font-size: 16px;
+  color: #1a1a1ae6;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+#express-checkout-element {
+  min-height: 50px; /* ou mais, dependendo da altura do botão */
+  display: block;
+}
 .title1 {
   font-size: 16px;
   color: #1a1a1ae6;
@@ -437,7 +453,36 @@ input, select {
   border-right: 1px solid #e8e8e8;
   border-bottom: none;
   font-size: 14px;
-  padding: 10px 12px;
+  padding: 10px 12px !important;
+}
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #e8e8e8;
+  box-sizing: border-box;
+}
+
+/* Seta customizada */
+.select-wrapper::after {
+  content: "▾";
+  font-size: 16px;
+  color: #888;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .InputGroup {
@@ -446,13 +491,17 @@ input, select {
 .groupShipping{
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
   border-radius: 999px;
-  overflow: visible
+  overflow: visible;
+}
+
+
+#groupShipping{
+  margin-bottom: 7px;
 }
 /* Container geral dos elementos */
 #card-elements, #payment-element {
   display: flex;
   flex-direction: column;
-  margin-bottom: 12px;
   overflow: hidden;
 
 }
@@ -521,7 +570,32 @@ input, select {
 .hidden {
   display: none;
 }
+.custom-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.custom-divider::before,
+.custom-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
 
+.custom-divider::before {
+  margin-right: 10px;
+}
+
+.custom-divider::after {
+  margin-left: 10px;
+}
+
+.custom-divider span {
+  white-space: nowrap;
+  color: #888;
+  font-weight: 500;
+  font-size: 14px;
+}
 .payment-option label.payment-label {
   display: flex;
   align-items: center;
@@ -652,7 +726,6 @@ input, select {
 #payment-form {
   max-width: 380px;
   margin: 0 auto 0 10%;
-  margin-top: 30px;
   gap: 5px;
 }
 
@@ -766,6 +839,58 @@ button {
   border-color: #66bfff;
   box-shadow: 0 0 0 3px rgba(102, 191, 255, 0.3);
 }
+#showMoreFields-billing{
+  color: #1a1a1ab2;
+  font-size: 12px;
+  text-decoration: underline dotted;
+}
+.billing{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+#billing-country{
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  color:#9c9c9c
+}
+.input-field.expanded {
+  border-bottom: none !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+#billing-line1{
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  border-bottom: 1px solid #e8e8e8;
+}
+#billing-line1.expanded{
+  border-bottom: none !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+#billing-postal{
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  border-bottom: 1px solid #e8e8e8;
+
+}
+#billing-name {
+  border: 1px solid #e8e8e8;
+  border-radius: 20px; 
+  padding: 13px 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  outline: none;
+  width: 100%;
+  transition: box-shadow 0.2s ease-in-out;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
+
+#billing-name:focus {
+  border: 1px solid #66bfff;
+  border-color: #66bfff;
+  box-shadow: 0 0 0 3px rgba(102, 191, 255, 0.3);
+}
 .arrow {
   width: 20px;
   height: 20px;
@@ -832,10 +957,6 @@ button {
   text-decoration: underline dotted;
   cursor: pointer;
 }
-.custom-divider{
-  display: none;
-}
-
 /* Responsivo */
 @media (max-width: 768px) {
   .checkout-container {
@@ -969,4 +1090,11 @@ button {
 .stripe-footer a {
   color: inherit;
   text-decoration: none;
+}
+
+.pac-container {
+  top: -1 !important;
+  z-index: 999 !important;
+  margin-top: -30px !important;
+  transform: translateY(-100%) !important;
 }
