@@ -36,6 +36,126 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     collectShippingAddress: true,
   });
+   function isDesktop() {
+    const desktopInput = document.getElementById("coupon-code-desktop");
+    return desktopInput && desktopInput.offsetParent !== null;
+  }
+
+  function getId(base) {
+    return isDesktop() ? `${base}-desktop` : base;
+  }
+  function $(id) {
+    return document.getElementById(getId(id));
+  }
+
+  const couponInput = $("coupon-code");
+  const applyButton = $("apply-coupon");
+  const messageBox = $("coupon-message");
+  const btnSpinner = applyButton.querySelector(".btn-spinner");
+  const btnLabel = applyButton.querySelector(".btn-label");
+  const discountValue = $("discount-value");
+  const cancelButton = $("cancel-coupon");
+  const couponIcon = $("coupon-valid-icon");
+  const totalPriceElement = document.getElementById("total-price");
+  const titlePriceDesk = document.getElementById("title-price-desk")
+  const totalPriceDesk = document.getElementById("total-price-desk")
+  
+  const titlePriceMobile = document.getElementById("title-price-mobile")
+  const discountAmount = $("discount-amount");
+
+  let totalText = totalPriceElement.textContent.trim();
+  let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
+
+  couponInput.addEventListener("focus", () => {
+    couponInput.classList.add("focused");
+  });
+
+  couponInput.addEventListener("input", () => {
+    if (couponInput.value.trim()) {
+      applyButton.style.display = "inline-block";
+      btnLabel.style.display = "inline-block";
+      btnSpinner.style.display = "none";
+    } else {
+      btnLabel.style.display = "none";
+    }
+  });
+  // couponInput.addEventListener("blur", () => {
+  //   couponInput.classList.remove("focused");
+  // });
+  cancelButton.addEventListener("click", () => {
+    couponInput.disabled = false;
+    couponInput.value = "";
+    couponInput.placeholder = "Enter your coupon code";
+    cancelButton.style.display = "none";
+    discountValue.textContent = "";
+    btnLabel.style.display = "inline-block";
+    couponIcon.style.display = "none"
+    discountAmount.style.display = "none";
+  });
+  applyButton.addEventListener("click", async () => {
+    const code = couponInput.value.trim();
+    messageBox.textContent = ""; 
+    messageBox.style.color = ""; 
+    if (!code) {
+      messageBox.textContent = "Please enter a coupon code.";
+      messageBox.style.color = "red";
+      return;
+    }
+    btnLabel.style.display = "none";
+    btnSpinner.style.display = "inline-block";
+
+    try {
+      const paymentIntentId = window.clientSecret.split("_secret")[0];
+
+      const response = await fetch("/validate-coupon", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ coupon: code, payment_intent_id: paymentIntentId })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        messageBox.textContent = result.error || "Invalid coupon.";
+        messageBox.style.color = "red";
+        btnSpinner.style.display = "none";
+
+        return;
+      }
+      const discount = result.discount;
+      const newClientSecret = result.new_client_secret;
+
+      couponInput.placeholder = code;
+      couponInput.disabled = true;
+      cancelButton.style.display = "inline-block"; 
+      couponInput.classList.remove("focused");
+      discountValue.style.display = "inline"; 
+      discountValue.textContent = `${result.discount}% discount`;
+      btnSpinner.style.display = "none";
+      couponIcon.style.display = "block"
+      const discountedPrice = (totalNumber * (1 - discount / 100)).toFixed(2);
+      totalPriceElement.textContent = `US$ ${discountedPrice}`; 
+      titlePriceDesk.textContent = `US$ ${discountedPrice}`;
+      titlePriceMobile.textContent = `US$ ${discountedPrice}`;
+      totalPriceDesk.textContent = `US$ ${discountedPrice}`;
+      const amountOff = (totalNumber - discountedPrice).toFixed(2);
+      discountAmount.style.display = "inline";
+      discountAmount.textContent = `-US$ ${amountOff}`;
+
+      console.log("Cupom válido:", result);
+
+      window.clientSecret = newClientSecret;
+      window.paymentIntentId = result.paymentIntentId;
+      elements.update({ clientSecret: newClientSecret });
+
+    } catch (err) {
+      console.error("Erro ao validar cupom:", err);
+      alert("Erro na validação do cupom.");
+      btnLabel.style.display = "inline-block";
+    }
+  });
 
   expressCheckoutElement.mount("#express-checkout-element");
   expressCheckoutElement.on('ready', () => {
@@ -102,8 +222,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // const price = parseInt(window.productPrice || 0);
   // const shippingAmount = 490;
-  
-  
   // if (price <= 0) {
   //   console.error("Valor inválido para o produto. Abortando Google Pay.");
   // } else {
@@ -391,6 +509,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const overlay = document.getElementById('accordionOverlay');
   const details = document.getElementById('product-details');
   const triggers = document.querySelectorAll('.details-trigger');
+  const arrowUpSvg = `
+    <svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" style="display:inline; vertical-align:middle; margin-left:4px">
+      <path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+  const arrowDownSvg = `
+    <svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" style="display:inline; vertical-align:middle; margin-left:4px">
+      <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
 
   if (window.innerWidth < 769) {
     triggers.forEach(trigger => {
@@ -398,9 +525,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const isOpen = overlay.classList.toggle('show');
         details.classList.toggle('open');
 
-        // Atualiza o texto em todos os botões
         triggers.forEach(btn => {
-          btn.textContent = isOpen ? 'Close ▴' : 'View details ▾';
+          btn.innerHTML  = isOpen ? `Close ${arrowUpSvg}` : `View details ${arrowDownSvg}`;
         });
       });
     });
@@ -410,7 +536,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         overlay.classList.remove('show');
         details.classList.remove('open');
         triggers.forEach(btn => {
-          btn.textContent = 'View details ▾';
+          btn.innerHTML  = `View details ${arrowDownSvg}`;
         });
       }
     });

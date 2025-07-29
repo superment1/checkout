@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    
     <title>Superment Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/basil/stripe.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="manifest" href="/manifest.json">    
+    <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/static/img/favicon.ico">
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
@@ -21,6 +23,7 @@
         })(window, document, 'script', 'dataLayer', 'GTM-T6Z2ZN9H');</script>
     <!-- End Google Tag Manager -->
 </head>
+
 <body>
     <header>
         <div>
@@ -33,7 +36,14 @@
                 <span class="voltar">Back</span>
             </a>
         </div>
-        <div class="details-trigger">Details ▾</div>
+        <div class="details-trigger">
+            <span>Details</span>
+            <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"
+                style="display:inline; vertical-align:middle; margin-left:4px">
+                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </div>
         </div>
     </header>
     <div class="head-desk">
@@ -45,23 +55,23 @@
             </span>
             <span class="voltar">Back</span>
         </a>
-    </div>  
+    </div>
     <div class="checkout-container">
         <div class="checkout-left">
             <div class="product-summary">
                 <!-- ACCORDION -->
                 <div class="accordion-overlay" id="accordionOverlay">
                     <div id="product-details" class="product-details mobile-only accordion-content">
-                        <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product" width="160" />
                         <div class="sumary-product">
                             <div class="product-row-mobile">
                                 <div class="product-info">
                                     <div class="product-col">
-                                        <p> Super Natural Sleep BR </p>
-                                        <p> None</p>
+                                        <p>{{ product.name }}</p>
+                                        <p> {{ product.description }}</p>
                                     </div>
                                     <span class="product-price">
-                                        $ 250.00
+                                        US$ {{ '%.2f' | format(price.unit_amount / 100) }}
                                     </span>
                                 </div>
                             </div>
@@ -70,22 +80,58 @@
                                     <div class="product-row">
                                         <p class="product-text">Subtotal</p>
                                         <span class="product-price">
-                                            $ 250.00
+                                            US$ {{ '%.2f' | format(price.unit_amount / 100) }}
                                         </span>
+                                    </div>
+                                    <div class="product-row coupon-discount">
+                                        <div class="coupon">
+                                            <svg id="coupon-valid-icon" class="coupon-icon" focusable="false" width="12"
+                                                height="12" viewBox="0 0 12 12" fill="none" style="display:none;">
+                                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M5.76372 0.441305L11.7795 6.4757C12.0735 6.76867 12.0735 7.24365 11.7795 7.53662L7.52046 11.7803C7.22643 12.0732 6.74973 12.0732 6.4557 11.7803L0.435789 5.74171C0.156657 5.46172 0 5.08308 0 4.68843V1.50036C0 0.671734 0.674166 0 1.50579 0H4.69951C5.09908 0 5.48213 0.158844 5.76372 0.441305ZM2.625 3.75C3.24632 3.75 3.75 3.24632 3.75 2.625C3.75 2.00368 3.24632 1.5 2.625 1.5C2.00368 1.5 1.5 2.00368 1.5 2.625C1.5 3.24632 2.00368 3.75 2.625 3.75Z"
+                                                    fill="currentColor"></path>
+                                            </svg>
+                                            <input id="coupon-code" type="text" class="input-coupon mobile 1"
+                                                placeholder="Promotion Code Entry">
+                                            <button type="button" id="apply-coupon">
+                                                <span class="btn-label">Apply</span>
+                                                <span class="btn-spinner" style="display: none;">
+                                                    <svg class="spinner" viewBox="0 0 50 50">
+                                                        <defs>
+                                                            <linearGradient id="spinner-gradient" x1="0%" y1="0%"
+                                                                x2="100%" y2="0%">
+                                                                <stop offset="0%" stop-color="#2e8eca"
+                                                                    stop-opacity="1" />
+                                                                <stop offset="100%" stop-color="#2e8eca"
+                                                                    stop-opacity="0" />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <circle class="path" cx="25" cy="25" r="20" />
+                                                    </svg>
+                                                </span>
+                                            </button>
+                                            <button id="cancel-coupon"
+                                                style="position: absolute; left: 50px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
+                                            <span style="display: none" id="discount-value"></span>
+                                            <span id="discount-value"></span>
+                                            <div id="coupon-message" style="margin-top: 5px; font-size: 14px;"></div>
+                                        </div>
+                                        <span id="discount-amount"
+                                            style="display: none; margin-left: 10px; font-size: 14px; color: #ffffff9f;"></span>
                                     </div>
                                     <div class="product-row">
                                         <div class="product-col shipping">
                                             <p class="product-col shipping">Shipping</p>
                                             <p>U.S. Shipping (Up to 7 days)</p>
                                         </div>
-                                        <span class="value-shipping">$ 4,90</span>
+                                        <span class="value-shipping">US$ 4,90</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="product-row product-text">
-                                <p class="product-text">Total Due</p>
-                                <span>
-                                    $ 254.90
+                                <p class="product-text">Total due</p>
+                                <span id="total-price">
+                                    US$ {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
                                 </span>
                             </div>
                         </div>
@@ -106,30 +152,38 @@
 
                 <!-- HERO MOBILE  -->
                 <div class="mobile-hero">
-                    <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
-                    <h2> Super Natural Sleep BR </h2>
-                    <span class="title-price">
-                        $ 254.90
+                    <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product" width="160" />
+                    <p>{{ product.name }}</p>
+                    <span id="title-price-mobile">
+                        US$ {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
                     </span>
-                <div class="details-trigger">View details ▾</div>
+                    <div class="details-trigger">
+                        <span>View details</span>
+                        <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            style="display:inline; vertical-align:middle; margin-left:4px">
+                            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
                 </div>
                 <!-- DETAILS DESKTOP -->
                 <div class="desktop-only-title">
                     <p class="desktop-only-title"> Pay Superment</p>
-                    <span class="title-price">
-                        $ 254.90
+                    <span id="title-price-desk">
+                        US$ {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
                     </span>
                 </div>
                 <div id="product-details" class="product-details desktop-only">
-                    <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="160" />
+                    <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product" width="160" />
                     <div class="sumary-product">
                         <div class="product-row">
                             <div class="product-col">
-                                <p> Super Natural Sleep BR </p>
-                                <p> None</p>
+                                <p>{{ product.name }}</p>
+                                <p> {{ product.description }}</p>
                             </div>
                             <span class="product-price">
-                                $ 250.00
+                                US$ {{ '%.2f' | format(price.unit_amount / 100) }}
                             </span>
                         </div>
                         <div class="product-row">
@@ -137,8 +191,41 @@
                                 <div class="product-row">
                                     <p class="product-text">Subtotal</p>
                                     <span class="product-price">
-                                        $ 250.00
+                                        $ {{ '%.2f' | format(price.unit_amount / 100) }}
                                     </span>
+                                </div>
+                                <div class="product-row coupon-discount">
+                                    <div class="coupon">
+                                        <svg id="coupon-valid-icon-desktop" class="coupon-icon" focusable="false" width="12"
+                                            height="12" viewBox="0 0 12 12" fill="none" style="display:none;">
+                                            <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M5.76372 0.441305L11.7795 6.4757C12.0735 6.76867 12.0735 7.24365 11.7795 7.53662L7.52046 11.7803C7.22643 12.0732 6.74973 12.0732 6.4557 11.7803L0.435789 5.74171C0.156657 5.46172 0 5.08308 0 4.68843V1.50036C0 0.671734 0.674166 0 1.50579 0H4.69951C5.09908 0 5.48213 0.158844 5.76372 0.441305ZM2.625 3.75C3.24632 3.75 3.75 3.24632 3.75 2.625C3.75 2.00368 3.24632 1.5 2.625 1.5C2.00368 1.5 1.5 2.00368 1.5 2.625C1.5 3.24632 2.00368 3.75 2.625 3.75Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                        <input id="coupon-code-desktop" type="text" class="input-coupon desktop"
+                                            placeholder="Promotion Code Entry">
+                                        <button type="button" id="apply-coupon-desktop">
+                                            <span class="btn-label">Apply</span>
+                                            <span class="btn-spinner" style="display: none;">
+                                                <svg class="spinner" viewBox="0 0 50 50">
+                                                    <defs>
+                                                        <linearGradient id="spinner-gradient-desktop" 
+                                                        x1="0%" y1="0%" x2="100%" y2="0%">
+                                                            <stop offset="0%" stop-color="#2e8eca" stop-opacity="1" />
+                                                            <stop offset="100%" stop-color="#2e8eca" stop-opacity="0" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <circle class="path" cx="25" cy="25" r="20" />
+                                                </svg>
+                                            </span></button>
+                                        <button id="cancel-coupon-desktop"
+                                            style="position: absolute; left: 50px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
+                                        <span style="display: none" id="discount-value-desktop"></span>
+                                        <span id="discount-value-desktop"></span>
+                                        <div id="coupon-message-desktop" style="margin-top: 5px; font-size: 14px;"></div>
+                                    </div>
+                                    <span id="discount-amount-desktop"
+                                        style="display: none; font-size: 14px; color: #ffffff9f;"></span>
                                 </div>
                                 <div class="product-row">
                                     <div class="product-col shipping">
@@ -151,8 +238,8 @@
                         </div>
                         <div class="product-row product-text">
                             <p class="product-text">Total due</p>
-                            <span>
-                                $ 254.90
+                            <span id="total-price-desk">
+                                US$ {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
                             </span>
                         </div>
                     </div>
@@ -160,15 +247,16 @@
             </div>
         </div>
         <!-- PAYMENT -->
-        <div class="checkout-right">           
-            <div id="express-checkout-element" class="google-pay-details only-mobile" ></div>            
+        <div class="checkout-right">
+            <div id="express-checkout-element" class="google-pay-details only-mobile"></div>
             <form id="payment-form">
-                <!-- No seu HTML -->          
+                <!-- No seu HTML -->
                 <div class="custom-divider"><span>Or</span></div>
                 <div class="title3"> Shipping information</div>
                 <div class="email-form">
                     <label class="title" for="email">E-mail</label>
-                    <input id="email" class="input-field" name="email" type="email" placeholder="email@example.com" required />
+                    <input id="email" class="input-field" name="email" type="email" placeholder="email@example.com"
+                        required />
                 </div>
                 <label class="title">Shipping Address</label>
                 <div class="groupShipping">
@@ -184,7 +272,8 @@
                     </div>
                     <div id="extraFields" style="display: none;">
                         <div class="input-wrapper">
-                            <input id="shippingAddressLine2" class="input-field" name="shippingAddressLine2" placeholder="Address, line 2" type="text" />
+                            <input id="shippingAddressLine2" class="input-field" name="shippingAddressLine2"
+                                placeholder="Address, line 2" type="text" />
                         </div>
                         <div class="InputGroup">
                             <div class="input-wrapper">
@@ -276,46 +365,54 @@
                             <div id="card-cvc-element" class="StripeInput"></div>
                         </div>
 
-                        <div class="checkbox">                           
-                            <input type="checkbox" id="showBillingFields" class="custom-checkbox" checked>   
-                             <label class="title-billing">Shipping Address</label>                        
+                        <div class="checkbox">
+                            <input type="checkbox" id="showBillingFields" class="custom-checkbox" checked>
+                            <label class="title-billing">Shipping Address</label>
                         </div>
                         <div id="groupShipping-billing">
                             <div class="input-wrapper">
-                                 <label class="title billing" for="billing-same">Name</label>
-                                <input class="input-field" type="text" id="billing-name" name="billing_name" placeholder="Full name" required>
-                            </div>                            
+                                <label class="title billing" for="billing-same">Name</label>
+                                <input class="input-field" type="text" id="billing-name" name="billing_name"
+                                    placeholder="Full name" required>
+                            </div>
                             <div id="groupShipping">
-                                <label class="title billing">Billing address</label>    
-                            </div>      
+                                <label class="title billing">Billing address</label>
+                            </div>
                             <div class="groupShipBilling">
                                 <div id="Country-adress">
                                     <div class="select-wrapper">
-                                        <select  class="Select-source input-field" id="billing-country" name="billing-country" placeholder="Country" required>
+                                        <select class="Select-source input-field" id="billing-country"
+                                            name="billing-country" placeholder="Country" required>
                                             <option value="" disabled selected>Select a country</option>
                                         </select>
-                                    </div>                                                                              
-                                    <div class="input-wrapper">
-                                        <input class="input-field" type="text" id="billing-line1" name="billing_line1" placeholder="Street address" required>
                                     </div>
-                                </div>                             
+                                    <div class="input-wrapper">
+                                        <input class="input-field" type="text" id="billing-line1" name="billing_line1"
+                                            placeholder="Street address" required>
+                                    </div>
+                                </div>
                                 <div id="billingExtraFields" style="display: none;">
                                     <div class="input-wrapper">
-                                        <input class="input-field" type="text" id="billing-line2" name="billing_line2" placeholder="Address line 2 (optional)">
+                                        <input class="input-field" type="text" id="billing-line2" name="billing_line2"
+                                            placeholder="Address line 2 (optional)">
                                     </div>
                                     <div class="input-wrapper">
-                                        <input class="input-field" type="text" id="billing-city" name="billing_city" placeholder="City" required>
+                                        <input class="input-field" type="text" id="billing-city" name="billing_city"
+                                            placeholder="City" required>
                                     </div>
                                     <div class="input-wrapper">
-                                        <input  class="input-field" id="billing-state" name="billing_state" placeholder="State" required>
+                                        <input class="input-field" id="billing-state" name="billing_state"
+                                            placeholder="State" required>
                                     </div>
                                     <div class="input-wrapper">
-                                        <input class="input-field" type="text" id="billing-postal" name="billing_postal" placeholder="Postal Code" required>
-                                    </div>     
-                                </div>                                                   
-                            </div>           
-                            <a href="#" id="showMoreFields-billing" style="display: none; margin-top: 8px;"> Fill in the address manually</a>       
-                        </div>                                   
+                                        <input class="input-field" type="text" id="billing-postal" name="billing_postal"
+                                            placeholder="Postal Code" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" id="showMoreFields-billing" style="display: none; margin-top: 8px;"> Fill in the
+                                address manually</a>
+                        </div>
                     </div>
                     <!-- <div class="save-information">
                         <input class="custom-checkbox" type="checkbox">
@@ -325,86 +422,34 @@
                         </div>
                     </div> -->
                 </div>
-               
+
                 <div id="payment-buttons">
                     <div id="payment-message" style="color: red; margin-top: 10px;"></div>
                     <button class="btn-pay" type="submit" id="submit">Pay</button>
                 </div>
-                <!-- FOOTER -->          
-                
+                <!-- FOOTER -->
+
                 <div class="stripe-footer">
                     <a href="https://stripe.com/"><strong>stripe</strong></span>
-                    <span class="divider">|</span>
-                    <a href="https://stripe.com/legal/end-users" target="_blank" rel="noopener noreferrer">Terms</a>
-                    <a href="https://stripe.co/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
+                        <span class="divider">|</span>
+                        <a href="https://stripe.com/legal/end-users" target="_blank" rel="noopener noreferrer">Terms</a>
+                        <a href="https://stripe.co/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
                 </div>
             </form>
-            
+
         </div>
 
-
-        <!-- Google Pay -->
-        <!-- <div class="payment-option"> -->
-        <!-- <label for="payment-method-google" class="payment-label">
-                            <input type="radio" name="payment-method" id="payment-method-google" class="RadioButton">
-                            <img class="icon icon-google" src="/static/img/googlePay.svg">
-                            Google Pay
-                        </label>
-                    </div> -->
-
-
-        <!-- <p class="title-details">Order details</p> -->
-        <!-- MOBILE DETAILS  AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA -->
-        <!-- <div id="product-details" class="product-details mobile-only">                    
-                    <div class="sumary-product">
-                        <div class="product-row-mobile">
-                            <img src="https://files.stripe.com/links/MDB8YWNjdF8xUmRZN1hKQ1RzRnlhNGUyfGZsX2xpdmVfN3M1eWs1eXZrVmlrOGoxaEdNaWdJNVBS00zZZ0kDo2" class="img-product" alt="Imagem do Produto" width="100" />
-                            <div class="product-info">
-                                <div class="product-col">
-                                    <p> Super Natural Sleep BR </p>
-                                    <p> None</p>
-                                </div>                            
-                                <span class="product-price">
-                                    $ 250.00
-                                </span>
-                            </div>
-                        </div>
-                        <div class="product-row">
-                            <div class="product-col-2">
-                                <div class="product-row">
-                                    <p class="product-text">Subtotal</p>
-                                    <span class="product-price">
-                                        $ 250.00
-                                    </span>
-                                </div>
-                                <div class="product-row">
-                                    <div class="product-col shipping">
-                                        <p class="product-col shipping">Shipping</p>
-                                        <p>U.S. Shipping (Up to 7 days)</p>
-                                    </div>
-                                    <span class="value-shipping">$ 4,90</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-row product-text">
-                            <p class="product-text">Total due</p>
-                            <span>
-                                $ 254.90
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div id="mobile-product-details-placeholder"></div> -->
 
 
     </div>
     </div>
     <script>
-        window.publishableKey = "pk_live_51RdY7XJCTsFya4e2zTbX2ewLbFjPdtBv7x1OZBsqxQAqqyJ5tPvsFV4ETsUSCmvucmtVFh2WpCKSqSTQy0C7Cxnz00yRJZqr4D";
-        window.clientSecret = "pi_3Rp8fMJCTsFya4e20WOAB2xN_secret_7cIxWCNMAedEr4zYNSNGEi3W5";
-        window.productPrice = "25000";
-        window.productCurrency = "";
-        window.api_key = "AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA"
+
+        window.publishableKey = "{{ publishable_key }}";
+        window.clientSecret = "{{ client_secret }}";
+        window.productPrice = "{{ product_price }}";
+        window.productCurrency = "{{ product_currency }}";
+        window.mapsKey = "{{ google_maps_key }}";
 
         function initShippingAutocomplete() {
             const input = document.getElementById('shippingAddressLine1');
@@ -435,7 +480,7 @@
                 }
             }
             const autocomplete = new google.maps.places.Autocomplete(input, {
-                types: ['address'], 
+                types: ['address'],
                 componentRestrictions: { country: ['us'] },
                 fields: ['address_components', 'geometry', 'formatted_address']
             });
@@ -452,9 +497,9 @@
                     console.error("Nenhum detalhe de endereço disponível para: " + place.name);
                     extraFieldsContainer.style.display = 'none';
                     return;
-                }  
+                }
                 extraFieldsContainer.style.display = 'block';
-               
+
                 let streetNumber = '';
                 let streetName = '';
                 let city = '';
@@ -471,14 +516,14 @@
                         streetName = component.long_name;
                     } else if (type === 'locality') {
                         city = component.long_name;
-                    } else if (type === 'administrative_area_level_1') { 
-                        stateAbbreviation = component.short_name; 
-                    } else if (type === 'postal_code') { 
+                    } else if (type === 'administrative_area_level_1') {
+                        stateAbbreviation = component.short_name;
+                    } else if (type === 'postal_code') {
                         postalCode = component.long_name;
                     }
-                   
+
                 }
-              
+
 
                 input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
                 shippingLocality.value = city;
@@ -513,7 +558,7 @@
                 billingPostalCode.value = '';
                 billingState.value = '';
                 extraFieldsContainer.style.display = 'block';
-                
+
                 let country = '';
                 let streetNumber = '';
                 let streetName = '';
@@ -524,8 +569,8 @@
                 for (const component of place.address_components) {
                     const type = component.types[0];
                     if (type === 'country') {
-                        country = component.long_name;     
-                    } else if(type === 'street_number') {
+                        country = component.long_name;
+                    } else if (type === 'street_number') {
                         streetNumber = component.long_name;
                     } else if (type === 'route') {
                         streetName = component.long_name;
@@ -537,16 +582,16 @@
                         postalCode = component.long_name;
                     }
                 }
-                
+
 
                 input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
                 billingCity.value = city;
                 billingPostalCode.value = postalCode;
-                if (stateAbbreviation) billingState.value = stateAbbreviation;   
-                const billingLine1 = document.getElementById("billing-line1");      
-                if (billingLine1){
+                if (stateAbbreviation) billingState.value = stateAbbreviation;
+                const billingLine1 = document.getElementById("billing-line1");
+                if (billingLine1) {
                     billingLine1.classList.add("expanded");
-                }       
+                }
 
             });
         }
@@ -555,19 +600,21 @@
             initBillingAutocomplete();
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete&loading=async" async defer></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete&loading=async"
+        async defer></script>
     <script src="/static/js/data/country.js"></script>
-        <script>
+    <script>
         const select = document.getElementById("billing-country");
-            if (select && window.countryList) {
-                window.countryList.forEach(country => {
-                    const option = document.createElement("option");
-                    option.value = country.value;
-                    option.textContent = country.label;
-                    select.appendChild(option);
-                });               
-            }               
-        </script> 
+        if (select && window.countryList) {
+            window.countryList.forEach(country => {
+                const option = document.createElement("option");
+                option.value = country.value;
+                option.textContent = country.label;
+                select.appendChild(option);
+            });
+        }               
+    </script>
     </script>
     <script src="/static/js/checkout.js"></script>
 </body>

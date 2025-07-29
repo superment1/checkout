@@ -22,10 +22,11 @@ CORS(app, resources={r"/*": {"origins": [
 def index():
     return render_template(
         'teste.html',
-        publishable_key=PUBLISHABLE_KEY,
-        maps_key=MAPS_API_KEY,
-        product=None,
-        price=None
+        # publishable_key=PUBLISHABLE_KEY,
+        # maps_key=MAPS_API_KEY,
+        # google_maps_key=os.getenv("MAPS_API_KEY")
+        # product=None,
+        # price=None
     )
 
 @app.route('/manifest.json')
@@ -40,8 +41,9 @@ def checkout():
     try:
         price = stripe.Price.retrieve(price_id)
         product = stripe.Product.retrieve(price.product)
+        shipping_fee = 490
         intent = stripe.PaymentIntent.create(
-            amount=price.unit_amount + 490,
+            amount=price.unit_amount + shipping_fee,
             currency=price.currency,
             automatic_payment_methods={"enabled": True}
         )
@@ -51,10 +53,12 @@ def checkout():
             product=product,
             publishable_key=PUBLISHABLE_KEY,
             maps_key=MAPS_API_KEY,
-            client_secret=intent.client_secret
+            client_secret=intent.client_secret,
+            payment_intent_id=intent.id
         )
     except Exception as e:
         return f"Erro: {str(e)}", 500
+    
 @app.route("/products", methods=["GET"])
 def list_products():
     try:
@@ -100,24 +104,6 @@ def get_price_id():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route("/pay", methods=["POST"])
-# def pay():
-#     data = request.json
-#     payment_method_id = data.get("paymentMethodId")
-
-#     intent = stripe.PaymentIntent.create(
-#         amount=amount,
-#         currency=price.currency,
-#         payment_method=payment_method_id,
-#         confirmation_method="manual",
-#         confirm=True,
-#     )
-
-#     return jsonify({"status": intent.status})
-    
-
-
-
 @app.route("/payment-intent", methods=["POST"])
 def create_payment():
     try:
@@ -153,7 +139,64 @@ def update_payment_intent():
         return jsonify(success=True)
     except Exception as e:
         return jsonify(error=str(e)), 500
+    
+@app.route("/validate-coupon", methods=["POST"])
+def validate_coupon():
+    try:
+        data = request.get_json()
+        coupon = data.get("coupon")
+        payment_intent_id = data.get("payment_intent_id")
 
+        if not coupon:
+            return jsonify({"error": "Coupon is required"}), 400
+        if not payment_intent_id:
+            return jsonify({"error": "PaymentIntent ID is required"}), 400
+
+        promo_codes = stripe.PromotionCode.list(code=coupon, active=True, limit=1)
+        if not promo_codes.data:
+            return jsonify({"error": "Invalid or inactive coupon"}), 404
+
+        promo = promo_codes.data[0]
+        coupon_data = promo.coupon
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        original_amount = payment_intent.amount
+
+        if coupon_data.get("percent_off"):
+            discount_percent = coupon_data["percent_off"]
+            discounted_amount = int(round(original_amount * (1 - discount_percent / 100)))
+            discount_type = "percent"
+            discount_value = discount_percent
+        elif coupon_data.get("amount_off"):
+            amount_off = coupon_data["amount_off"]
+            discounted_amount = max(0, original_amount - amount_off)
+            discount_type = "amount"
+            discount_value = amount_off
+        else:
+            return jsonify({"error": "Coupon has no discount value"}), 400
+
+        updated_intent = stripe.PaymentIntent.modify(
+            payment_intent_id,
+            amount=discounted_amount
+        )
+        return jsonify({
+            "success": True,
+            "promotion_code_id": promo.id,
+            "discount_type": discount_type,
+            "discount": discount_value,
+            "new_client_secret": updated_intent.client_secret,
+            "payment_intent_id": payment_intent_id
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/list-coupons", methods=["GET"])
+def list_coupons():
+    try:
+        coupons = stripe.Coupon.list(limit=20)
+        return jsonify(coupons)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/thanks')
 def thanks():
     return render_template('thanks.html')
