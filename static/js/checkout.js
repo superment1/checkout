@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const expressCheckoutElement = elements.create("expressCheckout", {
     buttonType: {
-      applePay: "buy",
+      applePay: "plain",
       googlePay: "buy",
       link: "buy",
     },
@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     collectShippingAddress: true,
   });
+
    function isDesktop() {
     const desktopInput = document.getElementById("coupon-code-desktop");
     return desktopInput && desktopInput.offsetParent !== null;
@@ -58,13 +59,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const couponIcon = $("coupon-valid-icon");
   const totalPriceElement = document.getElementById("total-price");
   const titlePriceDesk = document.getElementById("title-price-desk")
-  const totalPriceDesk = document.getElementById("total-price-desk")
-  
+  const totalPriceDesk = document.getElementById("total-price-desk")  
   const titlePriceMobile = document.getElementById("title-price-mobile")
   const discountAmount = $("discount-amount");
-
   let totalText = totalPriceElement.textContent.trim();
   let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
+  const originalTotal = totalNumber;
+  const originalClientSecret = window.clientSecret
 
   couponInput.addEventListener("focus", () => {
     couponInput.classList.add("focused");
@@ -79,9 +80,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnLabel.style.display = "none";
     }
   });
-  // couponInput.addEventListener("blur", () => {
-  //   couponInput.classList.remove("focused");
-  // });
   cancelButton.addEventListener("click", () => {
     couponInput.disabled = false;
     couponInput.value = "";
@@ -91,6 +89,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnLabel.style.display = "inline-block";
     couponIcon.style.display = "none"
     discountAmount.style.display = "none";
+    totalPriceElement.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    titlePriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    titlePriceMobile.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    totalPriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
+
+    elements.update({ clientSecret: originalClientSecret });
   });
   applyButton.addEventListener("click", async () => {
     const code = couponInput.value.trim();
@@ -143,9 +147,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const amountOff = (totalNumber - discountedPrice).toFixed(2);
       discountAmount.style.display = "inline";
       discountAmount.textContent = `-US$ ${amountOff}`;
-
-      console.log("Cupom válido:", result);
-
       window.clientSecret = newClientSecret;
       window.paymentIntentId = result.paymentIntentId;
       elements.update({ clientSecret: newClientSecret });
@@ -526,7 +527,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         details.classList.toggle('open');
 
         triggers.forEach(btn => {
-          btn.innerHTML  = isOpen ? `Close ${arrowUpSvg}` : `View details ${arrowDownSvg}`;
+          const isHeader = btn.closest('header');
+          const isProductSummary = btn.closest('.product-summary');
+          if (isOpen) {
+            btn.innerHTML = isHeader
+              ? `Close ${arrowUpSvg}`
+              : `Close ${arrowUpSvg}`;
+          } else {
+            btn.innerHTML = isHeader
+              ? `View details ${arrowDownSvg}`
+              : `Add code ${arrowDownSvg}`;
+          }
         });
       });
     });
@@ -536,7 +547,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         overlay.classList.remove('show');
         details.classList.remove('open');
         triggers.forEach(btn => {
-          btn.innerHTML  = `View details ${arrowDownSvg}`;
+        const isHeader = btn.closest('header');
+        const isProductSummary = btn.closest('.product-summary');
+
+        btn.innerHTML = isHeader
+          ? `View details ${arrowDownSvg}`
+          : `Add code ${arrowDownSvg}`;
         });
       }
     });

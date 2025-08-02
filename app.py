@@ -18,16 +18,16 @@ CORS(app, resources={r"/*": {"origins": [
     "https://checkout.superment.co"
     ]}})
 
-@app.route('/')
-def index():
-    return render_template(
-        'teste.html',
-        # publishable_key=PUBLISHABLE_KEY,
-        # maps_key=MAPS_API_KEY,
-        # google_maps_key=os.getenv("MAPS_API_KEY")
-        # product=None,
-        # price=None
-    )
+# @app.route('/')
+# def index():
+#     return render_template(
+#         'teste.html',
+#         # publishable_key=PUBLISHABLE_KEY,
+#         # maps_key=MAPS_API_KEY,
+#         # google_maps_key=os.getenv("MAPS_API_KEY")
+#         # product=None,
+#         # price=None
+#     )
 
 @app.route('/manifest.json')
 def manifest():
@@ -59,31 +59,31 @@ def checkout():
     except Exception as e:
         return f"Erro: {str(e)}", 500
     
-@app.route("/products", methods=["GET"])
-def list_products():
-    try:
-        limit = int(request.args.get("limit", 10)) 
-        active = request.args.get("active")  
+# @app.route("/products", methods=["GET"])
+# def list_products():
+#     try:
+#         limit = int(request.args.get("limit", 10)) 
+#         active = request.args.get("active")  
 
-        params = {"limit": limit}
-        if active is not None:
-            params["active"] = active.lower() == "true"
+#         params = {"limit": limit}
+#         if active is not None:
+#             params["active"] = active.lower() == "true"
 
-        products = stripe.Product.list(**params)
-        return jsonify(products)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#         products = stripe.Product.list(**params)
+#         return jsonify(products)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-@app.route("/check-stripe")
-def check_stripe():
-    try:
-        prices = stripe.Price.list(
-            limit=20,
-            expand=["data.product"]
-        )
-        return jsonify(prices)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route("/check-stripe")
+# def check_stripe():
+#     try:
+#         prices = stripe.Price.list(
+#             limit=20,
+#             expand=["data.product"]
+#         )
+#         return jsonify(prices)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 @app.route("/get-price-id")
 def get_price_id():
@@ -160,7 +160,6 @@ def validate_coupon():
         coupon_data = promo.coupon
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         original_amount = payment_intent.amount
-
         if coupon_data.get("percent_off"):
             discount_percent = coupon_data["percent_off"]
             discounted_amount = int(round(original_amount * (1 - discount_percent / 100)))
