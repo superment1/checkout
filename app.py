@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, request, jsonify, send_from_
 import stripe
 from dotenv import load_dotenv
 from flask_cors import CORS
+from auth import require_api_key
 
 load_dotenv()
 app = Flask(__name__)
@@ -33,6 +34,26 @@ CORS(app, resources={r"/*": {"origins": [
 def manifest():
     return send_from_directory('.', 'manifest.json', mimetype='application/manifest+json')
 
+@app.route("/get-client-secret", methods=["POST"])
+def get_client_secret():
+    try:
+        data = request.get_json()
+        payment_intent_id = data.get("payment_intent_id")
+
+        if not payment_intent_id:
+            return jsonify({"error": "payment_intent_id is required"}), 400
+
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+        if not intent.metadata.get("authorized") == "true":
+            return jsonify({"error": "Unauthorized PaymentIntent"}), 403
+        
+        return jsonify({
+            "client_secret": intent.client_secret
+        })
+    except Exception as e:
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
+
 @app.route("/checkout")
 def checkout():
     price_id = request.args.get("price_id")
@@ -45,7 +66,8 @@ def checkout():
         intent = stripe.PaymentIntent.create(
             amount=price.unit_amount + shipping_fee,
             currency=price.currency,
-            automatic_payment_methods={"enabled": True}
+            automatic_payment_methods={"enabled": True},
+            metadata={"authorized": "true"} 
         )
         return render_template(
             "index.html", 
@@ -53,41 +75,42 @@ def checkout():
             product=product,
             publishable_key=PUBLISHABLE_KEY,
             maps_key=MAPS_API_KEY,
-            client_secret=intent.client_secret,
             payment_intent_id=intent.id
         )
     except Exception as e:
-        return f"Erro: {str(e)}", 500
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
-# @app.route("/products", methods=["GET"])
-# def list_products():
-#     try:
-#         limit = int(request.args.get("limit", 10)) 
-#         active = request.args.get("active")  
+@app.route("/products", methods=["GET"])
+@require_api_key()
+def list_products():
+    try:
+        limit = int(request.args.get("limit", 10)) 
+        active = request.args.get("active")  
 
-#         params = {"limit": limit}
-#         if active is not None:
-#             params["active"] = active.lower() == "true"
+        params = {"limit": limit}
+        if active is not None:
+            params["active"] = active.lower() == "true"
 
-#         products = stripe.Product.list(**params)
-#         return jsonify(products)
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+        products = stripe.Product.list(**params)
+        return jsonify(products)
+    except Exception as e:
+        return "Erro interno. Tente novamente mais tarde.", 500
 
-# @app.route("/check-stripe")
-# def check_stripe():
-#     try:
-#         prices = stripe.Price.list(
-#             limit=20,
-#             expand=["data.product"]
-#         )
-#         return jsonify(prices)
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+@app.route("/check-stripe")
+@require_api_key()
+def check_stripe():
+    try:
+        prices = stripe.Price.list(
+            limit=20,
+            expand=["data.product"]
+        )
+        return jsonify(prices)
+    except Exception as e:
+        return "Erro interno. Tente novamente mais tarde.", 500
 
 @app.route("/get-price-id")
 def get_price_id():
-    product_id = request.args.get("product_id")
+    product_id = request.args.get("product_id").strip()
     if not product_id:
         return jsonify({"error": "product_id is required"}), 400
     try:
@@ -102,26 +125,35 @@ def get_price_id():
             "currency": price.currency
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return "Erro interno. Tente novamente mais tarde.", 500
 
 @app.route("/payment-intent", methods=["POST"])
 def create_payment():
     try:
         data = request.get_json()
-        amount = data.get("amount")
+        price_id = data.get("price_id")
         email = data.get("email")
-        shipping = data.get("shipping")        
+        shipping = data.get("shipping")
 
+        if not price_id:
+            return jsonify({"error": "price_id is required"}), 400
+         
+        price = stripe.Price.retrieve(price_id)
+        shipping_fee = 490
+        amount = price.unit_amount + shipping_fee
+        currency = price.currency
+        
         intent = stripe.PaymentIntent.create(
             amount=amount,
-            currency=price.currency,
+            currency = currency,
             receipt_email=email,
             shipping=shipping,
             automatic_payment_methods={"enabled": True},
+            metadata={"authorized": "true"}
         )
         return jsonify(clientSecret=intent.client_secret)
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
 
 @app.route("/update-payment-intent", methods=["POST"])
 def update_payment_intent():
@@ -138,7 +170,7 @@ def update_payment_intent():
         )
         return jsonify(success=True)
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route("/validate-coupon", methods=["POST"])
 def validate_coupon():
@@ -186,15 +218,16 @@ def validate_coupon():
             "payment_intent_id": payment_intent_id
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route("/list-coupons", methods=["GET"])
+@require_api_key()
 def list_coupons():
     try:
         coupons = stripe.Coupon.list(limit=20)
         return jsonify(coupons)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route('/thanks')
 def thanks():
@@ -204,7 +237,5 @@ def thanks():
 def cancel():
     return 'Pagamento cancelado.'
 
-
-
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    app.run(port=5001, debug=False)

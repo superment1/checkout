@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  const res = await fetch("/get-client-secret", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payment_intent_id: window.paymentIntentId })
+  });
+  const data = await res.json();
+  let clientSecret = data.client_secret;
+
   const stripe = Stripe(window.publishableKey);
   const form = document.getElementById("payment-form");
   const message = document.getElementById("payment-message");
@@ -15,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
   };
   const elements = stripe.elements({
-    clientSecret: window.clientSecret,
+    clientSecret,
     appearance,
     locale: "en",
   });
@@ -65,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let totalText = totalPriceElement.textContent.trim();
   let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
   const originalTotal = totalNumber;
-  const originalClientSecret = window.clientSecret
+  const originalClientSecret = clientSecret
 
   couponInput.addEventListener("focus", () => {
     couponInput.classList.add("focused");
@@ -109,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnSpinner.style.display = "inline-block";
 
     try {
-      const paymentIntentId = window.clientSecret.split("_secret")[0];
+      const paymentIntentId = clientSecret.split("_secret")[0];
 
       const response = await fetch("/validate-coupon", {
         method: "POST",
@@ -147,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const amountOff = (totalNumber - discountedPrice).toFixed(2);
       discountAmount.style.display = "inline";
       discountAmount.textContent = `-US$ ${amountOff}`;
-      window.clientSecret = newClientSecret;
+      clientSecret = newClientSecret;
       window.paymentIntentId = result.paymentIntentId;
       elements.update({ clientSecret: newClientSecret });
 
@@ -165,7 +173,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const {error} = await stripe.confirmPayment({
       elements,
-      clientSecret: window.clientSecret,
+      clientSecret: clientSecret,
       confirmParams: {
         return_url:"https://superment.co/supersleep/sucess/"
       },
@@ -178,7 +186,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Erro no handler confirm:", err);
     }
   });
-
 
   const style = {
     base: {
@@ -211,246 +218,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   cardExpiry.mount('#card-expiry-element');
   cardCvc.mount('#card-cvc-element');
 
-  // const paymentElement = elements.create('payment', {
-  //   fields: {
-  //     billingDetails: {
-  //       name: 'auto',
-  //       email: 'auto',
-  //       address: 'auto',
-  //     }
-  //   }
-  // });
-
-  // const price = parseInt(window.productPrice || 0);
-  // const shippingAmount = 490;
-  // if (price <= 0) {
-  //   console.error("Valor inválido para o produto. Abortando Google Pay.");
-  // } else {
-  //   const paymentRequest = stripe.paymentRequest({
-  //     country: "US",
-  //     currency: currency,
-  //     total: {
-  //       label: "Total",
-  //       amount: totalAmount,
-  //     },
-  //     requestPayerName: true,
-  //     requestPayerEmail: true,
-  //     requestShipping: true,
-  //     shippingOptions: [
-  //       {
-  //         id: 'us-shipping',
-  //         label: 'U.S. Shipping (At most 7 days)',
-  //         detail: '',
-  //         amount: shippingAmount,
-  //       },
-  //     ],
-  //   });
-
-  //   const smartPayButton = elements.create("paymentRequestButton", {
-  //     paymentRequest,
-  //     style: {
-  //       paymentRequestButton: {
-  //         type: "default",
-  //         theme: "dark",
-  //         borderRadius: "20px",
-  //         height: "40px"
-  //       }
-  //     }
-  //   });
-  //   const smartPayContainer = document.getElementById("smart-pay-button");
-
-  //   paymentRequest.canMakePayment().then((result) => {
-  //     console.log("canMakePayment result:", result);
-  //     if (result && (result.googlePay || result.applePay)) {
-  //       if (smartPayContainer.children.length === 0) {
-  //         smartPayButton.mount("#smart-pay-button");
-  //       }
-  //       smartPayContainer.style.display = "block";
-  //     } else {
-  //       smartPayContainer.style.display = "none";
-  //     }
-  //   });
-  //   paymentRequest.on("paymentmethod", async (ev) => {
-  //     console.log("Shipping address fornecido pelo Google/Apple Pay:", ev.shippingAddress);
-  //     if (!ev.paymentMethod || !ev.paymentMethod.id) {
-  //       console.error("paymentMethod ID ausente");
-  //       ev.complete("fail");
-  //       if (message) message.textContent = "Erro ao processar o pagamento.";
-  //       return;
-  //     }
-
-  //     const shipping = {
-  //       name: ev.payerName || ev.shippingAddress.recipient || "Cliente",
-  //       address: {
-  //         line1: ev.shippingAddress.addressLine?.[0] || "",
-  //         city: ev.shippingAddress.city || "",
-  //         state: ev.shippingAddress.region || "",
-  //         postal_code: ev.shippingAddress.postalCode || "",
-  //         country: ev.shippingAddress.country || "US"
-  //       }
-  //     };
-
-  //     const email = ev.payerEmail || "";
-  //     await fetch("/update-payment-intent", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         payment_intent_id: window.clientSecret.split("_secret")[0],
-  //         email,
-  //         shipping
-  //       })
-  //     });
-
-
-  //     console.log("Dados do pagamento:");
-  //     console.log("Email:", email);
-  //     console.log("Nome:", shipping.name);
-  //     console.log("Endereço:", shipping.address);
-
-  //     const { error } = await stripe.confirmCardPayment(window.clientSecret, {
-  //       payment_method: ev.paymentMethod.id
-  //     });
-
-  //     if (error) {
-  //       ev.complete("fail");
-  //       if (message) message.textContent = error.message;
-  //     } else {
-  //       ev.complete("success");
-  //       window.location.href = "https://superment.co/supersleep/sucess/";
-  //     }
-  //   });
-  // }
-
-  //   paymentRequest.on("paymentmethod", async (ev) => {
-  //     if (!ev.paymentMethod || !ev.paymentMethod.id) {
-  //       console.error("paymentMethod ID ausente");
-  //       ev.complete("fail");
-  //       if (message) message.textContent = "Erro ao processar o pagamento.";
-  //       return;
-  //     }
-  //     const email = document.getElementById("email")?.value || "";
-  //     const name = document.getElementById("name")?.value || "Cliente";
-  //     const shipping = {
-  //       name,
-  //       address: {
-  //         line1: document.getElementById("shippingAddressLine1")?.value || "",
-  //         city: document.getElementById("shippingLocality")?.value || "",
-  //         state: document.getElementById("shippingAdministrativeArea")?.value || "",
-  //         postal_code: document.getElementById("shippingPostalCode")?.value || "",
-  //         country: "US"
-  //       }
-  //     };
-  //     console.log("Dados do pagamento:");
-  //     console.log("Email:", email);
-  //     console.log("Nome:", name);
-  //     console.log("Endereço:", shipping.address);
-
-  //     const { error } = await stripe.confirmCardPayment(window.clientSecret, {
-  //       payment_method: ev.paymentMethod.id,
-  //       shipping,
-  //       receipt_email: email,
-  //     });
-
-  //     if (error) {
-  //       ev.complete("fail");
-  //       if (message) message.textContent = error.message;
-  //     } else {
-  //       ev.complete("success");
-  //       window.location.href = "https://superment.co/supersleep/sucess/";
-  //     }
-  //   });
-  // }
-//     const smartPayContainer = document.getElementById("smart-pay-button");
-
-//     paymentRequest.canMakePayment().then((result) => {
-//       console.log("canMakePayment result:", result);
-//       if (result && (result.googlePay || result.applePay)) {
-//         if (smartPayContainer.children.length === 0) {
-//           smartPayButton.mount("#smart-pay-button");
-//         }
-//         smartPayContainer.style.display = "block";
-//       } else {
-//         smartPayContainer.style.display = "none";
-//       }
-//     });
-//     if (!ev.paymentMethod || !ev.paymentMethod.id) {
-//       console.error("paymentMethod ID ausente");
-//       ev.complete("fail");
-//       message.textContent = "Erro ao processar o pagamento.";
-//       return;
-// }
-//     paymentRequest.on("paymentmethod", async (ev) => {
-//       const { error } = await stripe.confirmCardPayment(window.clientSecret, {
-//         payment_method: ev.paymentMethod.id,
-//         shipping: {
-//           name: ev.payerName,
-//         },
-//         receipt_email: ev.payerEmail
-//       });
-
-//       if (error) {
-//         ev.complete("fail");
-//         message.textContent = error.message;
-//       } else {
-//         ev.complete("success");
-//         window.location.href = "https://superment.co/supersleep/sucess/";
-//       }
-//     });
-//   }
-
-  // === Alternância UI ===
-  // const cardRadio = document.getElementById("payment-method-card");
-  // const googleRadio = document.getElementById("payment-method-google");
-  // const googleDetails = document.querySelector(".google-pay-details");
-
-  // function togglePaymentDetails() {
-  //   if (cardRadio.checked) {
-  //     cardDetails.style.display = "flex";
-  //     googleDetails.style.display = "none";
-  //   } else {
-  //     cardDetails.style.display = "none";
-  //     googleDetails.style.display = "block";
-  //   }
-  // }
-
-  // function updateSubmitButton() {
-  //   const message = document.getElementById("payment-message");
-  //     if (googleRadio.checked) {
-  //     submitBtn.style.display = "none"; 
-  //     message.style.display = "block";
-  //   } else {
-  //     submitBtn.style.display = "block";
-  //     submitBtn.classList.remove("btn-google");
-  //     submitBtn.textContent = "Pay";
-  //     message.style.display = "none";
-  //     }
-  // }
-
-  // function updateLabelStyles() {
-  //   document.querySelectorAll('.payment-label').forEach(label => {
-  //     label.classList.remove('selected');
-  //   });
-
-  //   const selected = document.querySelector('input[name="payment-method"]:checked');
-  //   if (selected) {
-  //     selected.closest('label').classList.add('selected');
-  //   }
-  // }
-
-  // togglePaymentDetails();
-  // updateSubmitButton();
-  // updateLabelStyles();
-  // cardRadio.addEventListener("change", () => {
-  //   togglePaymentDetails();
-  //   updateSubmitButton();
-  //   updateLabelStyles();
-  // });
-  // googleRadio.addEventListener("change", () => {
-  //   togglePaymentDetails();
-  //   updateSubmitButton();
-  //   updateLabelStyles()
-  // });
-
   // === SUBMIT com Cartão ===
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -467,17 +234,37 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     };
     
-    const billing = {
-      name: document.getElementById("billing-name")?.value || shipping.name,
-      address: {
-        line1: document.getElementById("billing-line1")?.value || "",
-        line2: document.getElementById("billing-line2")?.value || "",
-        city: document.getElementById("billing-city")?.value || "",
-        state: document.getElementById("billing-state")?.value || "",
-        postal_code: document.getElementById("billing-postal")?.value || "",
-        country: document.getElementById("billing-country").value
-      }
-    };
+    let billing;
+    if (billingCheckbox.checked) {
+      // usa o endereço de entrega como billing
+      billing = {
+        name: shipping.name,
+        address: { ...shipping.address }
+      };
+    } else {
+      billing = {
+        name: document.getElementById("billing-name")?.value || shipping.name,
+        address: {
+          line1: document.getElementById("billing-line1")?.value,
+          line2: document.getElementById("billing-line2")?.value,
+          city: document.getElementById("billing-city")?.value,
+          state: document.getElementById("billing-state")?.value,
+          postal_code: document.getElementById("billing-postal")?.value,
+          country: document.getElementById("billing-country")?.value
+        }
+      };
+    }
+    // const billing = {
+    //   name: document.getElementById("billing-name")?.value || shipping.name,
+    //   address: {
+    //     line1: document.getElementById("billing-line1")?.value || "",
+    //     line2: document.getElementById("billing-line2")?.value || "",
+    //     city: document.getElementById("billing-city")?.value || "",
+    //     state: document.getElementById("billing-state")?.value || "",
+    //     postal_code: document.getElementById("billing-postal")?.value || "",
+    //     country: document.getElementById("billing-country").value
+    //   }
+    // };
     console.log("BILLING", billing)
 
     const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
@@ -493,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       message.textContent = paymentMethodError.message;
       return;
     }
-    const { error: confirmError } = await stripe.confirmCardPayment(window.clientSecret, {
+    const { error: confirmError } = await stripe.confirmCardPayment(clientSecret, {
       payment_method: paymentMethod.id,
       receipt_email: email,
       shipping: shipping
@@ -566,10 +353,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   const billingExtraFields = document.getElementById("billingExtraFields");
   const billingToggleLink = document.getElementById("showMoreFields-billing");
   const billingLine1 = document.getElementById("billing-line1");
+  
+  function updateBillingRequiredFields(enabled) {
+    const billingFields = [
+      document.getElementById("billing-name"),
+      document.getElementById("billing-country"),
+      document.getElementById("billing-line1"),
+      document.getElementById("billing-city"),
+      document.getElementById("billing-state"),
+      document.getElementById("billing-postal"),
+    ];
 
+    billingFields.forEach(field => {
+      if (field) field.required = enabled;
+    });
+  }
   function initializeBillingFields() {
     if (billingCheckbox.checked) {
       billingContainer.style.display = "none";
+      updateBillingRequiredFields(false);
+    } else {
+      updateBillingRequiredFields(true);
     }
   }
 
@@ -579,11 +383,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       billingExtraFields.style.display = "none";
       billingToggleLink.style.display = "none";
       billingLine1.classList.remove("expanded");
+      updateBillingRequiredFields(false)
     } else {
       billingContainer.style.display = "block";
       billingExtraFields.style.display = "none";
       billingToggleLink.style.display = "block";
       billingLine1.classList.remove("expanded");
+      updateBillingRequiredFields(true);
     }
   }
 
@@ -593,7 +399,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     billingToggleLink.style.display = "none";
     billingLine1.classList.add("expanded");
     billingLine1.classList.add("expanded")
-
   }
 
   billingCheckbox.addEventListener("change", toggleBillingFieldsFromCheckbox);
@@ -606,6 +411,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shippingExtraFields = document.getElementById("extraFields");
   const shippingLine1 = document.getElementById("shippingAddressLine1");
 
+  shippingLine1.addEventListener('focus', () => {
+    shippingLine1.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+  });
+  
   function expandShippingAddressFields() {
     if (shippingExtraFields && shippingToggleLink) {
       shippingExtraFields.style.display = "block";
@@ -638,3 +450,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 })
+
+
+  // === Alternância UI ===
+  // const cardRadio = document.getElementById("payment-method-card");
+  // const googleRadio = document.getElementById("payment-method-google");
+  // const googleDetails = document.querySelector(".google-pay-details");
+
+  // function togglePaymentDetails() {
+  //   if (cardRadio.checked) {
+  //     cardDetails.style.display = "flex";
+  //     googleDetails.style.display = "none";
+  //   } else {
+  //     cardDetails.style.display = "none";
+  //     googleDetails.style.display = "block";
+  //   }
+  // }
+
+  // function updateSubmitButton() {
+  //   const message = document.getElementById("payment-message");
+  //     if (googleRadio.checked) {
+  //     submitBtn.style.display = "none"; 
+  //     message.style.display = "block";
+  //   } else {
+  //     submitBtn.style.display = "block";
+  //     submitBtn.classList.remove("btn-google");
+  //     submitBtn.textContent = "Pay";
+  //     message.style.display = "none";
+  //     }
+  // }
+
+  // function updateLabelStyles() {
+  //   document.querySelectorAll('.payment-label').forEach(label => {
+  //     label.classList.remove('selected');
+  //   });
+
+  //   const selected = document.querySelector('input[name="payment-method"]:checked');
+  //   if (selected) {
+  //     selected.closest('label').classList.add('selected');
+  //   }
+  // }
+
+  // togglePaymentDetails();
+  // updateSubmitButton();
+  // updateLabelStyles();
+  // cardRadio.addEventListener("change", () => {
+  //   togglePaymentDetails();
+  //   updateSubmitButton();
+  //   updateLabelStyles();
+  // });
+  // googleRadio.addEventListener("change", () => {
+  //   togglePaymentDetails();
+  //   updateSubmitButton();
+  //   updateLabelStyles()
+  // });

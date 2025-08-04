@@ -110,7 +110,7 @@
                                                 </span>
                                             </button>
                                             <button id="cancel-coupon"
-                                                style="position: absolute; left: 50px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
+                                                style="position: absolute; left: 56px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
                                             <span style="display: none" id="discount-value"></span>
                                             <span id="discount-value"></span>
                                             <div id="coupon-message" style="margin-top: 5px; font-size: 14px;"></div>
@@ -247,8 +247,7 @@
         <!-- PAYMENT -->
         <div class="checkout-right">
             <div id="express-checkout-element" class="google-pay-details only-mobile"></div>
-            <form id="payment-form">
-                <!-- No seu HTML -->
+            <form id="payment-form">                
                 <div class="custom-divider"><span>Or</span></div>
                 <div class="title3"> Shipping information</div>
                 <div class="email-form">
@@ -261,7 +260,7 @@
                     <div class="input-wrapper">
                         <input id="name" name="name" class="input-field" placeholder="Name" type="text" required />
                     </div>
-                    <div class="input-wrapper">
+                    <div class="autocomplete-wrapper">
                         <input id="country" class="input-field" name="country" value="United States" disabled />
                     </div>
                     <div class="input-wrapper">
@@ -436,18 +435,15 @@
             </form>
 
         </div>
-
-
-
     </div>
     </div>
     <script>
 
         window.publishableKey = "{{ publishable_key }}";
-        window.clientSecret = "{{ client_secret }}";
+        window.paymentIntentId = "{{ payment_intent_id }}";
         window.productPrice = "{{ product_price }}";
         window.productCurrency = "{{ product_currency }}";
-        window.mapsKey = "{{ google_maps_key }}";
+        window.mapsKey = "{{ maps_key }}";
 
         function initShippingAutocomplete() {
             const input = document.getElementById('shippingAddressLine1');
@@ -519,10 +515,7 @@
                     } else if (type === 'postal_code') {
                         postalCode = component.long_name;
                     }
-
                 }
-
-
                 input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
                 shippingLocality.value = city;
                 shippingPostalCode.value = postalCode;
@@ -530,7 +523,6 @@
                 if (stateAbbreviation) {
                     shippingAdministrativeArea.value = stateAbbreviation;
                 }
-
             });
         }
         function initBillingAutocomplete() {
@@ -580,8 +572,6 @@
                         postalCode = component.long_name;
                     }
                 }
-
-
                 input.value = `${streetNumber ? streetNumber + ' ' : ''}${streetName}`;
                 billingCity.value = city;
                 billingPostalCode.value = postalCode;
@@ -590,7 +580,6 @@
                 if (billingLine1) {
                     billingLine1.classList.add("expanded");
                 }
-
             });
         }
         function initAutocomplete() {
@@ -599,7 +588,7 @@
         }
     </script>
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJ20cTWHAx2QhyaUUJKy7HKhGLXzcFSnA&libraries=places&callback=initAutocomplete&loading=async"
+        src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&libraries=places&callback=initAutocomplete&loading=async"
         async defer></script>
     <script src="/static/js/data/country.js"></script>
     <script>

@@ -81,7 +81,7 @@ h1{
   font-weight: 500;
 }
 #express-checkout-element {
-  min-height: 50px; /* ou mais, dependendo da altura do botão */
+  min-height: 50px;
   display: block;
 }
 .title1 {
@@ -184,17 +184,19 @@ h1{
   align-items: flex-start;
   width: 100%;
 }
-
+.autocomplete-wrapper {
+  position: relative;
+}
 .input-coupon {
-  width: 80%;
+  width: 88%;
+  align-items: center;
   background: #ffffff1f;
   color: white;
-  padding: 8px 8px 8px 24px !important;
-  line-height: 1.3;
+  padding: 10px 8px 10px 24px !important;
   border-radius: 6px;
   border: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   transition: all 0.3s ease;
   cursor: text;
   position: relative;
@@ -263,13 +265,13 @@ h1{
   left: 6px;
   color: white;
   opacity: 0.7;
-  top: 12px;
+  top: 10px;
 }
 #cancel-coupon-desktop,
 #cancel-coupon {
   position: absolute;
   margin: 0;
-  right: -14%;
+  right: 10px;
   padding: 0;
   background: none;
   border: none;
@@ -277,6 +279,7 @@ h1{
   cursor: pointer;
   z-index: 2;
   color: white;
+  opacity: 0.7;
 }
 #apply-coupon,
 #apply-coupon-desktop {
@@ -1266,9 +1269,16 @@ button {
   text-decoration: none;
 }
 
+
 .pac-container {
-  top: -1 !important;
-  z-index: 999 !important;
-  margin-top: -30px !important;
-  transform: translateY(-100%) !important;
+  z-index: 9999 !important;
+  position: absolute !important;
+  top: 51% !important;
+  transform: none !important;
+  margin-top: 4px !important;
+}
+@media (min-width: 769px) {
+  .pac-container {
+    top: 342px !important;
+  }
 }
