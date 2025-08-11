@@ -43,8 +43,8 @@ header{
   will-change: transform;
   animation: scroll-text 40s linear infinite;
   height: 22px;
-  border-top: 1px solid;
-  border-bottom: 1px solid;
+  border-top: 1px solid #ffffff6e;
+  border-bottom: 1px solid #ffffff6e;
   font-size: 13px;
   padding-bottom: 5px;
 }
@@ -144,11 +144,11 @@ h1{
   margin: 10px auto;
 }
 .title {
-  font-size: 13px;
+  font-size: 14px;
   color: #1a1a1ab3;
   font-weight: 600;
   padding-top: 1.5rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
 }
 .title-billing {
   font-size: 12px;
@@ -158,8 +158,7 @@ h1{
 .title3 {
   font-size: 17px;
   color: #1a1a1a;
-  margin-top: 5px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-weight: 700;
 }
 #express-checkout-element {
@@ -253,7 +252,8 @@ h1{
   text-decoration: line-through;
   color: #8D8D8D;
   justify-self: end;
-  font-size: 15px;
+  align-content: end;
+  font-size: 16px;
 }
 .price-mobile{
   justify-self: end;
@@ -285,6 +285,7 @@ h1{
 }
 .new-mobile-sumary p:first-child {
   grid-column: 1 / -1;
+  font-weight: 300;
 }
 .new-mobile-sumary p:nth-child(2) {
   grid-column: 1;
@@ -382,38 +383,39 @@ h1{
   .product-row.product-text{
     display: flex;
   }
-  .dep-container {
-    --items: 5;
-    --per: 7s;  
+  .dep-container{
+    --item-h: 156px; 
+    --gap: 15px;     
+    --step: calc(var(--item-h) + var(--gap)); 
+    --per: 3s;      
+    --count: 5;      
     position: relative;
     width: 100%;
-    height: 150px;
-    perspective: 1000px; 
+    height: var(--item-h);
+    overflow: hidden;
+  }
+  .dep-track{
+    position: absolute;
+    inset: 0 0 auto 0;
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+    animation: depPause calc(var(--count) * var(--per)) linear infinite;
+  }
+  .dep{
+    background-color: #A0DAF2 !important;
+    position: relative;
+    min-height: var(--item-h);   /* todos com mesma “vitrine” */
+    margin-bottom: var(--gap);
   }
 
-  .dep-container .dep{
-    position: absolute; inset: 0;
-    opacity: 0;  
-    visibility: hidden;    
-    transform: rotateY(90deg);
-    transform-origin: center center;
-    backface-visibility: hidden;
-    will-change: transform, opacity;
-    animation: flipSlot calc(var(--items) * var(--per)) infinite ease-in-out both;
-  }
-
-  .dep-container .dep:nth-child(1){ animation-delay: calc(0 * var(--per)); }
-  .dep-container .dep:nth-child(2){ animation-delay: calc(1 * var(--per)); }
-  .dep-container .dep:nth-child(3){ animation-delay: calc(2 * var(--per)); }
-  .dep-container .dep:nth-child(4){ animation-delay: calc(3 * var(--per)); }
-  .dep-container .dep:nth-child(5){ animation-delay: calc(4 * var(--per)); }
-
-  @keyframes flipSlot{
-    0%   { opacity:0; visibility: hidden; transform: rotateY(90deg); }
-    3%   { opacity:1; visibility: visible; transform: rotateY(0);     }
-    17%  { opacity:1; visibility: visible; transform: rotateY(0);     } 
-    20%  { opacity:0; visibility: hidden; transform: rotateY(-90deg);}
-    100% { opacity:0; visibility: hidden; transform: rotateY(-90deg);}
+  @keyframes depPause{
+    0%,   12% { transform: translateY(0); }
+    20%,  32% { transform: translateY(calc(-1 * var(--step))); }
+    40%,  52% { transform: translateY(calc(-2 * var(--step))); }
+    60%,  72% { transform: translateY(calc(-3 * var(--step))); }
+    80%,  92% { transform: translateY(calc(-4 * var(--step))); }
+    100%      { transform: translateY(calc(-1 * var(--count) * var(--step))); }
   }
   .testimonials-desktop{
     display: flex;
@@ -447,11 +449,10 @@ h1{
     color: #FFDC03;
   }
   .satisfaction-desktop{
-    color: #ffffff;
     font-weight: 600;
     font-size: 22px;
     text-align: center;
-    background: rgba(255, 255, 255, 0.4); 
+    background: #A0DAF2;
     padding: 15px 0 13px;
     align-items: center;
     max-width: 100%;
@@ -707,6 +708,9 @@ h1{
   .desktop-only {
     display: none !important;
   }
+  .new-mobile-sumary p:first-child {
+    font-weight: 600 !important;
+  }
   .discount-field{
     display: none;
   }
@@ -751,7 +755,7 @@ h1{
     display: grid;
     grid-auto-columns: auto auto;
     grid-template-rows: auto auto; 
-    gap: 4px 10px; 
+    gap: 0px 10px; 
     margin: 0;
   }
   .new-mobile-sumary p:first-of-type {
@@ -821,7 +825,7 @@ h1{
   }
   .product-summary {  
     background-image: url('../img/rectangle_31.webp');
-    background-size: 110%;
+    background-size: 119%;
     background-position: 33% 27px;
     margin: 0;
     width: 100%;
@@ -847,7 +851,7 @@ h1{
   }
   .details-all{
     margin: 0;
-    padding: 10px 20px 20px 30px;
+    padding: 15px 20px 20px 30px;
   }
   .mobile-hero .details-trigger {
     font-size: 13px;
@@ -919,7 +923,7 @@ h1{
     margin-bottom: 6px !important;
   }
   #showMoreFields {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
   }
   #card-element{
     margin-top: 5px;
@@ -1001,8 +1005,8 @@ input, select {
   border-left: 1px solid #e8e8e8;
   border-right: 1px solid #e8e8e8;
   border-bottom: none;
-  font-size: 13px;
-  padding: 12px 12px !important;
+  font-size: 15px;
+  padding: 15px 12px !important;
 }
 .select-wrapper {
   position: relative;
@@ -1126,7 +1130,7 @@ input, select {
 .custom-divider::after {
   content: "";
   flex: 1;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #E0E0E0;
 }
 
 .custom-divider::before {
@@ -1139,7 +1143,7 @@ input, select {
 
 .custom-divider span {
   white-space: nowrap;
-  color: #888;
+  color: #E0E0E0;
   font-weight: 500;
   font-size: 14px;
 }
@@ -1274,7 +1278,7 @@ input, select {
 }
 
 #showMoreFields {
-  color: #1a1a1ab2;
+  color: #1a1a1a82;
   font-size: 12px;
   text-decoration: underline dotted;
   margin-top: 0 !important;
@@ -1469,7 +1473,7 @@ label[for="payment-method-google"] {
   height: 22px;
 }
 .timer img{
-  width: 20px;
+  width: 24px;
 }
 .btn-radio {
   display: flex;
@@ -1649,6 +1653,7 @@ button {
   justify-content: center;
   padding: 10px;
   color: #1a1a1ab3;
+  font-size: 18px;
   gap: 10px;
   font-weight: 400;
   box-shadow: 0 0px 2px rgba(0, 0, 0, 0.2);
@@ -1673,7 +1678,7 @@ button {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 20px 0;
+    margin: 20px 0 15px;
   }
   
   .footer{
@@ -1694,7 +1699,7 @@ button {
   .custom-divider::after {
     content: "";
     flex: 1;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #E0E0E0;
   }
   .custom-divider::before {
     margin-right: 10px;
@@ -1704,7 +1709,7 @@ button {
   }
   .custom-divider span {
     white-space: nowrap;
-    color: #888;
+    color: #E0E0E0;
     font-weight: 500;
     font-size: 14px;
   }
@@ -1719,7 +1724,7 @@ button {
   .checkout-right {
     height: auto;
     flex-direction: column;
-    padding: 24px;
+    padding: 30px 24px;
   }
   #payment-form {
     margin: auto;

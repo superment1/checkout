@@ -135,7 +135,7 @@
                             <div class="product-row product-text">
                                 <p class="product-text">Total due</p>
                                 <span id="total-price">
-                                   {{ sym }} {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
+                                   {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                                 </span>
                             </div>
                         </div>
@@ -167,99 +167,24 @@
                         <img src="../static/img/group_74.webp" alt="usa">
                     </div>                 
                 </div>
-               
-                <!-- DETAILS DESKTOP -->
-                <!-- <div class="desktop-only-title">
-                    <p class="desktop-only-title"> Pay Superment</p>
-                    <span id="title-price-desk">
-                        US$ {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
-                    </span>
-                </div>
-                <div id="product-details" class="product-details desktop-only">
-                    <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product" width="160" />
-                    <div class="sumary-product">
-                        <div class="product-row">
-                            <div class="product-col">
-                                <p>{{ product.name }}</p>
-                                <p> {{ product.description }}</p>
-                            </div>
-                            <span class="product-price">
-                               {{ sym }} {{ '%.2f' | format(price.unit_amount / 100) }}
-                            </span>
-                        </div>
-                        <div class="product-row">
-                            <div class="product-col-2">
-                                <div class="product-row">
-                                    <p class="product-text">Subtotal</p>
-                                    <span class="product-price">
-                                        {{ sym }} {{ '%.2f' | format(price.unit_amount / 100) }}
-                                    </span>
-                                </div>
-                                <div class="product-row coupon-discount">
-                                    <div class="coupon">
-                                        <svg id="coupon-valid-icon-desktop" class="coupon-icon" focusable="false" width="12"
-                                            height="12" viewBox="0 0 12 12" fill="none" style="display:none;">
-                                            <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M5.76372 0.441305L11.7795 6.4757C12.0735 6.76867 12.0735 7.24365 11.7795 7.53662L7.52046 11.7803C7.22643 12.0732 6.74973 12.0732 6.4557 11.7803L0.435789 5.74171C0.156657 5.46172 0 5.08308 0 4.68843V1.50036C0 0.671734 0.674166 0 1.50579 0H4.69951C5.09908 0 5.48213 0.158844 5.76372 0.441305ZM2.625 3.75C3.24632 3.75 3.75 3.24632 3.75 2.625C3.75 2.00368 3.24632 1.5 2.625 1.5C2.00368 1.5 1.5 2.00368 1.5 2.625C1.5 3.24632 2.00368 3.75 2.625 3.75Z"
-                                                fill="currentColor"></path>
-                                        </svg>
-                                        <input id="coupon-code-desktop" type="text" class="input-coupon desktop"
-                                            placeholder="Promotion Code Entry">
-                                        <button type="button" id="apply-coupon-desktop">
-                                            <span class="btn-label">Apply</span>
-                                            <span class="btn-spinner" style="display: none;">
-                                                <svg class="spinner" viewBox="0 0 50 50">
-                                                    <defs>
-                                                        <linearGradient id="spinner-gradient-desktop" 
-                                                        x1="0%" y1="0%" x2="100%" y2="0%">
-                                                            <stop offset="0%" stop-color="#2e8eca" stop-opacity="1" />
-                                                            <stop offset="100%" stop-color="#2e8eca" stop-opacity="0" />
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <circle class="path" cx="25" cy="25" r="20" />
-                                                </svg>
-                                            </span></button>
-                                        <button id="cancel-coupon-desktop"
-                                            style="position: absolute; left: 50px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
-                                        <span style="display: none" id="discount-value-desktop"></span>
-                                        <span id="discount-value-desktop"></span>
-                                        <div id="coupon-message-desktop" style="margin-top: 5px; font-size: 14px;"></div>
-                                    </div>
-                                    <span id="discount-amount-desktop" style="display: none; font-size: 14px; color: #ffffff9f;"></span>
-                                </div>
-                                <div class="product-row">
-                                    <div class="product-col shipping">
-                                        <p class="product-col shipping">Shipping</p>
-                                        <p>U.S. Shipping (At most 7 days)</p>
-                                    </div>
-                                    <span class="value-shipping">$ 4,90</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-row product-text">
-                            <p class="product-text">Total due</p>
-                            <span id="total-price-desk">
-                                {{ sym }} {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
-                            </span>
-                        </div>
-                    </div>
-                </div> -->
             </div>
             <div class="desk-left">
                 <div class="new-mobile-sumary">            
                 <p>{{ product.name }}</p>
                 <p>{{ product.description }}</p>
-                <span class="price-old">{{ sym }} {{ '%.2f' | format((price.unit_amount + 490) / 100) }}</span>
+                <span class="price-old"></span>
             </div>
-            <div class="details-all">   
-                    <div id="qty-wrapper" class="qty-wrapper" style="display:none;">
-                        <button id="qty-minus" type="button" aria-label="Decrease">−</button>
-                        <input id="qty" type="number" min="1" value="1" inputmode="numeric">
-                        <button id="qty-plus" type="button" aria-label="Increase">+</button>
-                    </div>
+            <div class="details-all">
+                    <div>
+                        <div id="qty-wrapper" class="qty-wrapper" style="display:none;">
+                            <button id="qty-minus" type="button" aria-label="Decrease">−</button>
+                            <input id="qty" type="number" min="1" value="1" inputmode="numeric">
+                            <button id="qty-plus" type="button" aria-label="Increase">+</button>
+                        </div>
+                    </div>                      
                     <div class="price-mobile">
                         <span id="title-price-mobile">
-                            {{ sym }} {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
+                            {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                         </span>
                         <span class="delivery">Free U.S. Shipping</span>
                     </div>
@@ -315,7 +240,7 @@
                 <div class="product-row product-text">
                     <p class="product-text">Total due</p>
                     <span id="total-due-price">
-                        {{ sym }} {{ '%.2f' | format((price.unit_amount + 490) / 100) }}
+                        {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                     </span>
                 </div>
                 <div class="testimonials-desktop">
@@ -325,51 +250,53 @@
                         <p>All real and fresh reviews:</p>
                     </div>
                     <div class="dep-container">
-                        <div class="dep">
-                            <div class="title-dep">
-                                <h1>LIGIANI G., 44</h1>
-                                <img src="/static/img/verifield.webp" alt="verifield">
-                                <p>Verified Customer</p>
-                            </div>                
-                            <p class="state">Boston, MA</p>
-                            <span class="depoiments-desk">This is amazing. I take it and I’m out like a rock. Best sleep I’ve had in a long time.</span>
-                        </div> 
-                        <div class="dep">
-                            <div class="title-dep">
-                                <h1>BRUNA R., 38</h1>
-                                <img src="/static/img/verifield.webp" alt="verifield">
-                                <p>Verified Customer</p>
-                            </div>                
-                            <p>New York, NY</p>
-                            <span class="depoiments">I’m honestly loving it. I fall asleep so fast now. That never used to happen. One capsule is all I need, and I’m finally getting real sleep.</span>
+                        <div class="dep-track">
+                            <div class="dep">
+                                <div class="title-dep">
+                                    <h1>LIGIANI G., 44</h1>
+                                    <img src="/static/img/verifield.webp" alt="verifield">
+                                    <p>Verified Customer</p>
+                                </div>                
+                                <p class="state">Boston, MA</p>
+                                <span class="depoiments-desk">This is amazing. I take it and I’m out like a rock. Best sleep I’ve had in a long time.</span>
+                            </div> 
+                            <div class="dep">
+                                <div class="title-dep">
+                                    <h1>BRUNA R., 38</h1>
+                                    <img src="/static/img/verifield.webp" alt="verifield">
+                                    <p>Verified Customer</p>
+                                </div>                
+                                <p>New York, NY</p>
+                                <span class="depoiments">I’m honestly loving it. I fall asleep so fast now. That never used to happen. One capsule is all I need, and I’m finally getting real sleep.</span>
+                            </div>
+                            <div class="dep">
+                                <div class="title-dep">
+                                    <h1>ELISEU C., 40</h1>
+                                    <img src="/static/img/verifield.webp" alt="verifield">
+                                    <p>Verified Customer</p>
+                                </div>                
+                                <p>Fort Lauderdale, FL</p>
+                                <span class="depoiments">I never had trouble falling asleep, but I always woke up at night to pee. Now I sleep straight through, and I feel way more rested during the day.</span>
+                            </div>   
+                            <div class="dep">
+                                <div class="title-dep">
+                                    <h1>DANIELLE A., 36</h1>
+                                    <img src="/static/img/verifield.webp" alt="verifield">
+                                    <p>Verified Customer</p>
+                                </div>                
+                                <p>Los Angeles, CA</p>
+                                <span class="depoiments">I took two the first night and it completely knocked me out. I didn’t expect it to work so well, but it really does.</span>
+                            </div>    
+                            <div class="dep">
+                                <div class="title-dep">
+                                    <h1>NUALA O., 35</h1>
+                                    <img src="/static/img/verifield.webp" alt="verifield">
+                                    <p>Verified Customer</p>
+                                </div>                
+                                <p>Miami, FL</p>
+                                <span class="depoiments">I used to be up until 5, sometimes 10 in the morning. Now I’m asleep by 9 or 10 p.m. No grogginess, just real sleep.</span>
+                            </div>   
                         </div>
-                        <div class="dep">
-                            <div class="title-dep">
-                                <h1>ELISEU C., 40</h1>
-                                <img src="/static/img/verifield.webp" alt="verifield">
-                                <p>Verified Customer</p>
-                            </div>                
-                            <p>Fort Lauderdale, FL</p>
-                            <span class="depoiments">I never had trouble falling asleep, but I always woke up at night to pee. Now I sleep straight through, and I feel way more rested during the day.</span>
-                        </div>   
-                        <div class="dep">
-                            <div class="title-dep">
-                                <h1>DANIELLE A., 36</h1>
-                                <img src="/static/img/verifield.webp" alt="verifield">
-                                <p>Verified Customer</p>
-                            </div>                
-                            <p>Los Angeles, CA</p>
-                            <span class="depoiments">I took two the first night and it completely knocked me out. I didn’t expect it to work so well, but it really does.</span>
-                        </div>    
-                        <div class="dep">
-                            <div class="title-dep">
-                                <h1>NUALA O., 35</h1>
-                                <img src="/static/img/verifield.webp" alt="verifield">
-                                <p>Verified Customer</p>
-                            </div>                
-                            <p>Miami, FL</p>
-                            <span class="depoiments">I used to be up until 5, sometimes 10 in the morning. Now I’m asleep by 9 or 10 p.m. No grogginess, just real sleep.</span>
-                        </div>   
                     </div>                    
                 </div>    
                 <div class="footer-desk">

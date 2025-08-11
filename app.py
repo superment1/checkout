@@ -63,10 +63,9 @@ def checkout():
     try:
         price = stripe.Price.retrieve(price_id)
         product = stripe.Product.retrieve(price.product)
-        shipping_fee = 490 
 
         intent = stripe.PaymentIntent.create(
-            amount=price.unit_amount + shipping_fee,
+            amount=price.unit_amount,
             currency=price.currency,
             automatic_payment_methods={"enabled": True},
             metadata={
@@ -145,7 +144,6 @@ def create_payment():
             return jsonify({"error": "price_id is required"}), 400
          
         price = stripe.Price.retrieve(price_id)
-        shipping_fee = 490
         amount = price.unit_amount + shipping_fee
         currency = price.currency
         
@@ -246,7 +244,6 @@ def update_quantity():
         price = stripe.Price.retrieve(price_id)
         unit_cents = int(price["unit_amount"])
         currency = price["currency"]
-        shipping_cents = 490
 
         subtotal = unit_cents * quantity
 

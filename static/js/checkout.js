@@ -12,8 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const message = document.getElementById("payment-message");
   const submitBtn = document.getElementById("submit");
   const price = parseInt(window.productPrice || 0);
-  const shippingAmount = 490;
-  const totalAmount = price + shippingAmount;
+  const totalAmount = price;
   const currency = window.productCurrency;
 
   const appearance = {
@@ -80,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById('title-price-mobile'),
       document.getElementById('total-due-price'), 
       document.querySelector('.product-row-mobile .product-price'),
-      document.querySelector('.new-mobile-sumary .price-old'),
+      // document.querySelector('.new-mobile-sumary .price-old'),
       document.querySelector('.product-row .product-price'),
     ].filter(Boolean);
   }
@@ -241,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const style = {
     base: {
-      fontSize: '13px',
+      fontSize: '21px',
       color: '#333',
       backgroundColor: '#fff',
       border: '1px solid #ccc',
@@ -344,13 +343,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "https://checkout.superment.co/thanks";
     }
   });
+
+  const OLD_PRICE_CENTS_BY_ID = {
+    'prod_SbKYsQrxStW8wB':  6000, 
+    'prod_SbKa8ag01A2TGX':  18000,   
+    'prod_SbKaRuJpDVBEzx':  36000, 
+  };
+  (function setOldPrice(){
+    const cents = OLD_PRICE_CENTS_BY_ID[window.productId];
+    if (typeof cents !== 'number') return;
+
+    const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+    const text = `${sym} ${(cents/100).toFixed(2)}`;
+
+    document.querySelectorAll('.price-old').forEach(el => {
+      el.textContent = text;
+    });
+  })();
+
   // === QUANTITY (mínimo) ===
-  const TARGET_PRODUCT_ID = 'prod_SgGRuiyYsEVyCF';
+  const TARGET_PRODUCT_ID = 'prod_SbKYsQrxStW8wB';
   const qtyWrapper = document.getElementById('qty-wrapper'); 
   if (window.productId === TARGET_PRODUCT_ID && qtyWrapper) {
     qtyWrapper.style.setProperty('display', 'flex', 'important');
     const unitCents = parseInt(window.productPrice || 0, 10);
-    const shipCents = 490;
     let qty = 1;
 
     const qtyInput = document.getElementById("qty");
@@ -378,24 +394,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ payment_intent_id: paymentIntentId, quantity: qty })
         });
-
         const data = await res.json();
         if (!res.ok || !data.success) {
           console.warn("Falha ao atualizar PI:", data.error || "Erro");
           return;
         }
-
         const totalCents = parseInt(data.amount, 10);
         const dollars = (totalCents / 100).toFixed(2);
 
         const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
         setPriceText(`${sym} ${dollars}`);
-        // totalPriceElement.textContent = `US$ ${dollars}`;
-        // titlePriceDesk.textContent    = `US$ ${dollars}`;
-        // titlePriceMobile.textContent  = `US$ ${dollars}`;
-        // totalPriceDesk.textContent    = `US$ ${dollars}`;
-
-        // se estiver usando Payment Request (Apple/Google Pay)
         if (window.paymentRequest) {
           window.paymentRequest.update({
             total: { label: 'Order total', amount: totalCents }
