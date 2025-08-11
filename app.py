@@ -56,18 +56,24 @@ def get_client_secret():
 
 @app.route("/checkout")
 def checkout():
+    
     price_id = request.args.get("price_id")
     if not price_id:
         return "price_id missing", 400
     try:
         price = stripe.Price.retrieve(price_id)
         product = stripe.Product.retrieve(price.product)
-        shipping_fee = 490
+        shipping_fee = 490 
+
         intent = stripe.PaymentIntent.create(
             amount=price.unit_amount + shipping_fee,
             currency=price.currency,
             automatic_payment_methods={"enabled": True},
-            metadata={"authorized": "true"} 
+            metadata={
+                "authorized": "true",
+                "product_id": product.id,
+                "price_id": price.id   
+            } 
         )
         return render_template(
             "index.html", 
@@ -219,7 +225,55 @@ def validate_coupon():
         })
     except Exception as e:
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
-    
+
+@app.post("/update-quantity")
+def update_quantity():
+    try:
+        data = request.get_json() or {}
+        pi_id = data.get("payment_intent_id")
+        quantity = int(data.get("quantity", 1))
+        if not pi_id:
+            return jsonify({"success": False, "error": "payment_intent_id is required"}), 400
+        if quantity < 1:
+            quantity = 1
+
+        pi = stripe.PaymentIntent.retrieve(pi_id)
+
+        price_id = pi.metadata.get("price_id")
+        if not price_id:
+            return jsonify({"success": False, "error": "price_id missing in metadata"}), 400
+
+        price = stripe.Price.retrieve(price_id)
+        unit_cents = int(price["unit_amount"])
+        currency = price["currency"]
+        shipping_cents = 490
+
+        subtotal = unit_cents * quantity
+
+        coupon_type = pi.metadata.get("coupon_type")
+        if coupon_type == "percent":
+            percent = int(pi.metadata.get("coupon_percent", "0") or 0)
+            discounted = int(round(subtotal * (1 - percent / 100)))
+        elif coupon_type == "amount":
+            amount_off = int(pi.metadata.get("coupon_amount_off", "0") or 0)
+            discounted = max(0, subtotal - amount_off)
+        else:
+            discounted = subtotal
+
+        new_amount = max(0, discounted + shipping_cents)
+
+        updated = stripe.PaymentIntent.modify(
+            pi_id,
+            amount=new_amount,
+            currency=currency,
+            metadata={**pi.metadata, "quantity": str(quantity)}
+        )
+
+        return jsonify({"success": True, "amount": updated.amount})
+    except Exception:
+        return jsonify({"success": False, "error": "Erro interno. Tente novamente mais tarde."}), 500
+
+
 @app.route("/list-coupons", methods=["GET"])
 @require_api_key()
 def list_coupons():

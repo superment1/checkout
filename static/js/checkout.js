@@ -28,6 +28,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     locale: "en",
   });
 
+  let timeLeft = 7 * 60; 
+  const countdownEl = document.getElementById("countdown");
+  function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+    if (timeLeft > 0) {
+      timeLeft--;
+    } else {
+      clearInterval(timerInterval);
+      countdownEl.textContent = "00:00";
+    }
+  }
+  updateTimer();
+  const timerInterval = setInterval(updateTimer, 1000);
+
   const expressCheckoutElement = elements.create("expressCheckout", {
     buttonType: {
       applePay: "plain",
@@ -57,21 +74,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     return document.getElementById(getId(id));
   }
 
-  const couponInput = $("coupon-code");
-  const applyButton = $("apply-coupon");
-  const messageBox = $("coupon-message");
+  function getPriceTargets() {
+    return [
+      document.getElementById('total-price'),
+      document.getElementById('title-price-mobile'),
+      document.getElementById('total-due-price'), 
+      document.querySelector('.product-row-mobile .product-price'),
+      document.querySelector('.new-mobile-sumary .price-old'),
+      document.querySelector('.product-row .product-price'),
+    ].filter(Boolean);
+  }
+
+  function setPriceText(text) {
+    getPriceTargets().forEach(el => { el.textContent = text; });
+  }
+  function readCurrentTotal() {
+    const el = getPriceTargets()[0];
+    if (!el) return 0;
+    const n = parseFloat((el.textContent || '').replace(/[^0-9.]/g, ''));
+    return Number.isFinite(n) ? n : 0;
+  }
+  const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+
+  const pick = (base) => {
+    const desk = document.getElementById(`${base}-desktop`);
+    const mob  = document.getElementById(base);
+    if (isDesktop()) return desk || mob || null;   // desktop aberto
+    return mob || desk || null;                    // mobile (accordion)
+  };
+  const couponInput = pick("coupon-code");
+  const applyButton = pick("apply-coupon");
+  const messageBox = pick("coupon-message");
   const btnSpinner = applyButton.querySelector(".btn-spinner");
   const btnLabel = applyButton.querySelector(".btn-label");
-  const discountValue = $("discount-value");
-  const cancelButton = $("cancel-coupon");
-  const couponIcon = $("coupon-valid-icon");
-  const totalPriceElement = document.getElementById("total-price");
-  const titlePriceDesk = document.getElementById("title-price-desk")
-  const totalPriceDesk = document.getElementById("total-price-desk")  
-  const titlePriceMobile = document.getElementById("title-price-mobile")
-  const discountAmount = $("discount-amount");
-  let totalText = totalPriceElement.textContent.trim();
-  let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
+  const discountValue = pick("discount-value");
+  const cancelButton = pick("cancel-coupon");
+  const couponIcon = pick("coupon-valid-icon");
+  const discountAmount = pick("discount-amount");
+  // let totalText = totalPriceElement.textContent.trim();
+  // let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
+  // const originalTotal = totalNumber;
+
+  let totalNumber = readCurrentTotal();
   const originalTotal = totalNumber;
   const originalClientSecret = clientSecret
 
@@ -97,10 +141,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnLabel.style.display = "inline-block";
     couponIcon.style.display = "none"
     discountAmount.style.display = "none";
-    totalPriceElement.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    titlePriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    titlePriceMobile.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    totalPriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
+
+    setPriceText(`${sym} ${originalTotal.toFixed(2)}`);
+
+    // totalPriceElement.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    // titlePriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    // titlePriceMobile.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    // totalPriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
 
     elements.update({ clientSecret: originalClientSecret });
   });
@@ -147,12 +194,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       discountValue.textContent = `${result.discount}% discount`;
       btnSpinner.style.display = "none";
       couponIcon.style.display = "block"
-      const discountedPrice = (totalNumber * (1 - discount / 100)).toFixed(2);
-      totalPriceElement.textContent = `US$ ${discountedPrice}`; 
-      titlePriceDesk.textContent = `US$ ${discountedPrice}`;
-      titlePriceMobile.textContent = `US$ ${discountedPrice}`;
-      totalPriceDesk.textContent = `US$ ${discountedPrice}`;
-      const amountOff = (totalNumber - discountedPrice).toFixed(2);
+      const before = readCurrentTotal();
+      const discounted = +(before * (1 - discount / 100)).toFixed(2);
+      setPriceText(`${sym} ${discounted.toFixed(2)}`);
+      const amountOff = (before - discounted).toFixed(2);
+
+      // const discountedPrice = (totalNumber * (1 - discount / 100)).toFixed(2);
+      // totalPriceElement.textContent = `US$ ${discountedPrice}`; 
+      // titlePriceDesk.textContent = `US$ ${discountedPrice}`;
+      // titlePriceMobile.textContent = `US$ ${discountedPrice}`;
+      // totalPriceDesk.textContent = `US$ ${discountedPrice}`;
+      // const amountOff = (totalNumber - discountedPrice).toFixed(2);
       discountAmount.style.display = "inline";
       discountAmount.textContent = `-US$ ${amountOff}`;
       clientSecret = newClientSecret;
@@ -189,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const style = {
     base: {
-      fontSize: '16px',
+      fontSize: '13px',
       color: '#333',
       backgroundColor: '#fff',
       border: '1px solid #ccc',
@@ -292,6 +344,68 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "https://checkout.superment.co/thanks";
     }
   });
+  // === QUANTITY (mínimo) ===
+  const TARGET_PRODUCT_ID = 'prod_SgGRuiyYsEVyCF';
+  const qtyWrapper = document.getElementById('qty-wrapper'); 
+  if (window.productId === TARGET_PRODUCT_ID && qtyWrapper) {
+    qtyWrapper.style.setProperty('display', 'flex', 'important');
+    const unitCents = parseInt(window.productPrice || 0, 10);
+    const shipCents = 490;
+    let qty = 1;
+
+    const qtyInput = document.getElementById("qty");
+    const qtyMinus = document.getElementById("qty-minus");
+    const qtyPlus  = document.getElementById("qty-plus");
+
+    qtyMinus?.addEventListener("click", () => setQty(Math.max(1, qty - 1)));
+    qtyPlus?.addEventListener("click",  () => setQty(qty + 1));
+    qtyInput?.addEventListener("input", () => {
+      const n = parseInt(qtyInput.value || "1", 10);
+      setQty(isNaN(n) || n < 1 ? 1 : n);
+    });
+
+    function setQty(newQty) {
+      qty = newQty;
+      if (qtyInput) qtyInput.value = String(qty);
+      recalcAndSyncPI();
+    }
+    async function recalcAndSyncPI() {
+      try {
+        const paymentIntentId = clientSecret.split("_secret")[0];
+
+        const res = await fetch("/update-quantity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ payment_intent_id: paymentIntentId, quantity: qty })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          console.warn("Falha ao atualizar PI:", data.error || "Erro");
+          return;
+        }
+
+        const totalCents = parseInt(data.amount, 10);
+        const dollars = (totalCents / 100).toFixed(2);
+
+        const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+        setPriceText(`${sym} ${dollars}`);
+        // totalPriceElement.textContent = `US$ ${dollars}`;
+        // titlePriceDesk.textContent    = `US$ ${dollars}`;
+        // titlePriceMobile.textContent  = `US$ ${dollars}`;
+        // totalPriceDesk.textContent    = `US$ ${dollars}`;
+
+        // se estiver usando Payment Request (Apple/Google Pay)
+        if (window.paymentRequest) {
+          window.paymentRequest.update({
+            total: { label: 'Order total', amount: totalCents }
+          });
+        }
+      } catch (e) {
+        console.error("Erro ao sincronizar quantidade:", e);
+      }
+    }
+  }
 
   // PRODUCT
   const overlay = document.getElementById('accordionOverlay');
@@ -322,8 +436,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               : `Close ${arrowUpSvg}`;
           } else {
             btn.innerHTML = isHeader
-              ? `View details ${arrowDownSvg}`
-              : `Add code ${arrowDownSvg}`;
+              ? `Details ${arrowDownSvg}`
+              : `Add your discount code ${arrowDownSvg}`;
           }
         });
       });
@@ -338,13 +452,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const isProductSummary = btn.closest('.product-summary');
 
         btn.innerHTML = isHeader
-          ? `View details ${arrowDownSvg}`
-          : `Add code ${arrowDownSvg}`;
+          ? `Details ${arrowDownSvg}`
+          : `Add your discount code ${arrowDownSvg}`;
         });
       }
     });
   }
-
+  
   //Shipping
 
   // === BILLING ===
