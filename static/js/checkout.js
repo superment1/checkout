@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     buttonTheme: {
       applePay: "black",
     },
-    buttonHeight: 48,
+    buttonHeight: 42,
     layout: {
       maxRows: 2,
       maxColumns: 2,
@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const style = {
     base: {
-      fontSize: '21px',
+      fontSize: '16px',
       color: '#333',
       backgroundColor: '#fff',
       border: '1px solid #ccc',

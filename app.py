@@ -144,7 +144,7 @@ def create_payment():
             return jsonify({"error": "price_id is required"}), 400
          
         price = stripe.Price.retrieve(price_id)
-        amount = price.unit_amount + shipping_fee
+        amount = price.unit_amount
         currency = price.currency
         
         intent = stripe.PaymentIntent.create(
@@ -257,7 +257,7 @@ def update_quantity():
         else:
             discounted = subtotal
 
-        new_amount = max(0, discounted + shipping_cents)
+        new_amount = max(0, discounted)
 
         updated = stripe.PaymentIntent.modify(
             pi_id,
