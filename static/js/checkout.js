@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   const data = await res.json();
   let clientSecret = data.client_secret;
-
+  const PRICE_ID = window.priceId;
   const stripe = Stripe(window.publishableKey);
   const form = document.getElementById("payment-form");
   const message = document.getElementById("payment-message");
@@ -77,9 +77,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return [
       document.getElementById('total-price'),
       document.getElementById('title-price-mobile'),
+      document.getElementById('title-price-mobile-accordion'),
       document.getElementById('total-due-price'), 
       document.querySelector('.product-row-mobile .product-price'),
-      // document.querySelector('.new-mobile-sumary .price-old'),
       document.querySelector('.product-row .product-price'),
     ].filter(Boolean);
   }
@@ -97,32 +97,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const pick = (base) => {
     const desk = document.getElementById(`${base}-desktop`);
+    const acc  = document.getElementById(`${base}-accordion`);
     const mob  = document.getElementById(base);
-    if (isDesktop()) return desk || mob || null;   // desktop aberto
-    return mob || desk || null;                    // mobile (accordion)
+    if (isDesktop()) return desk || acc || mob || null;   
+    return acc || mob || desk || null;                
   };
+
   const couponInput = pick("coupon-code");
   const applyButton = pick("apply-coupon");
   const messageBox = pick("coupon-message");
-  const btnSpinner = applyButton.querySelector(".btn-spinner");
-  const btnLabel = applyButton.querySelector(".btn-label");
+  const btnSpinner = applyButton ? applyButton.querySelector(".btn-spinner") : null;
+  const btnLabel   = applyButton ? applyButton.querySelector(".btn-label")   : null;
   const discountValue = pick("discount-value");
   const cancelButton = pick("cancel-coupon");
   const couponIcon = pick("coupon-valid-icon");
   const discountAmount = pick("discount-amount");
-  // let totalText = totalPriceElement.textContent.trim();
-  // let totalNumber = parseFloat(totalText.replace(/[^0-9.]/g, ''));
-  // const originalTotal = totalNumber;
 
+  if (!couponInput || !applyButton || !messageBox) {
+    console.warn("Coupon UI incompleta para este layout.");
+    return;
+  }
   let totalNumber = readCurrentTotal();
   const originalTotal = totalNumber;
   const originalClientSecret = clientSecret
 
-  couponInput.addEventListener("focus", () => {
+  couponInput && couponInput.addEventListener("focus", () => {
     couponInput.classList.add("focused");
   });
 
-  couponInput.addEventListener("input", () => {
+  couponInput && couponInput.addEventListener("input", () => {
     if (couponInput.value.trim()) {
       applyButton.style.display = "inline-block";
       btnLabel.style.display = "inline-block";
@@ -131,26 +134,41 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnLabel.style.display = "none";
     }
   });
-  cancelButton.addEventListener("click", () => {
+  cancelButton && cancelButton.addEventListener("click", async () => {
     couponInput.disabled = false;
     couponInput.value = "";
     couponInput.placeholder = "Enter your coupon code";
     cancelButton.style.display = "none";
     discountValue.textContent = "";
+    discountValue.style.display = "none";
     btnLabel.style.display = "inline-block";
     couponIcon.style.display = "none"
     discountAmount.style.display = "none";
+    applyButton.style.display = "none";
 
     setPriceText(`${sym} ${originalTotal.toFixed(2)}`);
 
-    // totalPriceElement.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    // titlePriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    // titlePriceMobile.textContent = `US$ ${originalTotal.toFixed(2)}`;
-    // totalPriceDesk.textContent = `US$ ${originalTotal.toFixed(2)}`;
+    try {
+      const r = await fetch("/update-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price_id: PRICE_ID }) // agora a variável existe
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "reset failed");
 
-    elements.update({ clientSecret: originalClientSecret });
+      clientSecret = data.client_secret;
+      window.paymentIntentId = data.payment_intent_id;
+      elements.update({ clientSecret });
+    } catch (e) {
+      console.error("Erro ao resetar PaymentIntent:", e);
+      clientSecret = originalClientSecret;
+      elements.update({ clientSecret });
+      window.paymentIntentId = clientSecret.split("_secret")[0];
+    }
+    couponInput.blur();
   });
-  applyButton.addEventListener("click", async () => {
+  applyButton && applyButton.addEventListener("click", async () => {
     const code = couponInput.value.trim();
     messageBox.textContent = ""; 
     messageBox.style.color = ""; 
@@ -189,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       couponInput.disabled = true;
       cancelButton.style.display = "inline-block"; 
       couponInput.classList.remove("focused");
-      discountValue.style.display = "inline"; 
+      discountValue.style.display = "flex"; 
       discountValue.textContent = `${result.discount}% discount`;
       btnSpinner.style.display = "none";
       couponIcon.style.display = "block"
@@ -198,14 +216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       setPriceText(`${sym} ${discounted.toFixed(2)}`);
       const amountOff = (before - discounted).toFixed(2);
 
-      // const discountedPrice = (totalNumber * (1 - discount / 100)).toFixed(2);
-      // totalPriceElement.textContent = `US$ ${discountedPrice}`; 
-      // titlePriceDesk.textContent = `US$ ${discountedPrice}`;
-      // titlePriceMobile.textContent = `US$ ${discountedPrice}`;
-      // totalPriceDesk.textContent = `US$ ${discountedPrice}`;
-      // const amountOff = (totalNumber - discountedPrice).toFixed(2);
       discountAmount.style.display = "inline";
-      discountAmount.textContent = `-US$ ${amountOff}`;
+      discountAmount.textContent = `-${sym} ${amountOff}`;
       clientSecret = newClientSecret;
       window.paymentIntentId = result.paymentIntentId;
       elements.update({ clientSecret: newClientSecret });
@@ -287,7 +299,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     let billing;
     if (billingCheckbox.checked) {
-      // usa o endereço de entrega como billing
       billing = {
         name: shipping.name,
         address: { ...shipping.address }
@@ -305,17 +316,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       };
     }
-    // const billing = {
-    //   name: document.getElementById("billing-name")?.value || shipping.name,
-    //   address: {
-    //     line1: document.getElementById("billing-line1")?.value || "",
-    //     line2: document.getElementById("billing-line2")?.value || "",
-    //     city: document.getElementById("billing-city")?.value || "",
-    //     state: document.getElementById("billing-state")?.value || "",
-    //     postal_code: document.getElementById("billing-postal")?.value || "",
-    //     country: document.getElementById("billing-country").value
-    //   }
-    // };
     console.log("BILLING", billing)
 
     const { paymentMethod, error: paymentMethodError } = await stripe.createPaymentMethod({
@@ -363,28 +363,55 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // === QUANTITY (mínimo) ===
   const TARGET_PRODUCT_ID = 'prod_SbKYsQrxStW8wB';
-  const qtyWrapper = document.getElementById('qty-wrapper'); 
-  if (window.productId === TARGET_PRODUCT_ID && qtyWrapper) {
-    qtyWrapper.style.setProperty('display', 'flex', 'important');
+  const qtyWrapper = document.querySelectorAll('#qty-wrapper, #qty-wrapper-accordion'); 
+  if (window.productId === TARGET_PRODUCT_ID && qtyWrapper.length) {
+    qtyWrapper.forEach(w => w.style.setProperty('display', 'flex', 'important'));
     const unitCents = parseInt(window.productPrice || 0, 10);
     let qty = 1;
 
-    const qtyInput = document.getElementById("qty");
-    const qtyMinus = document.getElementById("qty-minus");
-    const qtyPlus  = document.getElementById("qty-plus");
-
-    qtyMinus?.addEventListener("click", () => setQty(Math.max(1, qty - 1)));
-    qtyPlus?.addEventListener("click",  () => setQty(qty + 1));
-    qtyInput?.addEventListener("input", () => {
-      const n = parseInt(qtyInput.value || "1", 10);
-      setQty(isNaN(n) || n < 1 ? 1 : n);
-    });
-
+    function syncInputs() {
+      qtyWrapper.forEach(w => {
+        const input = w.querySelector('#qty');
+        if (input) input.value = String(qty);
+      });
+    }
     function setQty(newQty) {
-      qty = newQty;
-      if (qtyInput) qtyInput.value = String(qty);
+      qty = Math.max(1, newQty);
+      syncInputs();
       recalcAndSyncPI();
     }
+    
+    qtyWrapper.forEach(w => {
+      const qtyInput = w.querySelector('#qty');
+      const qtyMinus = w.querySelector('#qty-minus');
+      const qtyPlus  = w.querySelector('#qty-plus');
+
+      qtyMinus?.addEventListener('click', () => setQty(qty - 1));
+      qtyPlus?.addEventListener('click',  () => setQty(qty + 1));
+      qtyInput?.addEventListener('input', () => {
+        const n = parseInt(qtyInput.value || '1', 10);
+        setQty(Number.isFinite(n) && n > 0 ? n : 1);
+      });
+    });
+
+    // inicializa ambos inputs com o valor atual
+    syncInputs();
+    // const qtyInput = document.getElementById("qty");
+    // const qtyMinus = document.getElementById("qty-minus");
+    // const qtyPlus  = document.getElementById("qty-plus");
+
+    // qtyMinus?.addEventListener("click", () => setQty(Math.max(1, qty - 1)));
+    // qtyPlus?.addEventListener("click",  () => setQty(qty + 1));
+    // qtyInput?.addEventListener("input", () => {
+    //   const n = parseInt(qtyInput.value || "1", 10);
+    //   setQty(isNaN(n) || n < 1 ? 1 : n);
+    // });
+
+    // function setQty(newQty) {
+    //   qty = newQty;
+    //   if (qtyInput) qtyInput.value = String(qty);
+    //   recalcAndSyncPI();
+    // }
     async function recalcAndSyncPI() {
       try {
         const paymentIntentId = clientSecret.split("_secret")[0];
@@ -421,12 +448,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const triggers = document.querySelectorAll('.details-trigger');
   const arrowUpSvg = `
     <svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" style="display:inline; vertical-align:middle; margin-left:4px">
-      <path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1 5L5 1L9 5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
 
   const arrowDownSvg = `
     <svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" style="display:inline; vertical-align:middle; margin-left:4px">
-      <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1 1L5 5L9 1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
 
   if (window.innerWidth < 769) {
@@ -440,8 +467,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           const isProductSummary = btn.closest('.product-summary');
           if (isOpen) {
             btn.innerHTML = isHeader
-              ? `Close ${arrowUpSvg}`
-              : `Close ${arrowUpSvg}`;
+              ? `Close <span class="close-icon">X</span>`
+              : `Close <span class="close-icon">X</span>`;
           } else {
             btn.innerHTML = isHeader
               ? `Details ${arrowDownSvg}`
@@ -466,9 +493,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
-  
-  //Shipping
 
+  //Shipping
   // === BILLING ===
   const billingCheckbox = document.getElementById("showBillingFields");
   const billingContainer = document.getElementById("groupShipping-billing");
@@ -572,57 +598,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 })
-
-
-  // === Alternância UI ===
-  // const cardRadio = document.getElementById("payment-method-card");
-  // const googleRadio = document.getElementById("payment-method-google");
-  // const googleDetails = document.querySelector(".google-pay-details");
-
-  // function togglePaymentDetails() {
-  //   if (cardRadio.checked) {
-  //     cardDetails.style.display = "flex";
-  //     googleDetails.style.display = "none";
-  //   } else {
-  //     cardDetails.style.display = "none";
-  //     googleDetails.style.display = "block";
-  //   }
-  // }
-
-  // function updateSubmitButton() {
-  //   const message = document.getElementById("payment-message");
-  //     if (googleRadio.checked) {
-  //     submitBtn.style.display = "none"; 
-  //     message.style.display = "block";
-  //   } else {
-  //     submitBtn.style.display = "block";
-  //     submitBtn.classList.remove("btn-google");
-  //     submitBtn.textContent = "Pay";
-  //     message.style.display = "none";
-  //     }
-  // }
-
-  // function updateLabelStyles() {
-  //   document.querySelectorAll('.payment-label').forEach(label => {
-  //     label.classList.remove('selected');
-  //   });
-
-  //   const selected = document.querySelector('input[name="payment-method"]:checked');
-  //   if (selected) {
-  //     selected.closest('label').classList.add('selected');
-  //   }
-  // }
-
-  // togglePaymentDetails();
-  // updateSubmitButton();
-  // updateLabelStyles();
-  // cardRadio.addEventListener("change", () => {
-  //   togglePaymentDetails();
-  //   updateSubmitButton();
-  //   updateLabelStyles();
-  // });
-  // googleRadio.addEventListener("change", () => {
-  //   togglePaymentDetails();
-  //   updateSubmitButton();
-  //   updateLabelStyles()
-  // });

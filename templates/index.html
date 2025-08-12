@@ -41,7 +41,7 @@
             <span>Details</span>
             <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"
                 style="display:inline; vertical-align:middle; margin-left:4px">
-                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                <path d="M1 1L5 5L9 1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"
                     stroke-linejoin="round" />
             </svg>
         </div>
@@ -50,12 +50,12 @@
     </header>
     <div class="scroll-animation">
         <div class="scroll-text-wrapper">
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save 30% <span class="espacada">|</span> 30-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57% <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee<span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57% <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span> </p>
+        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span> </p>
         </div>
     </div>
     <div class="checkout-container">
@@ -63,9 +63,74 @@
             <div class="product-summary">
                 <!-- ACCORDION -->
                 <div class="accordion-overlay" id="accordionOverlay">
-                    <div id="product-details" class="product-details mobile-only accordion-content">
-                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product" width="160" />
-                        <div class="sumary-product">
+                    <div id="product-details" class="product-details mobile-only accordion-content">                   
+                        <img src='../static/img/img-mobile.webp' alt="{{ product.name }}" class="img-product accordion" width="160" />
+                        <div class="new-mobile-sumary accordion">
+                            <p>{{ product.name }}</p>
+                            <p>{{ product.description }}</p>
+                            <span class="price-old"></span>
+                        </div>
+                        <div class="details-all accordion">
+                            <div>
+                                <div id="qty-wrapper" class="qty-wrapper" style="display:none;">
+                                    <button id="qty-minus" type="button" aria-label="Decrease">−</button>
+                                    <input id="qty" type="number" min="1" value="1" inputmode="numeric">
+                                    <button id="qty-plus" type="button" aria-label="Increase">+</button>
+                                </div>
+                            </div>
+                            <div class="price-mobile">
+                                {% set sym = 'R$' if price.currency == 'brl' else 'US$' %}
+                                <span id="title-price-mobile-accordion">
+                                    {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                                </span>
+                                <span class="delivery">Free U.S. Shipping</span>
+                            </div>
+                            <div class="coupon-discount-accordion">
+                                <div class="coupon">
+                                    <svg id="coupon-valid-icon-accordion" class="coupon-icon" focusable="false" width="14"
+                                        height="20" viewBox="0 0 12 12" fill="none" style="display:none;">
+                                        <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M5.76372 0.441305L11.7795 6.4757C12.0735 6.76867 12.0735 7.24365 11.7795 7.53662L7.52046 11.7803C7.22643 12.0732 6.74973 12.0732 6.4557 11.7803L0.435789 5.74171C0.156657 5.46172 0 5.08308 0 4.68843V1.50036C0 0.671734 0.674166 0 1.50579 0H4.69951C5.09908 0 5.48213 0.158844 5.76372 0.441305ZM2.625 3.75C3.24632 3.75 3.75 3.24632 3.75 2.625C3.75 2.00368 3.24632 1.5 2.625 1.5C2.00368 1.5 1.5 2.00368 1.5 2.625C1.5 3.24632 2.00368 3.75 2.625 3.75Z"
+                                            fill="currentColor"></path>
+                                    </svg>
+                                    <input id="coupon-code-accordion" 
+                                    type="text" 
+                                    class="input-coupon mobile" 
+                                    placeholder="Add promotional code">
+                                    <button type="button" id="apply-coupon-accordion">
+                                        <span class="btn-label">Apply</span>
+                                        <span class="btn-spinner" style="display: none;">
+                                            <svg class="spinner" viewBox="0 0 50 50">
+                                                <defs>
+                                                    <linearGradient id="spinner-gradient-desktop" 
+                                                    x1="0%" y1="0%" x2="100%" y2="0%">
+                                                        <stop offset="0%" stop-color="#2e8eca" stop-opacity="1" />
+                                                        <stop offset="100%" stop-color="#2e8eca" stop-opacity="0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <circle class="path" cx="25" cy="25" r="20" />
+                                            </svg>
+                                        </span></button>
+                                    <button id="cancel-coupon-accordion"
+                                        style="position: absolute; left: 50px; top: 12px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
+                                    
+                                    <div id="coupon-message-accordion" style="margin-top: 5px; font-size: 14px;"></div>
+                                </div>
+                            </div>
+                            <div class="discount-field-accordion" style="line-height: 1">
+                                <span id="discount-amount-accordion" style="display: none; font-size: 18px;"></span>                
+                                <span style="display: none" id="discount-value-accordion"></span>
+                            </div>                            
+                        </div>
+                        <div class="product-row product-text accordion">
+                            <p class="product-text">Total</p>
+                            <span id="total-price">
+                                {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                            </span>
+                        </div>                                                
+                    </div> 
+                    <!-- <div class="product-details mobile-only accordion-content"> -->
+                        <!-- <div class="sumary-product">
                             <div class="product-row-mobile">
                                 <div class="product-info">
                                     <div class="product-col">
@@ -86,43 +151,7 @@
                                         <span class="product-price">
                                             {{ sym }} {{ '%.2f' | format(price.unit_amount / 100) }}
                                         </span>
-                                    </div>
-                                    <div class="product-row coupon-discount accordion">
-                                        <div class="coupon">
-                                            <svg id="coupon-valid-icon" class="coupon-icon" focusable="false" width="12"
-                                                height="12" viewBox="0 0 12 12" fill="none" style="display:none;">
-                                                <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M5.76372 0.441305L11.7795 6.4757C12.0735 6.76867 12.0735 7.24365 11.7795 7.53662L7.52046 11.7803C7.22643 12.0732 6.74973 12.0732 6.4557 11.7803L0.435789 5.74171C0.156657 5.46172 0 5.08308 0 4.68843V1.50036C0 0.671734 0.674166 0 1.50579 0H4.69951C5.09908 0 5.48213 0.158844 5.76372 0.441305ZM2.625 3.75C3.24632 3.75 3.75 3.24632 3.75 2.625C3.75 2.00368 3.24632 1.5 2.625 1.5C2.00368 1.5 1.5 2.00368 1.5 2.625C1.5 3.24632 2.00368 3.75 2.625 3.75Z"
-                                                    fill="currentColor"></path>
-                                            </svg>
-                                            <input id="coupon-code" type="text" class="input-coupon mobile 1"
-                                                placeholder="Promotion Code Entry">
-                                            <button type="button" id="apply-coupon">
-                                                <span class="btn-label">Apply</span>
-                                                <span class="btn-spinner" style="display: none;">
-                                                    <svg class="spinner" viewBox="0 0 50 50">
-                                                        <defs>
-                                                            <linearGradient id="spinner-gradient" x1="0%" y1="0%"
-                                                                x2="100%" y2="0%">
-                                                                <stop offset="0%" stop-color="#2e8eca"
-                                                                    stop-opacity="1" />
-                                                                <stop offset="100%" stop-color="#2e8eca"
-                                                                    stop-opacity="0" />
-                                                            </linearGradient>
-                                                        </defs>
-                                                        <circle class="path" cx="25" cy="25" r="20" />
-                                                    </svg>
-                                                </span>
-                                            </button>
-                                            <button id="cancel-coupon"
-                                                style="position: absolute; left: 56px; top: 8px; display: none; background: none; border: none; font-size: 12px; cursor: pointer;">✕</button>
-                                            <span style="display: none" id="discount-value"></span>
-                                            <span id="discount-value"></span>
-                                            <div id="coupon-message" style="margin-top: 5px; font-size: 14px;"></div>
-                                        </div>
-                                        <span id="discount-amount" style="display: none; margin-left: 10px; font-size: 14px; color: #ffffff9f;">
-                                        </span>
-                                    </div>
+                                    </div>                                    
                                     <div class="product-row">
                                         <div class="product-col shipping">
                                             <p class="product-col shipping">Shipping</p>
@@ -138,8 +167,8 @@
                                    {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                                 </span>
                             </div>
-                        </div>
-                    </div>
+                        </div> -->
+                    <!-- </div> -->
                 </div>
                 <div class="desk-header">
                     <a href="#" class="back-button" onclick="event.preventDefault(); history.back();">
@@ -160,11 +189,14 @@
                 </div>      
                 <div class="mobile-hero">                    
                     <p>Sleep better, wake-up recharged.</p>
-                    <div class="guarantees">
-                        <img class="money-back" src="../static/img/vector.webp" alt="money-back">
+                    <img class="money-back" src="../static/img/vector.webp" alt="money-back">
+                    <div class="guarantees">                        
                         <img src="../static/img/group_76.webp" alt="fda">
                         <img src="../static/img/group_75.webp" alt="organic">
                         <img src="../static/img/group_74.webp" alt="usa">
+                        <img src="../static/img/nsf.webp" alt="nsf">
+                        <img src="../static/img/onde_cert.webp" alt="cert">
+
                     </div>                 
                 </div>
             </div>
@@ -176,7 +208,7 @@
             </div>
             <div class="details-all">
                     <div>
-                        <div id="qty-wrapper" class="qty-wrapper" style="display:none;">
+                        <div id="qty-wrapper-accordion" class="qty-wrapper" style="display:none;">
                             <button id="qty-minus" type="button" aria-label="Decrease">−</button>
                             <input id="qty" type="number" min="1" value="1" inputmode="numeric">
                             <button id="qty-plus" type="button" aria-label="Increase">+</button>
@@ -232,13 +264,13 @@
                         <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6"
                             xmlns="http://www.w3.org/2000/svg"
                             style="display:inline; vertical-align:middle; margin-left:4px">
-                            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            <path d="M1 1L5 5L9 1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
                     </div>                                       
                 </div>
                 <div class="product-row product-text">
-                    <p class="product-text">Total due</p>
+                    <p class="product-text">Total</p>
                     <span id="total-due-price">
                         {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                     </span>
@@ -280,7 +312,7 @@
                             </div>   
                             <div class="dep">
                                 <div class="title-dep">
-                                    <h1>DANIELLE A., 36</h1>
+                                    <h1>DANIELLE A., 37</h1>
                                     <img src="/static/img/verifield.webp" alt="verifield">
                                     <p>Verified Customer</p>
                                 </div>                
@@ -412,7 +444,7 @@
                     </div>
                 </div>
                 <a href="#" id="showMoreFields" style="display: block; margin-top: 8px;">Enter address manually</a>
-                <label class="title1">Payment Method</label>
+                <label class="title1">Payment method</label>
                 <div id="card-elements" class="card-elements">
                     <!-- Cartão -->
                     <!-- <div class="payment-option"> -->
@@ -481,27 +513,13 @@
                                 address manually</a>
                         </div>
                     </div>
-                    <!-- <div class="save-information">
-                        <input class="custom-checkbox" type="checkbox">
-                        <div class="text-informations">
-                            <p class="info">Save my information for faster Checkout</p>
-                            <p class="info2">Pay faster on Superment and everywhere Link is accepted</p>
-                        </div>
-                    </div> -->
                 </div>
 
                 <div id="payment-buttons">
                     <div id="payment-message" style="color: red; margin-top: 10px;"></div>
                     <button class="btn-pay" type="submit" id="submit">Pay</button>
                 </div>
-                <!-- FOOTER -->
-
-                <!-- <div class="stripe-footer">
-                    <a href="https://stripe.com/"><strong>Powered by stripe</strong></span>
-                        <span class="divider">|</span>
-                        <a href="https://stripe.com/legal/end-users" target="_blank" rel="noopener noreferrer">Terms</a>
-                        <a href="https://stripe.co/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
-                </div> -->  
+           
             </form>
             <div class="infos-cards">
                 <img src="/static/img/stripe.webp" alt="flags">
@@ -542,7 +560,7 @@
             </div>   
             <div class="dep">
                 <div class="title-dep">
-                    <h1>DANIELLE A., 36</h1>
+                    <h1>DANIELLE A., 37</h1>
                     <img src="/static/img/verifield.webp" alt="verifield">
                     <p>Verified Customer</p>
                 </div>                
@@ -578,6 +596,7 @@
         window.productCurrency = "{{ product_currency }}";
         window.mapsKey = "{{ maps_key }}";
         window.productId = "{{ product.id }}"; 
+        window.priceId = "{{ price.id }}";
 
         function initShippingAutocomplete() {
             const input = document.getElementById('shippingAddressLine1');

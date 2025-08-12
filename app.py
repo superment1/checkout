@@ -162,19 +162,44 @@ def create_payment():
 @app.route("/update-payment-intent", methods=["POST"])
 def update_payment_intent():
     try:
-        data = request.get_json()
-        intent_id = data.get("payment_intent_id")
-        email = data.get("email")
-        shipping = data.get("shipping")
+        data = request.get_json(silent=True) or {}
+        price_id = data.get("price_id")
 
-        intent = stripe.PaymentIntent.modify(
-            intent_id,
-            receipt_email=email,
-            shipping=shipping
+        if not price_id:
+            return jsonify({"error": "price_id is required"}), 400
+
+        price = stripe.Price.retrieve(price_id)
+        amount = price.unit_amount
+        currency = price.currency
+
+        pi = stripe.PaymentIntent.create(
+            amount=amount,
+            currency=currency,
+            automatic_payment_methods={"enabled": True},
+            metadata={"base_amount": str(amount)}
         )
-        return jsonify(success=True)
+
+        return jsonify(client_secret=pi.client_secret, payment_intent_id=pi.id), 200
     except Exception as e:
+        app.logger.exception("update-payment-intent failed")
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
+
+# @app.route("/update-payment-intent", methods=["POST"])
+# def update_payment_intent():
+#     try:
+#         data = request.get_json()
+#         intent_id = data.get("payment_intent_id")
+#         email = data.get("email")
+#         shipping = data.get("shipping")
+
+#         intent = stripe.PaymentIntent.modify(
+#             intent_id,
+#             receipt_email=email,
+#             shipping=shipping
+#         )
+#         return jsonify(success=True)
+#     except Exception as e:
+#         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route("/validate-coupon", methods=["POST"])
 def validate_coupon():
