@@ -24,6 +24,21 @@
 </head>
 
 <body>
+    <div id="expired-modal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close></div>
+        <div class="total-modal">                    
+            <div class="modal-card">                    
+                <img src="/static/img/timer_2.webp"></img>
+                    <div class="modal-text">
+                        <div class="top-modal">                        
+                            <h3>Almost gone!</h3>
+                            <p>Refresh now to secure your order at this price.</p>
+                        </div>
+                    </div>        
+                <button id="refresh-btn">Refresh</button>                 
+            </div>
+        </div>                                      
+    </div>
     <header>
         <div>
             <a href="#" class="back-button" onclick="event.preventDefault(); history.back();">
@@ -64,7 +79,7 @@
                 <!-- ACCORDION -->
                 <div class="accordion-overlay" id="accordionOverlay">
                     <div id="product-details" class="product-details mobile-only accordion-content">                   
-                        <img src='../static/img/img-mobile.webp' alt="{{ product.name }}" class="img-product accordion" width="160" />
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="img-product accordion" width="160" />
                         <div class="new-mobile-sumary accordion">
                             <p>{{ product.name }}</p>
                             <p>{{ product.description }}</p>
@@ -118,7 +133,7 @@
                                 </div>
                             </div>
                             <div class="discount-field-accordion" style="line-height: 1">
-                                <span id="discount-amount-accordion" style="display: none; font-size: 18px;"></span>                
+                                <span id="discount-amount-accordion" style="display: none; font-size: 17px;"></span>                
                                 <span style="display: none" id="discount-value-accordion"></span>
                             </div>                            
                         </div>
@@ -186,19 +201,9 @@
                         <span class="superment">Superment</span>
                     </span>
                     <span class="voltar">Back</span>   
-                </div>      
-                <div class="mobile-hero">                    
-                    <p>Sleep better, wake-up recharged.</p>
-                    <img class="money-back" src="../static/img/vector.webp" alt="money-back">
-                    <div class="guarantees">                        
-                        <img src="../static/img/group_76.webp" alt="fda">
-                        <img src="../static/img/group_75.webp" alt="organic">
-                        <img src="../static/img/group_74.webp" alt="usa">
-                        <img src="../static/img/nsf.webp" alt="nsf">
-                        <img src="../static/img/onde_cert.webp" alt="cert">
-
-                    </div>                 
-                </div>
+                </div>              
+                <div class="mobile-hero" aria-hidden="true" style="background-image: url('{{ product.images[0] }}');">                   
+                </div>  
             </div>
             <div class="desk-left">
                 <div class="new-mobile-sumary">            
@@ -215,7 +220,7 @@
                         </div>
                     </div>                      
                     <div class="price-mobile">
-                        <span id="title-price-mobile">
+                        <span id="total-due-price">
                             {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                         </span>
                         <span class="delivery">Free U.S. Shipping</span>
@@ -349,6 +354,7 @@
                 Session expires in 
                 <span id="countdown"></span>
             </div>
+            
             <div id="express-checkout-element" class="google-pay-details only-mobile"></div>
             <form id="payment-form">                
                 <div class="custom-divider"><span>or</span></div>
@@ -522,7 +528,7 @@
            
             </form>
             <div class="infos-cards">
-                <img src="/static/img/stripe.webp" alt="flags">
+                <img src="/static/img/stripe_2.webp" alt="flags">
             </div>            
         </div>
         <div class="testimonials">

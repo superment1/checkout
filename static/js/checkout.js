@@ -26,9 +26,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     appearance,
     locale: "en",
   });
+  const refreshBtn = document.getElementById('refresh-btn');
 
-  let timeLeft = 7 * 60; 
+  refreshBtn.addEventListener('click', () => {
+    refreshBtn.disabled = true;
+     window.location.reload();  
+  });
+  const modal = document.getElementById("expired-modal");
+  let timeLeft = 7*60; 
   const countdownEl = document.getElementById("countdown");
+
+  function openModal() {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  modal.addEventListener("click", e => {
+    if (e.target.dataset.close !== undefined) closeModal();
+  });
   function updateTimer() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -39,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       clearInterval(timerInterval);
       countdownEl.textContent = "00:00";
+      openModal();
     }
   }
   updateTimer();
@@ -58,7 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       maxRows: 2,
       maxColumns: 2,
     },
-    collectShippingAddress: true,
+    emailRequired: true,
+    shippingAddressRequired: true
   });
 
    function isDesktop() {
@@ -77,7 +98,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return [
       document.getElementById('total-price'),
       document.getElementById('title-price-mobile'),
-      document.getElementById('title-price-mobile-accordion'),
       document.getElementById('total-due-price'), 
       document.querySelector('.product-row-mobile .product-price'),
       document.querySelector('.product-row .product-price'),
