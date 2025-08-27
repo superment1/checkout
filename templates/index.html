@@ -3,9 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    
     <title>Superment Checkout</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#370f1e">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#370f1e">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#370f1e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Superment Checkout">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
@@ -144,46 +150,6 @@
                             </span>
                         </div>                                                
                     </div> 
-                    <!-- <div class="product-details mobile-only accordion-content"> -->
-                        <!-- <div class="sumary-product">
-                            <div class="product-row-mobile">
-                                <div class="product-info">
-                                    <div class="product-col">
-                                        <p>{{ product.name }}</p>
-                                        <p> {{ product.description }}</p>
-                                    </div>
-                                    <span class="product-price">
-                                        {% set sym = 'R$' if price.currency == 'brl' else 'US$' %}
-
-                                        {{ sym }} {{ '%.2f' | format(price.unit_amount / 100) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="product-row">
-                                <div class="product-col-2">
-                                    <div class="product-row">
-                                        <p class="product-text">Subtotal</p>
-                                        <span class="product-price">
-                                            {{ sym }} {{ '%.2f' | format(price.unit_amount / 100) }}
-                                        </span>
-                                    </div>                                    
-                                    <div class="product-row">
-                                        <div class="product-col shipping">
-                                            <p class="product-col shipping">Shipping</p>
-                                            <p>U.S. Shipping (Up to 7 days)</p>
-                                        </div>
-                                        <span class="value-shipping">US$ 4,90</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-row product-text">
-                                <p class="product-text">Total due</p>
-                                <span id="total-price">
-                                   {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
-                                </span>
-                            </div>
-                        </div> -->
-                    <!-- </div> -->
                 </div>
                 <div class="desk-header">
                     <a href="#" class="back-button" onclick="event.preventDefault(); history.back();">
@@ -220,7 +186,7 @@
                         </div>
                     </div>                      
                     <div class="price-mobile">
-                        <span id="total-due-price">
+                        <span id="total-due-price-mobile">
                             {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
                         </span>
                         <span class="delivery">Free U.S. Shipping</span>
@@ -354,7 +320,6 @@
                 Session expires in 
                 <span id="countdown"></span>
             </div>
-            
             <div id="express-checkout-element" class="google-pay-details only-mobile"></div>
             <form id="payment-form">                
                 <div class="custom-divider"><span>or</span></div>
@@ -449,7 +414,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="#" id="showMoreFields" style="display: block; margin-top: 8px;">Enter address manually</a>
+                <a href="#" id="showMoreFields" style="display: block;">Enter address manually</a>
                 <label class="title1">Payment method</label>
                 <div id="card-elements" class="card-elements">
                     <!-- Cartão -->

@@ -207,6 +207,7 @@ def validate_coupon():
         data = request.get_json()
         coupon = data.get("coupon")
         payment_intent_id = data.get("payment_intent_id")
+        email = data.get("email")
 
         if not coupon:
             return jsonify({"error": "Coupon is required"}), 400
@@ -236,6 +237,7 @@ def validate_coupon():
 
         updated_intent = stripe.PaymentIntent.modify(
             payment_intent_id,
+            receipt_email=email,
             amount=discounted_amount
         )
         return jsonify({
@@ -255,6 +257,8 @@ def update_quantity():
         data = request.get_json() or {}
         pi_id = data.get("payment_intent_id")
         quantity = int(data.get("quantity", 1))
+        email = data.get("email")
+
         if not pi_id:
             return jsonify({"success": False, "error": "payment_intent_id is required"}), 400
         if quantity < 1:
@@ -287,6 +291,7 @@ def update_quantity():
         updated = stripe.PaymentIntent.modify(
             pi_id,
             amount=new_amount,
+            receipt_email=email,
             currency=currency,
             metadata={**pi.metadata, "quantity": str(quantity)}
         )

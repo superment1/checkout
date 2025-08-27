@@ -79,7 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       maxColumns: 2,
     },
     emailRequired: true,
-    shippingAddressRequired: true
   });
 
    function isDesktop() {
@@ -99,6 +98,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById('total-price'),
       document.getElementById('title-price-mobile'),
       document.getElementById('total-due-price'), 
+      document.getElementById('total-due-price-mobile'), 
       document.querySelector('.product-row-mobile .product-price'),
       document.querySelector('.product-row .product-price'),
     ].filter(Boolean);
@@ -258,7 +258,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       elements,
       clientSecret: clientSecret,
       confirmParams: {
-        return_url:"https://superment.co/supersleep/sucess/"
+        return_url:"https://checkout.superment.co/thanks",
+        receipt_email: email,
       },
     });
 
@@ -413,25 +414,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         setQty(Number.isFinite(n) && n > 0 ? n : 1);
       });
     });
-
-    // inicializa ambos inputs com o valor atual
     syncInputs();
-    // const qtyInput = document.getElementById("qty");
-    // const qtyMinus = document.getElementById("qty-minus");
-    // const qtyPlus  = document.getElementById("qty-plus");
 
-    // qtyMinus?.addEventListener("click", () => setQty(Math.max(1, qty - 1)));
-    // qtyPlus?.addEventListener("click",  () => setQty(qty + 1));
-    // qtyInput?.addEventListener("input", () => {
-    //   const n = parseInt(qtyInput.value || "1", 10);
-    //   setQty(isNaN(n) || n < 1 ? 1 : n);
-    // });
-
-    // function setQty(newQty) {
-    //   qty = newQty;
-    //   if (qtyInput) qtyInput.value = String(qty);
-    //   recalcAndSyncPI();
-    // }
     async function recalcAndSyncPI() {
       try {
         const paymentIntentId = clientSecret.split("_secret")[0];

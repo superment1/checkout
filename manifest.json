@@ -3,8 +3,8 @@
   "short_name": "Checkout",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#370f1e",
+  "theme_color": "#370f1e",
   "icons": [
     {
       "src": "/static/img/icon-192.png",
