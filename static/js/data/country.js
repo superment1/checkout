@@ -1,4 +1,5 @@
 window.countryList = [
+  { value: "US", label: "United States" },
   { value: "AC", label: "Ascension Island" },
   { value: "AD", label: "Andorra" },
   { value: "AE", label: "United Arab Emirates" },
@@ -219,7 +220,6 @@ window.countryList = [
   { value: "TZ", label: "Tanzania" },
   { value: "UA", label: "Ukraine" },
   { value: "UG", label: "Uganda" },
-  { value: "US", label: "United States" },
   { value: "UY", label: "Uruguay" },
   { value: "UZ", label: "Uzbekistan" },
   { value: "VA", label: "Vatican City" },

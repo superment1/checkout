@@ -79,20 +79,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       maxColumns: 2,
     },
     emailRequired: true,
+    billingAddressRequired: false,
+    shippingAddressRequired: true, 
+    allowedShippingCountries: ['US', "BR"], 
+    shippingRates: [
+      {
+        id: "free",
+        displayName: "Free shipping",
+        amount: 0,
+        deliveryEstimate: {
+          maximum: { unit: "day", value: 7 }
+        },
+      },
+    ],
   });
-
-   function isDesktop() {
+  window.__paymentInProgress = true;
+  try {
+    // await stripe.confirmPayment(...)
+  } finally {
+    window.__paymentInProgress = false;
+  }
+  function isDesktop() {
     const desktopInput = document.getElementById("coupon-code-desktop");
     return desktopInput && desktopInput.offsetParent !== null;
   }
-
   function getId(base) {
     return isDesktop() ? `${base}-desktop` : base;
   }
   function $(id) {
     return document.getElementById(getId(id));
   }
-
   function getPriceTargets() {
     return [
       document.getElementById('total-price'),
@@ -103,7 +119,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelector('.product-row .product-price'),
     ].filter(Boolean);
   }
-
   function setPriceText(text) {
     getPriceTargets().forEach(el => { el.textContent = text; });
   }
@@ -248,24 +263,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnLabel.style.display = "inline-block";
     }
   });
+  const pr = stripe.paymentRequest({
+    country: 'US',
+    currency: 'usd',
+    total: { label: 'Check', amount: 100 },
+  });
+  pr.canMakePayment()
+    .then((res) => {
+    console.log('canMakePayment:', res);
+    })
+    .catch((err) => console.error('canMakePayment error:', err));
 
   expressCheckoutElement.mount("#express-checkout-element");
-  expressCheckoutElement.on('ready', () => {
-  });
-  expressCheckoutElement.on('confirm', async (event) => {
-  try {
-    const {error} = await stripe.confirmPayment({
-      elements,
-      clientSecret: clientSecret,
-      confirmParams: {
-        return_url:"https://checkout.superment.co/thanks",
-        receipt_email: email,
-      },
-    });
+  expressCheckoutElement.on('ready', (ev) => {
+  const methods = ev?.availablePaymentMethods || {};
+  const hasWallet = !!(methods.applePay || methods.googlePay || methods.link);
 
-    if (error) {
-      console.error("Erro ao confirmar pagamento:", error.message);
-     } 
+  const wrap = document.getElementById('express-wrap');
+  if (hasWallet) {
+    // revela
+    wrap.style.opacity = '1';
+    wrap.style.height = 'auto';
+    wrap.style.overflow = 'visible';
+  } else {
+    // wrap.remove();
+  }
+});
+  expressCheckoutElement.on('confirm', async (event) => {
+    try {
+      const {error} = await stripe.confirmPayment({
+        elements,
+        clientSecret: clientSecret,
+        confirmParams: {
+          return_url:"https://checkout.superment.co/thanks",
+        },
+      });
+      if (error) {
+        console.error("Erro ao confirmar pagamento:", error.message);
+      } 
     } catch (err) {
       console.error("Erro no handler confirm:", err);
     }
@@ -473,6 +508,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.innerHTML = isHeader
               ? `Close <span class="close-icon">X</span>`
               : `Close <span class="close-icon">X</span>`;
+              couponInput.focus();
+              couponInput.classList.add("focused");
           } else {
             btn.innerHTML = isHeader
               ? `Details ${arrowDownSvg}`

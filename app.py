@@ -7,17 +7,31 @@ from auth import require_api_key
 
 load_dotenv()
 app = Flask(__name__)
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY") 
 PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
-DOMAIN = os.getenv("DOMAIN", "http://localhost:5000")
-MAPS_API_KEY = os.getenv("MAPS_API_KEY")
+BASE_URL = os.getenv("BASE_URL", "http://localhost:5003")
+MAPS_API_KEY = os.getenv("MAPS_API_KEY", "")
+ENV_NAME = os.getenv("ENV_NAME", "development")
 
-CORS(app, resources={r"/*": {"origins": [
-    "https://superment.co",
-    "https://www.superment.co",
-    "https://checkout.superment.co"
-    ]}})
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS")
+if cors_origins:
+    origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
+else:
+    # fallback sensato para desenvolvimento local
+    origins = ["http://localhost:5003", "http://localhost:3000", BASE_URL]
+
+CORS(app, resources={r"/*": {"origins": origins}})
+
+
+@app.get("/config")
+def get_public_config():
+    return jsonify({
+        "publishableKey": PUBLISHABLE_KEY,
+        "mapsApiKey": MAPS_API_KEY,
+        "env": ENV_NAME,
+        "baseUrl": BASE_URL,
+    })
 
 # @app.route('/')
 # def index():
@@ -101,6 +115,10 @@ def list_products():
     except Exception as e:
         return "Erro interno. Tente novamente mais tarde.", 500
 
+@app.get("/health")
+def health():
+     return {"ok": True, "env": os.getenv("ENV_NAME", "unknown")}, 200
+
 @app.route("/check-stripe")
 @require_api_key()
 def check_stripe():
@@ -115,14 +133,13 @@ def check_stripe():
 
 @app.route("/get-price-id")
 def get_price_id():
-    product_id = request.args.get("product_id").strip()
+    product_id = (request.args.get("product_id") or "").strip()
     if not product_id:
         return jsonify({"error": "product_id is required"}), 400
     try:
         prices = stripe.Price.list(product=product_id, active=True, limit=1)
         if not prices.data:
             return jsonify({"error": "No active prices found"}), 404
-
         price = prices.data[0]
         return jsonify({
             "price_id": price.id,
@@ -130,7 +147,9 @@ def get_price_id():
             "currency": price.currency
         })
     except Exception as e:
-        return "Erro interno. Tente novamente mais tarde.", 500
+        app.logger.exception("get_price_id failed")
+        return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
+
 
 @app.route("/payment-intent", methods=["POST"])
 def create_payment():
