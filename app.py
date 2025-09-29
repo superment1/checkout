@@ -18,11 +18,17 @@ cors_origins = os.getenv("CORS_ALLOWED_ORIGINS")
 if cors_origins:
     origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
 else:
-    # fallback sensato para desenvolvimento local
     origins = ["http://localhost:5003", "http://localhost:3000", BASE_URL]
 
-CORS(app, resources={r"/*": {"origins": origins}})
 
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            r"https://.*\.superment\.co",
+            "https://superment.co"        
+        ]
+    }
+})
 
 @app.get("/config")
 def get_public_config():

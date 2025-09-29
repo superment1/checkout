@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-product="{{ product.id }}">
 
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,7 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#370f1e">
     <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#370f1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Superment Checkout">
 
@@ -16,7 +17,7 @@
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}"> -->
     <link rel="icon" href="/static/img/favicon.webp">
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
@@ -28,19 +29,13 @@
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-T6Z2ZN9H');</script>
     <!-- End Google Tag Manager -->
-    <!-- Hotjar -->
-    <script>
-        (function (c, s, q, u, a, r, e) {
-            c.hj=c.hj||function(){(c.hj.q=c.hj.q||[]).push(arguments)};
-            c._hjSettings = { hjid: a };
-            r = s.getElementsByTagName('head')[0];
-            e = s.createElement('script');
-            e.async = true;
-            e.src = q + c._hjSettings.hjid + u;
-            r.appendChild(e);
-        })(window, document, 'https://static.hj.contentsquare.net/c/csq-', '.js', 6505028);
-    </script>
-     <!-- End Hotjar -->
+      <!-- Google Tag Manager2 -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-TMKKCTK3');</script>
+    <!-- End Google Tag Manager2 -->
 </head>
 
 <body>
@@ -61,14 +56,15 @@
     </div>
     <header>
         <div>
-            <a href="#" class="back-button" onclick="event.preventDefault(); history.back();">
+            <a id="backBtn" class="back-button" href="#" aria-label="Back">
                 <div class="circle-arrow">
                     <div class="arrow-left"></div>
-                </div>                
-                <span class="logo-superment">
-                    <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
-                    <span class="superment checkout-text-font-family">Superment</span>
-                </span>
+                </div>               
+                    <span class="logo-superment">
+                        <span class="superment checkout-text-font-family">Superment</span>
+                    </span>
+                </div> 
+
                 <span class="voltar">Back</span>
             </a>
         </div>
@@ -83,14 +79,8 @@
         </div>
   
     </header>
-    <div class="scroll-animation">
+    <div class="scroll-animation" aria-hidden="true">
         <div class="scroll-text-wrapper">
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57% <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee<span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span>  </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57% <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span> </p>
-        <p>Made in the USA <span class="espacada">|</span> Clean, natural, no fillers <span class="espacada">|</span> Save up to 57%  <span class="espacada">|</span> Up to 120-day money-back guarantee <span class="espacada">|</span> Real reviews rated 4.9/5.0 <span class="espacada">|</span> Free U.S shipping <span class="espacada">|</span> </p>
         </div>
     </div>
     <div class="checkout-container">
@@ -166,7 +156,8 @@
                     </div> 
                 </div>
                 <div class="desk-header">
-                    <a href="#" class="back-button" onclick="event.preventDefault(); history.back();">
+                    <a id="backBtnDesk" class="back-button" href="#" aria-label="Back"
+                        onclick="history.back(); return false;">
                         <div class="back-content">
                             <div class="circle-arrow">
                                 <div class="arrow-left"></div>
@@ -176,8 +167,7 @@
                 </div>
                 <!-- HERO MOBILE  -->
                  <div class="logo-desk">
-                    <span class="logo-superment">
-                        <img src="/static/img/sleep-logo.png" alt="logo" class="logo">
+                    <span class="logo-superment">                      
                         <span class="superment">Superment</span>
                     </span>
                     <span class="voltar">Back</span>   
@@ -270,12 +260,12 @@
                         <div class="dep-track">
                             <div class="dep">
                                 <div class="title-dep">
-                                    <h1>LIGIANI G., 44</h1>
+                                    <h1>teste G., 44</h1>
                                     <img src="/static/img/verifield.webp" alt="verifield">
                                     <p>Verified Customer</p>
                                 </div>                
                                 <p class="state">Boston, MA</p>
-                                <span class="depoiments-desk">This is amazing. I take it and I’m out like a rock. Best sleep I’ve had in a long time.</span>
+                                <span class="depoiments-desk">I used to arrive very stressed from work and still I couldn't rest… Now I'm finally able to relax and sleep again.</span>
                             </div> 
                             <div class="dep">
                                 <div class="title-dep">
@@ -284,7 +274,7 @@
                                     <p>Verified Customer</p>
                                 </div>                
                                 <p>New York, NY</p>
-                                <span class="depoiments">I’m honestly loving it. I fall asleep so fast now. That never used to happen. One capsule is all I need, and I’m finally getting real sleep.</span>
+                                <span class="depoiments">I just started but already feel less pain in my legs, which also helped me to rest at night.</span>
                             </div>
                             <div class="dep">
                                 <div class="title-dep">
@@ -293,7 +283,7 @@
                                     <p>Verified Customer</p>
                                 </div>                
                                 <p>Fort Lauderdale, FL</p>
-                                <span class="depoiments">I never had trouble falling asleep, but I always woke up at night to pee. Now I sleep straight through, and I feel way more rested during the day.</span>
+                                <span class="depoiments">I used to wake up at night to pee and then couldn’t fall back asleep. Now I sleep through and have way more energy in the day.</span>
                             </div>   
                             <div class="dep">
                                 <div class="title-dep">
@@ -302,7 +292,7 @@
                                     <p>Verified Customer</p>
                                 </div>                
                                 <p>Los Angeles, CA</p>
-                                <span class="depoiments">I took two the first night and it completely knocked me out. I didn’t expect it to work so well, but it really does.</span>
+                                <span class="depoiments">I feel less worried now and not snapping so much at my relatives. Honestly more calm overall.</span>
                             </div>    
                             <div class="dep">
                                 <div class="title-dep">
@@ -311,7 +301,7 @@
                                     <p>Verified Customer</p>
                                 </div>                
                                 <p>Miami, FL</p>
-                                <span class="depoiments">I used to be up until 5, sometimes 10 in the morning. Now I’m asleep by 9 or 10 p.m. No grogginess, just real sleep.</span>
+                                <span class="depoiments">I wasn’t expecting much, but I’m sleeping better and waking up with more energy.</span>
                             </div>   
                         </div>
                     </div>                    
@@ -462,7 +452,7 @@
             </div>
             <div class="dep">
                 <div class="title-dep">
-                    <h1>LIGIANI G., 44</h1>
+                    <h1>TESTE G., 44</h1>
                     <img src="/static/img/verifield.webp" alt="verifield">
                     <p>Verified Customer</p>
                 </div>                
@@ -520,6 +510,14 @@
     </div>
 
     <script>
+        document.getElementById('backBtnDesk').addEventListener('click', function(e){
+            e.preventDefault();
+            history.back();
+        });
+         document.getElementById('backBtn').addEventListener('click', function(e){
+            e.preventDefault();
+            history.back();
+        });
         window.publishableKey = "{{ publishable_key }}";
         window.paymentIntentId = "{{ payment_intent_id }}";
         window.productPrice = "{{  price.unit_amount|int }}";
@@ -703,12 +701,38 @@
         }
     </script>
     <script src="/static/js/checkout.js"></script>
-    {% set title = "WAIT" %}
+    <!-- {% set title = "WAIT" %}
     {% set subtitle = "DON'T LEAVE" %}
     {% set message = 'Get <span style="color:#FFDC03;font-size:1.4em;font-weight:700;">20% OFF</span> to shop now<br> — today only.' %}
-    {% set button_text = "SLEEP20" %}
-    
+    {% set button_text = "SLEEP20" %}   
     {% include "retention_modal.html" %}
-    <script defer src="{{ url_for('static', filename='js/retention-modal.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/retention-modal.js') }}"></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ref = document.referrer && document.referrer !== location.href ? document.referrer : '';
+            document.querySelectorAll('#backBtnDesk, #backBtn').forEach(function (a) {
+            if (!a) return;
+            if (ref) {
+                a.href = ref;
+                a.rel = 'noopener noreferrer';
+            } else {
+                a.addEventListener('click', function (e) {
+                e.preventDefault();
+                history.back();
+                });
+            }
+            });
+        });
+    </script>
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T6Z2ZN9H"
+              height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- Google Tag Manager2 (noscript) -->
+      <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMKKCTK3"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager2 (noscript) -->
 </body>
 </html>

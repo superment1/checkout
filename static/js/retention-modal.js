@@ -1,19 +1,48 @@
 (function () {
-    const cfg = { cooldownMs: 2000, disableEsc: false };
+    const cfg = { 
+        cooldownMs: 2000, 
+        disableEsc: false,
+        allowProducts: ['prod_SbKYsQrxStW8wB','prod_SbKa8ag01A2TGX','prod_SbKaRuJpDVBEzx'], 
+    };
+
     let lastShownAt = 0;
     let focusPrev = null;
-    let __rm_lastY = window.scrollY, __rm_lastT = Date.now(); // p/ detectar scroll rápido pra cima
-    let __rm_backArmed = false; // controle pro back do mobile
+    let __rm_lastY = window.scrollY, __rm_lastT = Date.now();
+    let __rm_backArmed = false;
+
+    function getProductId() {
+        return document.body?.dataset?.productId ||
+            document.querySelector("#retention-modal")?.dataset?.productId || window.productId ||
+            null;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('#backBtnDesk, #backBtn').forEach(function (a) {
+            if (!a) return;
+            a.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.__RM_SUPPRESS_ONCE = true;
+            history.back();
+            });
+        });
+    });
+    function isAllowedProduct() {
+        const pid = getProductId();
+        return !!pid && cfg.allowProducts.includes(pid);
+    }
     try {
         history.pushState({ rmSentinel: 1 }, '', location.href);
         __rm_backArmed = true;
         } catch {}
 
         window.addEventListener('popstate', (e) => {
-        if (!__rm_backArmed || paymentInProgress()) return;
-        openModal();
-        try { history.pushState({ rmSentinel: 1 }, '', location.href); } catch {}
-        });
+            if (window.__RM_SUPPRESS_ONCE) {
+                window.__RM_SUPPRESS_ONCE = false;
+                return;
+            }
+            if (!__rm_backArmed || paymentInProgress() || !isAllowedProduct() ) return;
+            openModal();
+            try { history.pushState({ rmSentinel: 1 }, '', location.href); } catch {}
+            });
         window.addEventListener('scroll', () => {
         const now = Date.now();
         const y   = window.scrollY;
@@ -35,17 +64,20 @@
         }
         return Promise.resolve(fallback());
         function fallback() {
-        const ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        return ok;
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
         }
     }
     function lockScroll(yes) { document.documentElement.classList.toggle('overflow-hidden', !!yes); }
     function dispatch(el, name) { el.dispatchEvent(new CustomEvent(name, { bubbles: true })); }
     function paymentInProgress() { return !!window.__paymentInProgress; }
+    function canShowNow() { 
+        return (Date.now() - lastShownAt >= cfg.cooldownMs) && isAllowedProduct(); 
+    }
     function canShowNow() { return Date.now() - lastShownAt >= cfg.cooldownMs; }
 
     function openModal() {
@@ -120,9 +152,11 @@
     }
 
     function init() {
+        const pid = getProductId();
+        const allowed = isAllowedProduct();
         const overlay = $('#retention-modal');
         if (!overlay) return;
-
+        if (!allowed) { overlay.hidden = true; return; }
         if (window.__RetentionModalBound) return;
         window.__RetentionModalBound = true;
 
@@ -130,6 +164,9 @@
         bindExitIntent();
     }
 
-    window.RetentionModal = { open: openModal, close: closeModal, init };
+    window.RetentionModal = { 
+        open: () => { if (isAllowedProduct()) openModal(); },
+        close: closeModal, 
+        init };
     document.addEventListener('DOMContentLoaded', init);
 })();

@@ -6,6 +6,18 @@ html, body {
   scrollbar-width: none;       /* Firefox */
   -ms-overflow-style: none; 
 }
+html[data-product="prod_SbKYsQrxStW8wB"] { --testimonials-bg: #A0DAF2; } /* atual */
+html[data-product="prod_SbKa8ag01A2TGX"] { --testimonials-bg: #A0DAF2; }
+html[data-product="prod_SbKaRuJpDVBEzx"] { --testimonials-bg: #A0DAF2; }
+html[data-product="prod_T2jNgj5cCjXcvG"] { --testimonials-bg: #4DBCB6; }
+html[data-product="prod_T2jOmiPYB2SrZd"] { --testimonials-bg: #4DBCB6; }
+html[data-product="prod_T2jPp4I1S0cfol"] { --testimonials-bg: #4DBCB6; }
+
+.real { color: #fff; }
+
+/* mesmo tom do NAME_COLOR */
+:root[data-theme="sleep"] .real { color: #fff; }
+:root[data-theme="relax"] .real { color: #370F1E; }
 
 html::-webkit-scrollbar, 
 body::-webkit-scrollbar {
@@ -24,7 +36,13 @@ body::-webkit-scrollbar {
   font-style: normal;
   font-weight: 100 900;
 }
-:root { --header-h: 46px;  --ticker-h: 24px;}
+
+:root { 
+  --header-h: 46px;  
+  --ticker-h: 24px;
+  --testimonials-bg: #4DBCB6;
+}
+
 header{
   display: flex;
   padding: 15px 16px 15px 21px;
@@ -40,16 +58,17 @@ header{
 .scroll-text-wrapper p{
   margin: 0;
 }
-
+.back-button * { pointer-events: none; }
 .scroll-text-wrapper {
-  display: inline-flex;      
+  display: flex;      
   color: #fff;    
   width: max-content; 
   align-items: center;
   justify-content: center;
   will-change: transform;
-  animation: scroll-text 40s linear infinite;
-  height: 21px;
+  transform: translate3d(0,0,0); 
+  animation: scroll-text 20s linear infinite;
+  height: 22px;
   border-top: 1px solid #ffffff6e;
   border-bottom: 1px solid #ffffff6e;
   font-size: 11px;
@@ -59,9 +78,11 @@ header{
   margin-left: 8px;
 }
 
+.scroll-text-wrapper > *{ flex:none; margin:0; }
+
 @keyframes scroll-text{
-  0%   { transform:translateX(0%); }
-  100% { transform:translateX(-50%); }
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-50%,0,0); }
 }
 .money-back-120{
   width: 65px ;
@@ -372,11 +393,18 @@ h1{
   font-size: 22px;
   align-items: center;
 }
+.boll{
+  background-color: white;
+  border-radius: 999px;
+  margin: 0 10px 0 10px;
+  width: 33px;
+  height: 33px;
+}
 .superment {
   font-size: 12px;
   letter-spacing: 0.237px;
   position: relative;
-  right: 7px;
+  right: -40px;
 }
 
  #discount-amount-accordion {
@@ -392,6 +420,7 @@ h1{
     flex: 1; 
   }
   .superment {
+    right: -60px;
     font-size: 16px;
     font-weight: 500;
   }
@@ -469,7 +498,7 @@ h1{
     animation: depPause calc(var(--count) * var(--per)) linear infinite;
   }
   .dep{
-    background-color: #A0DAF2 !important;
+    background-color: var(--testimonials-bg) !important;
     position: relative;
     height: var(--item-h);   /* todos com mesma “vitrine” */
     margin-bottom: var(--gap);
@@ -518,7 +547,7 @@ h1{
     font-weight: 600;
     font-size: 19px;
     text-align: center;
-    background: #A0DAF2;
+    background-color: var(--testimonials-bg);
     padding: 13px 0 11px;
     align-items: center;
     max-width: 100%;
@@ -553,6 +582,7 @@ h1{
     position: relative;
   }
   .logo-superment{
+    display:inline-block;
     width: 50px !important;
     height: 50px !important;
   }
@@ -808,9 +838,19 @@ h1{
 .only-mobile {
   display: none;
 }
-.scroll-animation {
-  display: none;
+.scroll-animation{
+  display: block;
+  width: 100%;
+  position: relative;
+  top: var(--header-h);
+  width:100%;
+  overflow:hidden;
+  background:rgb(55,15,30);
+  position: fixed;
+  z-index: 999;
+  height: 24px;
 }
+
 .discount-field{
   display: flex;
   flex-direction: column;
@@ -965,17 +1005,18 @@ input, select {
   .testimonials-desktop{
     display: none;
   }
-  .testimonials{
+  .testimonials {
     display: flex !important;
     flex-direction: column;
     align-items: center;
     gap: 9px;
     font-family: 'Gelasio', serif;
-    background-color: #6EC8F0 ;
+    background-color: var(--testimonials-bg);
     width: 100%;
     padding: 23px 24px;
     box-sizing: border-box;
   }
+
   .custom-divider::before,
   .custom-divider::after {
     content: "";
@@ -1017,11 +1058,12 @@ input, select {
     gap: 10px;
     width: 32.27px;
     height: 32.27px;
-    background-color: #fff;
-    border-radius: 20px;
-    right: 6px;
+    margin-left: 10px;
     position: relative;
-    margin-left: 17px;
+    background-repeat: no-repeat;   /* ✅ impede repetir */
+    background-size: contain;       /* ✅ encaixa a imagem */
+    background-position: center;    /* ✅ centraliza */
+    vertical-align: middle;
   }
   .google-pay-details{
     margin-left: auto;
@@ -1137,18 +1179,7 @@ input, select {
     font-size: 17px;
     font-weight: 500 !important;
   }
-  .scroll-animation{
-    display: block;
-    width: 100%;
-    position: relative;
-    top: var(--header-h);
-    width:100%;
-    overflow:hidden;
-    background:rgb(55,15,30);
-    position: fixed;
-    z-index: 999;
-    height: 24px;
-  }
+  
   .new-mobile-sumary{
     padding: 21px 20px 0 21px;
     display: grid;
@@ -1778,7 +1809,6 @@ label[for="payment-method-google"] {
   font-style: italic;
   font-size: 18px;
   letter-spacing: 0.314px;
-  color: #ffffff;
   font-weight: 600;
   padding-top: 22px;
   padding-bottom: 9px;
@@ -1997,8 +2027,10 @@ button {
   gap: 16px;
   width: 32.27px;
   height: 32.27px;
-  background-color: #ffffffe6;
-  border-radius: 40px;
+  background-repeat: no-repeat;   /* ✅ impede repetir */
+  background-size: contain;       /* ✅ encaixa a imagem */
+  background-position: center;    /* ✅ centraliza */
+  vertical-align: middle;
 }
 .logo {
   width: 32px;
@@ -2082,3 +2114,8 @@ button {
   transform: rotate(45deg) scaleY(1.2);
 }
 
+@media (min-width: 600px) {
+  .scroll-animation {
+    display: none;
+  }
+}
