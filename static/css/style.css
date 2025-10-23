@@ -3,10 +3,10 @@ html, body {
   width: 100%;
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Ubuntu", sans-serif;
-  scrollbar-width: none;       /* Firefox */
+  scrollbar-width: none;       
   -ms-overflow-style: none; 
 }
-html[data-product="prod_SbKYsQrxStW8wB"] { --testimonials-bg: #A0DAF2; } /* atual */
+html[data-product="prod_SbKYsQrxStW8wB"] { --testimonials-bg: #A0DAF2; }
 html[data-product="prod_SbKa8ag01A2TGX"] { --testimonials-bg: #A0DAF2; }
 html[data-product="prod_SbKaRuJpDVBEzx"] { --testimonials-bg: #A0DAF2; }
 html[data-product="prod_T2jNgj5cCjXcvG"] { --testimonials-bg: #4DBCB6; }
@@ -131,7 +131,9 @@ h1{
   font-size: 17px;
   font-weight: 600;
 }
-
+.paypal{
+  justify-content: center;
+}
 .head-desk{
   display: none;
 }
@@ -986,6 +988,9 @@ input, select {
     font-size: 16px;
     padding: 8px;
   }
+  #paypalbtn {
+    margin: 0 !important;
+  }
   .mobile-hero p{
     margin: 0;
   }
@@ -1045,7 +1050,7 @@ input, select {
   .checkout-right {
     height: auto;
     flex-direction: column;
-    padding: 23px 24px 22px 21px;
+    padding: 23px 24px 22px 24px;
   }
   #payment-form {
     margin: auto;
@@ -2070,9 +2075,25 @@ button {
   font-weight: 400;
   box-shadow: 0 0px 2px rgba(0, 0, 0, 0.2);
   max-width: 358px;
-  margin: 100px auto 0 10%;
+  margin: 20px auto 0 10%;
 }
-
+#paypalbtn {
+  display: block;
+  width: 377px;   
+  margin: 20px auto 0 10%;
+}
+#checkout-button {
+  display: none !important;
+}
+.css-au42bs {
+  display: none !important;
+}
+.vertical.css-134chkc {
+  margin-top: 0 !important;
+}
+.item-header{
+  display: none !important;
+}
 .checkbox{
   display: flex;
   font-size: 13px;

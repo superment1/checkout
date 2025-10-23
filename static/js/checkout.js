@@ -2,8 +2,80 @@ document.addEventListener("DOMContentLoaded", async () => {
   const res = await fetch("/get-client-secret", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ payment_intent_id: window.paymentIntentId })
+    body: JSON.stringify({ payment_intent_id: window.paymentIntentId }),
   });
+  try {
+    const countryRes = await fetch("/get-country");
+    const countryData = await countryRes.json();
+    window.USER_COUNTRY = countryData?.country || null;
+    console.log("country server:", window.USER_COUNTRY);
+  } catch (e) {
+    console.error("Erro ao detectar país:", e);
+  }
+  if (!window.USER_COUNTRY) {
+    async function detectClientCountryFallback() {
+      const providers = [
+        { url: 'https://ipwho.is/', pick: j => j && j.success ? j.country : null },
+        { url: 'https://ipinfo.io/json', pick: j => j && j.country ? j.country : null,
+          toName: code => ({ BR:'Brazil', US:'United States', CA:'Canada', GB:'United Kingdom', IE:'Ireland' }[code] || code) },
+        { url: 'https://get.geojs.io/v1/ip/country.json', pick: j => j && j.name ? j.name : null },
+      ];
+      for (const p of providers) {
+        try {
+          const r = await fetch(p.url, { cache: 'no-store' });
+          if (!r.ok) continue;
+          const j = await r.json();
+          let v = p.pick(j);
+          if (v && p.toName) v = p.toName(v);
+          if (v) return v;
+        } catch (_) {}
+      }
+      const lang = (navigator.language || '').toLowerCase();
+      if (lang.includes('pt-br')) return 'Brazil';
+      if (lang.startsWith('en-')) return 'United States';
+      return null;
+    }
+    window.USER_COUNTRY = await detectClientCountryFallback();
+    console.log('client:', window.USER_COUNTRY);
+  }
+  function resolveMarket(countryName) {
+    const byName = {
+      'Brazil':         { cc: 'BR', cur: 'brl', locale: 'pt', sym: 'R$' },
+      'United States':  { cc: 'US', cur: 'usd', locale: 'en', sym: 'US$' },
+      'Canada':         { cc: 'CA', cur: 'cad', locale: 'en', sym: 'CA$' },
+      'United Kingdom': { cc: 'GB', cur: 'gbp', locale: 'en', sym: '£' },
+      'Ireland':        { cc: 'IE', cur: 'eur', locale: 'en', sym: '€' },
+      'Germany':        { cc: 'DE', cur: 'eur', locale: 'de', sym: '€' },
+      'France':         { cc: 'FR', cur: 'eur', locale: 'fr', sym: '€' },
+      'Spain':          { cc: 'ES', cur: 'eur', locale: 'es', sym: '€' },
+      'Italy':          { cc: 'IT', cur: 'eur', locale: 'it', sym: '€' },
+      'Portugal':       { cc: 'PT', cur: 'eur', locale: 'pt', sym: '€' },
+    };
+    if (countryName && byName[countryName]) return byName[countryName];
+    return { cc: 'IE', cur: 'eur', locale: 'en', sym: '€' };
+  }
+
+  window.MARKET = resolveMarket(window.USER_COUNTRY);
+  (function ensureServerCurrencyMatchesMarket() {
+    try {
+      const want = (window.MARKET?.cur || '').toLowerCase();
+      const have = (window.productCurrency || '').toLowerCase();
+      if (!want || !have) return;
+
+      // Se já está certo, não faz nada
+      if (want === have) return;
+
+      // Já tem parâmetro currency? então não entra em loop
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('currency')) return;
+
+      // Peça ao backend para re-renderizar com o price correto
+      url.searchParams.set('currency', want);
+      // Mantém o price_id atual; o backend usará o product do price para achar o price na moeda desejada
+      window.location.replace(url.toString());
+    } catch (_) {}
+  })();
+
   const data = await res.json();
   let clientSecret = data.client_secret;
   const PRICE_ID = window.priceId;
@@ -11,9 +83,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("payment-form");
   const message = document.getElementById("payment-message");
   const submitBtn = document.getElementById("submit");
-  const price = parseInt(window.productPrice || 0);
-  const totalAmount = price;
-  const currency = window.productCurrency;
+
+  // const price = parseInt(window.productPrice || 0);
+  // const totalAmount = price;
+
+  const totalCents = Number(window.productPrice || 0);
+  const currency = (window.MARKET?.cur || window.productCurrency || 'usd').toLowerCase();
 
   const appearance = {
     theme: "stripe",
@@ -24,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const elements = stripe.elements({
     clientSecret,
     appearance,
-    locale: "en",
+    locale: window.MARKET?.locale || "en",
   });
   const refreshBtn = document.getElementById('refresh-btn');
 
@@ -81,7 +156,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     emailRequired: true,
     billingAddressRequired: false,
     shippingAddressRequired: true, 
-    allowedShippingCountries: ['US', "BR"], 
+    // allowedShippingCountries: ['US', "BR"], 
+    allowedShippingCountries: ['US','BR','CA','GB','IE'],
     shippingRates: [
       {
         id: "free",
@@ -128,7 +204,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const n = parseFloat((el.textContent || '').replace(/[^0-9.]/g, ''));
     return Number.isFinite(n) ? n : 0;
   }
-  const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+
+  const sym = (window.MARKET?.sym) || ((currency === 'brl') ? 'R$'
+           : (currency === 'usd') ? 'US$'
+           : (currency === 'cad') ? 'CA$'
+           : (currency === 'gbp') ? '£' : '€');
+           
+
+  console.log(' country', window.USER_COUNTRY);
+  console.log('currency:', (window.MARKET?.cur || window.productCurrency || 'usd'));
 
   const pick = (base) => {
     const desk = document.getElementById(`${base}-desktop`);
@@ -186,7 +270,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const r = await fetch("/update-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ price_id: PRICE_ID }) // agora a variável existe
+          body: JSON.stringify({ price_id: PRICE_ID })
         });
         const data = await r.json();
         if (!r.ok) throw new Error(data.error || "reset failed");
@@ -264,10 +348,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
   const pr = stripe.paymentRequest({
-    country: 'US',
-    currency: 'usd',
-    total: { label: 'Check', amount: 100 },
+    country: (window.MARKET?.cc || 'US'),
+    currency: (window.MARKET?.cur || window.productCurrency || 'usd'),
+    total: { label: 'Order total', amount: totalCents }, // usa direto o valor do back
   });
+  // const pr = stripe.paymentRequest({
+  //   country: (window.MARKET?.cc || 'US'),
+  //   currency: (window.MARKET?.cur || 'usd'),
+  //   total: { label: 'Order total', amount: Math.round((totalAmount || 0) * 100) },
+  // });
+  
   pr.canMakePayment()
     .then((res) => {
     })
@@ -348,7 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         city: document.getElementById("shippingLocality").value,
         state: document.getElementById("shippingAdministrativeArea").value,
         postal_code: document.getElementById("shippingPostalCode").value,
-        country: "US"
+        country: window.MARKET?.cc || "US"
       }
     };
     
@@ -367,7 +457,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           city: document.getElementById("billing-city")?.value,
           state: document.getElementById("billing-state")?.value,
           postal_code: document.getElementById("billing-postal")?.value,
-          country: document.getElementById("billing-country")?.value
+          country: document.getElementById("billing-country")?.value || (window.MARKET?.cc || "US")
         }
       };
     }
@@ -398,23 +488,69 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "https://checkout.superment.co/thanks";
     }
   });
+  const OLD_PRICE_CENTS = {
+    // Super Natural Sleep — 1 Bottle
+    'prod_SbKYsQrxStW8wB': {
+      usd: 6000,   
+      brl: 36000,  
+      eur: 6000,  
+      gbp: 5000,   
+      cad: 8500 
+    },
 
-  const OLD_PRICE_CENTS_BY_ID = {
-    'prod_SbKYsQrxStW8wB':  6000, 
-    'prod_SbKa8ag01A2TGX':  18000,   
-    'prod_SbKaRuJpDVBEzx':  36000, 
+    // Sleep — 3 Bottles (exemplo)
+    'prod_SbKa8ag01A2TGX': {
+      usd: 18000,
+      brl: 98000,
+      eur: 18000,
+      gbp: 14900,
+      cad: 26500
+    },
+
+    // Sleep — 6 Bottles (exemplo)
+    'prod_SbKaRuJpDVBEzx': {
+      usd: 36000,
+      brl: 199900,
+      eur: 32500,
+      gbp: 29000,
+      cad: 51000
+    }
   };
   (function setOldPrice(){
-    const cents = OLD_PRICE_CENTS_BY_ID[window.productId];
+    const pid = window.productId;
+    const cur = (window.MARKET?.cur || window.productCurrency || 'usd').toLowerCase();
+    const cents = OLD_PRICE_CENTS[pid]?.[cur];
+
     if (typeof cents !== 'number') return;
 
-    const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+    const sym =
+      cur === 'brl' ? 'R$' :
+      cur === 'cad' ? 'CA$' :
+      cur === 'gbp' ? '£' :
+      cur === 'eur' ? '€' : 'US$';
+
     const text = `${sym} ${(cents/100).toFixed(2)}`;
 
     document.querySelectorAll('.price-old').forEach(el => {
       el.textContent = text;
     });
   })();
+  // const OLD_PRICE_CENTS_BY_ID = {
+  //   'prod_SbKYsQrxStW8wB':  6000, 
+  //   'prod_SbKa8ag01A2TGX':  18000,   
+  //   'prod_SbKaRuJpDVBEzx':  36000, 
+  // };
+  // (function setOldPrice(){
+  //   const cents = OLD_PRICE_CENTS_BY_ID[window.productId];
+  //   if (typeof cents !== 'number') return;
+
+  //   const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
+  //   const text = `${sym} ${(cents/100).toFixed(2)}`;
+
+  //   document.querySelectorAll('.price-old').forEach(el => {
+  //     el.textContent = text;
+  //   });
+  // })();
 
   // === QUANTITY (mínimo) ===
   const TARGET_PRODUCT_IDS = [
@@ -915,15 +1051,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
-
   async function goToCheckout(productId) {
-  const res = await fetch(`/get-price-id?product_id=${productId}`);
-  const data = await res.json();
-  
+    const wantedCurrency = (window.MARKET?.cur || 'usd'); // 'brl','usd','eur','gbp','cad'
+    const res = await fetch(`/get-price-id?product_id=${productId}&currency=${wantedCurrency}`);
+    const data = await res.json();
+
     if (data.price_id) {
       window.location.href = `/checkout?price_id=${data.price_id}`;
     } else {
       alert("Erro ao obter preço.");
     }
   }
+  // async function goToCheckout(productId) {
+  // const res = await fetch(`/get-price-id?product_id=${productId}`);
+  // const data = await res.json();
+  
+  //   if (data.price_id) {
+  //     window.location.href = `/checkout?price_id=${data.price_id}`;
+  //   } else {
+  //     alert("Erro ao obter preço.");
+  //   }
+  // }
 })

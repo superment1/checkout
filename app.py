@@ -2,8 +2,10 @@ import os
 from flask import Flask, render_template, redirect, request, jsonify, send_from_directory
 import stripe
 from dotenv import load_dotenv
+import re
 from flask_cors import CORS
 from auth import require_api_key
+import ipaddress, requests
 
 load_dotenv()
 app = Flask(__name__)
@@ -14,21 +16,63 @@ BASE_URL = os.getenv("BASE_URL", "http://localhost:5003")
 MAPS_API_KEY = os.getenv("MAPS_API_KEY", "")
 ENV_NAME = os.getenv("ENV_NAME", "development")
 
-cors_origins = os.getenv("CORS_ALLOWED_ORIGINS")
-if cors_origins:
-    origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
-else:
-    origins = ["http://localhost:5003", "http://localhost:3000", BASE_URL]
-
+regex_superment = re.compile(r"^https://([a-z0-9-]+\.)*superment\.co$")
 
 CORS(app, resources={
-    r"/*": {
-        "origins": [
-            r"https://.*\.superment\.co",
-            "https://superment.co"        
-        ]
+    r"/get-price-id":          {"origins": [regex_superment]},
+    r"/create-payment-intent": {"origins": [regex_superment]},
+}, supports_credentials=False)
+
+def _client_ip():
+    xff = request.headers.get("X-Forwarded-For", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.remote_addr or ""
+
+def _infer_currency_from_country(country_name: str) -> str:
+    m = {
+        "Brazil": "brl",
+        "United States": "usd",
+        "Canada": "cad",
+        "United Kingdom": "gbp",
+        "Ireland": "eur",
+        "Germany": "eur",
+        "France": "eur",
+        "Spain": "eur",
+        "Italy": "eur",
+        "Portugal": "eur",
     }
-})
+    return m.get(country_name or "", "").lower() or "usd"
+
+@app.route("/get-country")
+def get_country():
+    ip = _client_ip()
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+        if ip_obj.is_private or ip_obj.is_loopback:
+            return jsonify({"country": None, "ip": ip, "dev": True})
+        r = requests.get(f"https://ipapi.co/{ip}/json/", timeout=4)
+        if r.ok and r.headers.get("Content-Type", "").startswith("application/json"):
+            data = r.json()
+            return jsonify({"country": data.get("country_name"), "ip": ip})
+        else:
+            return jsonify({"country": None, "ip": ip, "error": f"ipapi status {r.status_code}"}), 200
+    except Exception as e:
+        return jsonify({"country": None, "ip": ip, "error": str(e)}), 200
+
+# cors_origins = os.getenv("CORS_ALLOWED_ORIGINS")
+    # if cors_origins:
+    #     origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
+    # else:
+    #     origins = ["http://localhost:5003", "http://localhost:3000", BASE_URL]
+    # CORS(app, resources={
+    #     r"/*": {
+    #         "origins": [
+    #             r"https://.*\.superment\.co",
+    #             "https://superment.co"        
+    #         ]
+    #     }
+    # })
 
 @app.get("/config")
 def get_public_config():
@@ -39,6 +83,9 @@ def get_public_config():
         "baseUrl": BASE_URL,
     })
 
+@app.route("/")
+def home():
+    return "Checkout API is running", 200
 # @app.route('/')
 # def index():
 #     return render_template(
@@ -59,51 +106,178 @@ def get_client_secret():
     try:
         data = request.get_json()
         payment_intent_id = data.get("payment_intent_id")
-
         if not payment_intent_id:
             return jsonify({"error": "payment_intent_id is required"}), 400
-
         intent = stripe.PaymentIntent.retrieve(payment_intent_id)
-
         if not intent.metadata.get("authorized") == "true":
             return jsonify({"error": "Unauthorized PaymentIntent"}), 403
-        
         return jsonify({
             "client_secret": intent.client_secret
         })
     except Exception as e:
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
 
+
 @app.route("/checkout")
 def checkout():
-    
-    price_id = request.args.get("price_id")
-    if not price_id:
-        return "price_id missing", 400
+    price_id   = request.args.get("price_id")
+    product_id = request.args.get("product_id")  # opcional
+    want_cur   = (request.args.get("currency") or "").lower()  # opcional
+
     try:
-        price = stripe.Price.retrieve(price_id)
-        product = stripe.Product.retrieve(price.product)
+        if not want_cur or want_cur not in {"usd","brl","eur","gbp","cad"}:
+            ip = _client_ip()
+            try:
+                ip_obj = ipaddress.ip_address(ip)
+                if not (ip_obj.is_private or ip_obj.is_loopback):
+                    r = requests.get(f"https://ipapi.co/{ip}/json/", timeout=3)
+                    if r.ok and r.headers.get("Content-Type","").startswith("application/json"):
+                        want_cur = _infer_currency_from_country(r.json().get("country_name"))
+            except Exception:
+                pass
+            if not want_cur:
+                want_cur = "usd"
+        chosen_price = None
+
+        if price_id:
+            p = stripe.Price.retrieve(price_id, expand=["product"])
+            prod_id = p.product.id if hasattr(p.product, "id") else p.product
+
+            prices = stripe.Price.list(product=prod_id, active=True, limit=100)
+            for q in prices.auto_paging_iter():
+                if q.currency.lower() == want_cur:
+                    chosen_price = q
+                    break
+
+            if not chosen_price:
+                chosen_price = p
+
+            product_id = prod_id
+        else:
+            if not product_id:
+                return "price_id or product_id required", 400
+            prices = stripe.Price.list(product=product_id, active=True, limit=100)
+            for q in prices.auto_paging_iter():
+                if q.currency.lower() == want_cur:
+                    chosen_price = q
+                    break
+            if not chosen_price:
+                if not prices.data:
+                    return "no active prices", 404
+                chosen_price = prices.data[0]
+
+        if isinstance(chosen_price.product, str):
+            product = stripe.Product.retrieve(chosen_price.product)
+        else:
+            product = chosen_price.product 
+
+        amount_for_view   = chosen_price.unit_amount
+        currency_for_view = chosen_price.currency.lower()
+
+        co = getattr(chosen_price, "currency_options", None) or {}
+        if want_cur and currency_for_view != want_cur and want_cur in co:
+            amount_for_view   = co[want_cur].get("unit_amount", amount_for_view)
+            currency_for_view = want_cur
 
         intent = stripe.PaymentIntent.create(
-            amount=price.unit_amount,
-            currency=price.currency,
+            amount=chosen_price.unit_amount,
+            currency=chosen_price.currency,
             automatic_payment_methods={"enabled": True},
             metadata={
                 "authorized": "true",
                 "product_id": product.id,
-                "price_id": price.id   
-            } 
+                "price_id": chosen_price.id
+            }
         )
         return render_template(
-            "index.html", 
-            price=price,
+            "index.html",
+            price=chosen_price,
             product=product,
             publishable_key=PUBLISHABLE_KEY,
             maps_key=MAPS_API_KEY,
-            payment_intent_id=intent.id
+            payment_intent_id=intent.id,
+            product_amount=amount_for_view,      
+            product_currency=currency_for_view,
         )
-    except Exception as e:
+    except Exception:
+        app.logger.exception("checkout failed")
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
+
+    # price_id = request.args.get("price_id")
+    # product_id = request.args.get("product_id")
+    # want_currency = (request.args.get("currency") or "").lower()
+
+    # try:
+    #     if not price_id:
+    #         if not product_id:
+    #             return "price_id or product_id required", 400
+    #         prices = stripe.Price.list(product=product_id, active=True, limit=100)
+    #         chosen = None
+    #         if want_currency:
+    #             for p in prices.auto_paging_iter():
+    #                 if p.currency.lower() == want_currency:
+    #                     chosen = p
+    #                     break
+    #         if not chosen:
+    #             if not prices.data:
+    #                 return "no active prices", 404
+    #             chosen = prices.data[0]
+    #         price_id = chosen.id
+
+    #     price = stripe.Price.retrieve(price_id)
+    #     product = stripe.Product.retrieve(price.product)
+
+    #     intent = stripe.PaymentIntent.create(
+    #         amount=price.unit_amount,
+    #         currency=price.currency,
+    #         automatic_payment_methods={"enabled": True},
+    #         metadata={
+    #             "authorized": "true",
+    #             "product_id": product.id,
+    #             "price_id": price.id
+    #         }
+    #     )
+    #     return render_template(
+    #         "index.html",
+    #         price=price,
+    #         product=product,
+    #         publishable_key=PUBLISHABLE_KEY,
+    #         maps_key=MAPS_API_KEY,
+    #         payment_intent_id=intent.id
+    #     )
+    # except Exception:
+    #     return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
+
+
+# def checkout():
+    
+#     price_id = request.args.get("price_id")
+#     if not price_id:
+#         return "price_id missing", 400
+#     try:
+#         price = stripe.Price.retrieve(price_id)
+#         product = stripe.Product.retrieve(price.product)
+
+#         intent = stripe.PaymentIntent.create(
+#             amount=price.unit_amount,
+#             currency=price.currency,
+#             automatic_payment_methods={"enabled": True},
+#             metadata={
+#                 "authorized": "true",
+#                 "product_id": product.id,
+#                 "price_id": price.id   
+#             } 
+#         )
+#         return render_template(
+#             "index.html", 
+#             price=price,
+#             product=product,
+#             publishable_key=PUBLISHABLE_KEY,
+#             maps_key=MAPS_API_KEY,
+#             payment_intent_id=intent.id
+#         )
+#     except Exception as e:
+#         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route("/products", methods=["GET"])
 @require_api_key()
@@ -140,18 +314,36 @@ def check_stripe():
 @app.route("/get-price-id")
 def get_price_id():
     product_id = (request.args.get("product_id") or "").strip()
+    want_currency = (request.args.get("currency") or "").strip().lower()
     if not product_id:
         return jsonify({"error": "product_id is required"}), 400
     try:
-        prices = stripe.Price.list(product=product_id, active=True, limit=1)
+        prices = stripe.Price.list(product=product_id, active=True, limit=100, expand=["data.product"])
         if not prices.data:
             return jsonify({"error": "No active prices found"}), 404
-        price = prices.data[0]
+        chosen = None
+        if want_currency:
+            for p in prices.auto_paging_iter():
+                if p.active and p.currency.lower() == want_currency:
+                    chosen = p
+                    break
+        # fallback: primeiro ativo
+        if not chosen:
+            chosen = prices.data[0]
+
         return jsonify({
-            "price_id": price.id,
-            "unit_amount": price.unit_amount,
-            "currency": price.currency
+            "price_id": chosen.id,
+            "unit_amount": chosen.unit_amount,
+            "currency": chosen.currency,
+            "product_id": chosen.product.id if hasattr(chosen, "product") and hasattr(chosen.product, "id") else chosen.product
         })
+    
+        # price = prices.data[0]
+        # return jsonify({
+        #     "price_id": price.id,
+        #     "unit_amount": price.unit_amount,
+        #     "currency": price.currency
+        # })
     except Exception as e:
         app.logger.exception("get_price_id failed")
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
@@ -201,7 +393,11 @@ def update_payment_intent():
             amount=amount,
             currency=currency,
             automatic_payment_methods={"enabled": True},
-            metadata={"base_amount": str(amount)}
+            metadata={
+                "base_amount": str(amount),
+                "price_id": price_id,    
+                "product_id": price.product if isinstance(price.product, str) else price.product.get("id", "")
+                }
         )
 
         return jsonify(client_secret=pi.client_secret, payment_intent_id=pi.id), 200
@@ -344,4 +540,4 @@ def cancel():
     return 'Pagamento cancelado.'
 
 if __name__ == '__main__':
-    app.run(port=5001, debug=False)
+    app.run(port=5003, debug=False)

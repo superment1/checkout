@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-product="{{ product.id }}">
+<html lang="en" data-product="{{ product.id }}" data-currency="{{ price.currency }}">
 
 <head>
     <meta charset="UTF-8">
@@ -17,6 +17,12 @@
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="manifest" href="/manifest.json">
+    <!-- PAYPAL -->
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id=BAADShvj2DdSexegt4Zzx8uwVKCfE_X-l4djcubxoGg9-zRErPSlLGWIEjCbdGN_xgJ666fbajQQJVMpGc&components=hosted-buttons&disable-funding=venmo&currency={{ price.currency|upper }}">
+    </script>
+    <script type="module" src="/static/js/paypal.js"></script>
+    <!-- END PAYPAL -->
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}"> -->
     <link rel="icon" href="/static/img/favicon.webp">
     <!-- Google Tag Manager -->
@@ -64,7 +70,6 @@
                         <span class="superment checkout-text-font-family">Superment</span>
                     </span>
                 </div> 
-
                 <span class="voltar">Back</span>
             </a>
         </div>
@@ -104,11 +109,17 @@
                                 </div>
                             </div>
                             <div class="price-mobile">
-                                {% set sym = 'R$' if price.currency == 'brl' else 'US$' %}
+                                {% set sym =
+                                    'R$'  if product_currency == 'brl' else
+                                    'CA$' if product_currency == 'cad' else
+                                    '£'   if product_currency == 'gbp' else
+                                    '€'   if product_currency == 'eur' else
+                                    'US$'
+                                %}
                                 <span id="title-price-mobile-accordion">
-                                    {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                                    {{ sym }} {{ '%.2f' | format((product_amount) / 100) }}
                                 </span>
-                                <span class="delivery">Free U.S. Shipping</span>
+                                <span class="delivery">Free Shipping</span>
                             </div>
                             <div class="coupon-discount-accordion">
                                 <div class="coupon">
@@ -150,7 +161,7 @@
                         <div class="product-row product-text accordion">
                             <p class="product-text">Total</p>
                             <span id="total-price">
-                                {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                                {{ sym }} {{ '%.2f' | format((product_amount) / 100) }}
                             </span>
                         </div>                                                
                     </div> 
@@ -191,9 +202,9 @@
                     </div>                      
                     <div class="price-mobile">
                         <span id="total-due-price-mobile">
-                            {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                            {{ sym }} {{ '%.2f' | format((product_amount) / 100) }}
                         </span>
-                        <span class="delivery">Free U.S. Shipping</span>
+                        <span class="delivery">Free Shipping</span>
                     </div>
                     <div class="product-row coupon-discount">
                         <div class="coupon">
@@ -247,7 +258,7 @@
                 <div class="product-row product-text">
                     <p class="product-text">Total</p>
                     <span id="total-due-price">
-                        {{ sym }} {{ '%.2f' | format((price.unit_amount) / 100) }}
+                        {{ sym }} {{ '%.2f' | format((product_amount) / 100) }}
                     </span>
                 </div>
                 <div class="testimonials-desktop">
@@ -319,18 +330,20 @@
         </div>
         <!-- PAYMENT -->
         <div class="checkout-right">
+            <div id="paypalbtn">
+                <div id="paypal-container"></div>                    
+            </div>
             <div class="timer">
                 <img src="/static/img/timer.webp"></img>
                 Session expires in 
                 <span id="countdown"></span>
-            </div>
+            </div>            
             <div id="express-wrap" style="opacity:0;height:0;overflow:hidden;">               
                 <div id="express-checkout-element" class="google-pay-details ">
-                </div>
+                </div>                
                 <div class="custom-divider"><span>or</span></div>
             </div>
             <form id="payment-form">                
-            
                 <div class="title3"> Shipping address</div>
                 <div class="email-form">
                     <label class="title" for="email">Email</label>
@@ -343,7 +356,7 @@
                         <input id="name" name="name" class="input-field" placeholder="Name" type="text" required />
                     </div>
                     <div class="input-wrapper">
-                        <input id="country" class="input-field" name="country" value="United States" disabled />
+                        <input id="country" class="input-field" name="country" value="" placeholder="Country" disabled />
                     </div>
                     <div id="shipping-autocomplete-root" class="ac-root">
                         <input id="shippingAddressLine1" class="input-field" name="line1" placeholder="Enter address"
@@ -365,10 +378,11 @@
                             </div>
                         </div>
                         <div class="select-wrapper">
-                            <select id="shippingAdministrativeArea" class="Select-source input-field"
+                            <input type="text" id="shippingAdministrativeArea" class="input-field" name="shippingAdministrativeArea" placeholder="State" required>
+                            <!-- <select id="shippingAdministrativeArea" class="Select-source input-field"
                                 name="shippingAdministrativeArea" placeholder="State" required>
                                 <option value="" disabled selected>Select a state</option>
-                            </select>
+                            </select> -->
                         </div>
                     </div>
                 </div>
@@ -508,7 +522,6 @@
         </div>
     </div>
     </div>
-
     <script>
         document.getElementById('backBtnDesk').addEventListener('click', function(e){
             e.preventDefault();
@@ -520,8 +533,10 @@
         });
         window.publishableKey = "{{ publishable_key }}";
         window.paymentIntentId = "{{ payment_intent_id }}";
-        window.productPrice = "{{  price.unit_amount|int }}";
+        window.productPrice =  "{{ product_amount|int }}";
+        // window.productPrice = "{{  price.unit_amount|int }}";
         window.productCurrency = "{{ product_currency }}";
+        // window.productCurrency = "{{ product_currency }}";
         window.mapsKey = "{{ maps_key }}";
         window.productId = "{{ product.id }}"; 
         window.priceId = "{{ price.id }}";
@@ -534,30 +549,31 @@
             const shippingLocality = document.getElementById('shippingLocality');
             const shippingPostalCode = document.getElementById('shippingPostalCode');
             const shippingAdministrativeArea = document.getElementById('shippingAdministrativeArea');
+            
+            const CC = (window.MARKET?.cc || (window.USER_COUNTRY && resolveMarket(window.USER_COUNTRY).cc) || 'US').toUpperCase();
+
+            const countryName =
+                window.USER_COUNTRY ||
+                (typeof Intl !== 'undefined' && Intl.DisplayNames
+                    ? new Intl.DisplayNames([window.MARKET?.locale || 'en'], { type: 'region' }).of(CC)
+                    : ({ US:'United States', BR:'Brazil', CA:'Canada', GB:'United Kingdom', IE:'Ireland',
+                        DE:'Germany', FR:'France', ES:'Spain', IT:'Italy', PT:'Portugal' }[CC] || CC)
+                );
+
             const countryInput = document.getElementById('country');
-            const usStates = {
-                "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
-                "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
-                "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
-                "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
-                "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
-                "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
-                "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
-                "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
-                "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
-                "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
-            };
-            for (const abbreviation in usStates) {
-                if (usStates.hasOwnProperty(abbreviation)) {
-                    const option = document.createElement('option');
-                    option.value = abbreviation;
-                    option.textContent = usStates[abbreviation];
-                    shippingAdministrativeArea.appendChild(option);
-                }
+            console.log("MARKET Country Code (CC):", CC);
+            
+            if (countryInput) {
+                countryInput.value = countryName;
+                countryInput.placeholder = countryName;  
+                countryInput.dataset.cc = CC;      
             }
+
+            shippingAdministrativeArea.innerHTML = '';
+
             const autocomplete = new google.maps.places.Autocomplete(input, {
                 types: ['address'],
-                componentRestrictions: { country: ['us'] },
+                componentRestrictions: { country: CC },
                 fields: ['address_components', 'geometry', 'formatted_address'],
                 appendTo: root,
             });
@@ -608,6 +624,28 @@
                 }
             });
         }
+                // const usStates = {
+                //     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+                //     "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+                //     "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+                //     "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+                //     "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+                //     "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+                //     "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+                //     "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+                //     "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+                //     "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+                // };
+            //     for (const abbreviation in usStates) {
+            //         if (usStates.hasOwnProperty(abbreviation)) {
+            //             const option = document.createElement('option');
+            //             option.value = abbreviation;
+            //             option.textContent = usStates[abbreviation];
+            //             shippingAdministrativeArea.appendChild(option);
+            //         }
+            //     }
+            // }
+           
         function initBillingAutocomplete() {
             const input = document.getElementById('billing-line1');
             const root  = document.getElementById('billing-autocomplete-root');
@@ -618,9 +656,12 @@
             const billingState = document.getElementById('billing-state');
             const billingCountry = document.getElementById('billing-country');
 
+            const CC = (window.MARKET?.cc || (window.USER_COUNTRY && resolveMarket(window.USER_COUNTRY).cc) || 'US').toUpperCase();
+
+            console.log("MARKET Country Code (CC):", CC);
             const autocomplete = new google.maps.places.Autocomplete(input, {
                 types: ['address'],
-                componentRestrictions: { country: ['us'] },
+                componentRestrictions: { country: CC },
                 fields: ['address_components', 'geometry', 'formatted_address'],
                 appendTo: root, 
             });
@@ -668,13 +709,15 @@
             });
         }
         function initAutocomplete() {
+            if (!window.MARKET || !window.USER_COUNTRY) {
+                setTimeout(initAutocomplete, 150);
+                return;
+            }
             initShippingAutocomplete();
             initBillingAutocomplete();
         }
     </script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&libraries=places&callback=initAutocomplete&loading=async"
-        async defer></script>
+   
     <script src="/static/js/data/country.js"></script>
     <script>
         const select = document.getElementById("billing-country");
@@ -701,6 +744,10 @@
         }
     </script>
     <script src="/static/js/checkout.js"></script>
+     <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&libraries=places&callback=initAutocomplete&loading=async"
+        async defer>
+    </script>
     <!-- {% set title = "WAIT" %}
     {% set subtitle = "DON'T LEAVE" %}
     {% set message = 'Get <span style="color:#FFDC03;font-size:1.4em;font-weight:700;">20% OFF</span> to shop now<br> — today only.' %}
