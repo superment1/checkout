@@ -17,11 +17,17 @@
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="manifest" href="/manifest.json">
+   
     <!-- PAYPAL -->
-    <script 
-        src="https://www.paypal.com/sdk/js?client-id=BAADShvj2DdSexegt4Zzx8uwVKCfE_X-l4djcubxoGg9-zRErPSlLGWIEjCbdGN_xgJ666fbajQQJVMpGc&components=hosted-buttons&disable-funding=venmo&currency={{ price.currency|upper }}">
+    <script src="https://www.paypal.com/sdk/js?client-id=AeZ9yBxMBC2XfCIxJ139ggps5l9glYZwI_W-ehLRp1TUVfksZ0cuRhdc1tkIOg9W5a-clc8AXxzyeAus&currency=BRL&disable-funding=card,credit,venmo"></script>
+        <script>
+        const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        window.API_BASE = isLocal
+            ? "http://localhost:5003"     
+            : "https://checkout.superment.co";
     </script>
     <script type="module" src="/static/js/paypal.js"></script>
+    
     <!-- END PAYPAL -->
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}"> -->
     <link rel="icon" href="/static/img/favicon.webp">
@@ -330,9 +336,6 @@
         </div>
         <!-- PAYMENT -->
         <div class="checkout-right">
-            <div id="paypalbtn">
-                <div id="paypal-container"></div>                    
-            </div>
             <div class="timer">
                 <img src="/static/img/timer.webp"></img>
                 Session expires in 
@@ -342,6 +345,13 @@
                 <div id="express-checkout-element" class="google-pay-details ">
                 </div>                
                 <div class="custom-divider"><span>or</span></div>
+            </div>
+             <div id="paypalbtn">    
+                <div id="paypal-button"
+                    data-currency="{{ product_currency|upper }}"
+                    data-description="{{ product.name }}"
+                    data-value="{{ '%.2f' | format((product_amount) / 100) }}">
+                </div>               
             </div>
             <form id="payment-form">                
                 <div class="title3"> Shipping address</div>

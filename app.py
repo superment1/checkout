@@ -6,6 +6,8 @@ import re
 from flask_cors import CORS
 from auth import require_api_key
 import ipaddress, requests
+from app_paypal import paypal_bp
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -22,6 +24,8 @@ CORS(app, resources={
     r"/get-price-id":          {"origins": [regex_superment]},
     r"/create-payment-intent": {"origins": [regex_superment]},
 }, supports_credentials=False)
+
+app.register_blueprint(paypal_bp)
 
 def _client_ip():
     xff = request.headers.get("X-Forwarded-For", "")
@@ -538,6 +542,5 @@ def thanks():
 @app.route('/cancel')
 def cancel():
     return 'Pagamento cancelado.'
-
 if __name__ == '__main__':
     app.run(port=5003, debug=False)
