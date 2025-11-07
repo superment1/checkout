@@ -53,3 +53,6 @@ Thumbs.db
 
 __pycache__/
 *.pyc
+
+credentials.json
+token.json

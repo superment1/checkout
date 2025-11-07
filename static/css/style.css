@@ -93,7 +93,7 @@ header{
   border-radius: 25px !important;
 }
 #paypal-button{
-  margin-bottom: 23px;
+  margin-bottom: 6px;
   border-radius: 25px !important;
 }
 .money-back-120{
@@ -1015,6 +1015,7 @@ input, select {
     text-align: center;
     margin: 0;
     padding-bottom: 20px;
+    margin-left: 0% !important;
   }
   .footer{
     display: block;
@@ -1033,7 +1034,9 @@ input, select {
     padding: 23px 24px;
     box-sizing: border-box;
   }
-
+  .custom-divider {
+    margin-left: 10%;
+  }
   .custom-divider::before,
   .custom-divider::after {
     content: "";

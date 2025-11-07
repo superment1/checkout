@@ -19,7 +19,7 @@
     <link rel="manifest" href="/manifest.json">
    
     <!-- PAYPAL -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AeZ9yBxMBC2XfCIxJ139ggps5l9glYZwI_W-ehLRp1TUVfksZ0cuRhdc1tkIOg9W5a-clc8AXxzyeAus&currency=BRL&disable-funding=card,credit,venmo"></script>
+    <!-- <script src="https://www.paypal.com/sdk/js?client-id=AeZ9yBxMBC2XfCIxJ139ggps5l9glYZwI_W-ehLRp1TUVfksZ0cuRhdc1tkIOg9W5a-clc8AXxzyeAus&currency=BRL"></script>
         <script>
         const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
         window.API_BASE = isLocal
@@ -27,7 +27,7 @@
             : "https://checkout.superment.co";
     </script>
     <script type="module" src="/static/js/paypal.js"></script>
-    
+     -->
     <!-- END PAYPAL -->
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}"> -->
     <link rel="icon" href="/static/img/favicon.webp">
@@ -88,7 +88,6 @@
             </svg>
         </div>
         </div>
-  
     </header>
     <div class="scroll-animation" aria-hidden="true">
         <div class="scroll-text-wrapper">
@@ -117,7 +116,7 @@
                             <div class="price-mobile">
                                 {% set sym =
                                     'R$'  if product_currency == 'brl' else
-                                    'CA$' if product_currency == 'cad' else
+                                    'C$' if product_currency == 'cad' else
                                     '£'   if product_currency == 'gbp' else
                                     '€'   if product_currency == 'eur' else
                                     'US$'
@@ -342,17 +341,19 @@
                 <span id="countdown"></span>
             </div>            
             <div id="express-wrap" style="opacity:0;height:0;overflow:hidden;">               
-                <div id="express-checkout-element" class="google-pay-details ">
-                </div>                
-                <div class="custom-divider"><span>or</span></div>
+                <div id="express-checkout-element" class="google-pay-details "></div>   
+                     
             </div>
-             <div id="paypalbtn">    
+            <div class="custom-divider"><span>or</span></div>    
+            <!-- <div id="paypalbtn">    
                 <div id="paypal-button"
                     data-currency="{{ product_currency|upper }}"
                     data-description="{{ product.name }}"
                     data-value="{{ '%.2f' | format((product_amount) / 100) }}">
                 </div>               
-            </div>
+            </div>                             -->
+            
+             
             <form id="payment-form">                
                 <div class="title3"> Shipping address</div>
                 <div class="email-form">

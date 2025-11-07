@@ -29,7 +29,6 @@ def _get_access_token():
         timeout=30,
     )
     if not r.ok:
-        # Retorna JSON com erro de OAuth para o front logar
         return None, {"status": r.status_code, "body": r.text}
     return r.json()["access_token"], None
 
@@ -37,7 +36,7 @@ def _get_access_token():
 def create_order():
     try:
         data = request.get_json(silent=True) or {}
-        currency = data.get("currency", "US")
+        currency = data.get("currency", "USD")
         value = data.get("value", "48.00")
         description = data.get("description", "")
 

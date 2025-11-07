@@ -61,11 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const want = (window.MARKET?.cur || '').toLowerCase();
       const have = (window.productCurrency || '').toLowerCase();
       if (!want || !have) return;
-
-      // Se já está certo, não faz nada
       if (want === have) return;
-
-      // Já tem parâmetro currency? então não entra em loop
       const url = new URL(window.location.href);
       if (url.searchParams.get('currency')) return;
 
@@ -156,8 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     emailRequired: true,
     billingAddressRequired: false,
     shippingAddressRequired: true, 
-    // allowedShippingCountries: ['US', "BR"], 
-    allowedShippingCountries: ['US','BR','CA','GB','IE'],
+    allowedShippingCountries: ['US','CA','GB','IE'],
     shippingRates: [
       {
         id: "free",
@@ -210,7 +205,6 @@ document.addEventListener("DOMContentLoaded", async () => {
            : (currency === 'cad') ? 'CA$'
            : (currency === 'gbp') ? '£' : '€');
            
-
   console.log(' country', window.USER_COUNTRY);
   console.log('currency:', (window.MARKET?.cur || window.productCurrency || 'usd'));
 
@@ -350,13 +344,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const pr = stripe.paymentRequest({
     country: (window.MARKET?.cc || 'US'),
     currency: (window.MARKET?.cur || window.productCurrency || 'usd'),
-    total: { label: 'Order total', amount: totalCents }, // usa direto o valor do back
+    total: { label: 'Order total', amount: totalCents },
   });
-  // const pr = stripe.paymentRequest({
-  //   country: (window.MARKET?.cc || 'US'),
-  //   currency: (window.MARKET?.cur || 'usd'),
-  //   total: { label: 'Order total', amount: Math.round((totalAmount || 0) * 100) },
-  // });
   
   pr.canMakePayment()
     .then((res) => {
@@ -370,7 +359,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const wrap = document.getElementById('express-wrap');
   if (hasWallet) {
-    // revela
     wrap.style.opacity = '1';
     wrap.style.height = 'auto';
     wrap.style.overflow = 'visible';
@@ -510,10 +498,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Sleep — 6 Bottles (exemplo)
     'prod_SbKaRuJpDVBEzx': {
       usd: 36000,
-      brl: 199900,
+      brl: 19900,
       eur: 32500,
       gbp: 29000,
       cad: 51000
+    },
+      // Super — 1 relax
+    'prod_T2jNgj5cCjXcvG': {
+      usd: 6900,   
+      brl: 36000,  
+      eur: 5900,  
+      gbp: 5900,   
+      cad: 9900 
+    },
+
+    // Sleep — 3 Bottles (relax)
+    'prod_SbKYsQrxStW8wB': {
+      usd: 20700,
+      brl: 98000,
+      eur: 16900,
+      gbp: 16900,
+      cad: 29700
+    },
+
+    // Sleep — 6 Bottles (relax)
+    'prod_T2jPp4I1S0cfol': {
+      usd: 41400,
+      brl: 199900,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
     }
   };
   (function setOldPrice(){

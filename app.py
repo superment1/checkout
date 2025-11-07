@@ -7,6 +7,7 @@ from flask_cors import CORS
 from auth import require_api_key
 import ipaddress, requests
 from app_paypal import paypal_bp
+from app_stripe_webhook import stripe_bp
 
 
 load_dotenv()
@@ -26,6 +27,7 @@ CORS(app, resources={
 }, supports_credentials=False)
 
 app.register_blueprint(paypal_bp)
+app.register_blueprint(stripe_bp)
 
 def _client_ip():
     xff = request.headers.get("X-Forwarded-For", "")
