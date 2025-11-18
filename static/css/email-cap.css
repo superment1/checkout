@@ -1,0 +1,89 @@
+/* Fundo escuro/blur */
+.rd-modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s ease;
+    z-index: 9998;
+}
+
+.rd-modal-bg.active {
+    opacity: 1;
+    pointer-events: all;
+}
+#rd-form-mi3dqt9h input[type="email"]::placeholder {
+    color: #AAA !important;
+    font-size: 16px !important;
+    opacity: 1 !important;
+    content: "email@example.com" !important;
+}
+
+#rd-form-mi3dqt9h .bricks-form__label{
+    font-family: 'Crossfit', sans-serif !important;
+    color: #370F1E !important;
+    font-size: 26px !important;
+    padding-right: 120px !important;
+}
+/* Modal central */
+.rd-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    background: #E1DCCD;
+    padding: 10px;
+    width: 90%;
+    max-width: 350px;
+    border-radius: 16px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.rd-modal.active {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    pointer-events: all;
+}
+#rd-column-mi3dqt9g > div {
+    background-color: #E1DCCD !important;
+}
+#rd-section-mi3dqt9a {
+    background-color: #E1DCCD !important;
+}
+#rd-button-mi3dqt9k.bricks--component-button{
+    background-color:#370F1E !important;
+    border-color:#370F1E !important;
+    border-radius: 99px !important;
+    font-family: 'Gelasio', serif !important;
+    font-style: italic !important;
+    font-weight: 500 !important;
+    margin-top: 0 !important;
+}
+#rd-form-mi3dqt9h .bricks-form__input{
+    font-size: 13px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+}
+#formulario-checkout-ea4341fed34534484b7c form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px;
+}
+
+@media (min-width: 700px) {
+    .rd-modal {
+        max-width: 1200px;
+    }
+    #rd-form-mi3dqt9h .bricks-form__label{
+        font-family: 'Crossfit', sans-serif !important;
+        color: #370F1E !important;
+        font-size: 76px !important;
+
+    }
+}

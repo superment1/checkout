@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     refreshBtn.disabled = true;
      window.location.reload();  
   });
+  
   const modal = document.getElementById("expired-modal");
   let timeLeft = 7*60; 
   const countdownEl = document.getElementById("countdown");

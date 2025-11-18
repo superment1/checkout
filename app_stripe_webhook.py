@@ -4,12 +4,54 @@ import stripe
 import smtplib, ssl
 from flask import Blueprint, request, jsonify, abort
 from email.message import EmailMessage
+import base64
+import requests
+import traceback
 
 stripe_bp = Blueprint("stripe_bp", __name__)
 
 # ==== Stripe env ====
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+CARTROVER_USER = os.getenv("CARTROVER_API_USER")
+CARTROVER_KEY = os.getenv("CARTROVER_API_KEY")
+CARTROVER_BASE = os.getenv("CARTROVER_BASE_URL", "https://api.cartrover.com/v1").rstrip("/")
+
+PRODUCT_ITEM_MAP = {
+    "prod_SgGRuiyYsEVyCF": {
+        "sku": "SLEEP_TEST",
+        "qty": 1,
+    },  
+    "prod_AbCdEf12345":    {
+        "sku": "SLEEP_TEST",
+        "qty": 3,
+    },     
+    "prod_SbKYsQrxStW8wB":    {
+        "sku": "SPRSLP",
+        "qty": 1,
+    },    
+    "prod_SbKa8ag01A2TGX":    {
+        "sku": "SPRSLP",
+        "qty": 3,
+    },    
+    "prod_SbKaRuJpDVBEzx":    {
+        "sku": "SPRSLP",
+        "qty": 6,
+    },   
+    "prod_T2jNgj5cCjXcvG":    {
+        "sku": "SPRRLX",
+        "qty": 1,
+    },    
+    "prod_T2jOmiPYB2SrZd":    {
+        "sku": "SPRRLX",
+        "qty": 3,
+    },    
+    "prod_T2jPp4I1S0cfol":    {
+        "sku": "SPRRLX",
+        "qty": 6,
+    },   
+}
 
 DEBUG = os.getenv("STRIPE_DEBUG", "0") in ("1", "true", "True")
 if DEBUG:
@@ -73,8 +115,30 @@ def send_pdf(to_email: str):
         reply_to="superhelp@superment.co",
     )
 
-# Webhook Stripe
+def send_order_to_cartrover(order_payload: dict):
+    """Envia o pedido diretamente ao CartRover."""
+    if not CARTROVER_USER or not CARTROVER_KEY:
+        print("[CARTROVER] Falha: credenciais ausentes.")
+        return None
 
+    url = f"{CARTROVER_BASE}/cart/orders/cartrover"
+    auth_string = f"{CARTROVER_USER}:{CARTROVER_KEY}"
+    auth_header = base64.b64encode(auth_string.encode()).decode()
+
+    headers = {
+        "Authorization": f"Basic {auth_header}",
+        "Content-Type": "application/json",
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=order_payload, timeout=15)
+        print(f"[CARTROVER] POST {url} → status={resp.status_code}")
+        print(f"[CARTROVER] Response: {resp.text}")
+        return resp
+    except Exception as e:
+        print(f"[CARTROVER] Erro ao enviar pedido: {e}")
+        return None
+
+# Webhook Stripe
 @stripe_bp.post("/stripe/webhook")
 def stripe_webhook():
     try:
@@ -91,27 +155,34 @@ def stripe_webhook():
 
         etype = event.get("type")
         print("[WEBHOOK] Evento:", etype, flush=True)
-                    #PRODUTO RELAX DEVE SER ACEITO PARA ENVIO DO EMAIL
+        #PRODUTO RELAX DEVE SER ACEITO PARA ENVIO DO EMAIL
         PRODUCTS_ALLOWED = {
-            "prod_SgGRuiyYsEVyCF",
+            # "prod_SgGRuiyYsEVyCF",
             "prod_AbCdEf12345",
             # "prod_T2jNgj5cCjXcvG"
         }
+ 
+
         if event["type"] == "checkout.session.completed":
-            session = event["data"]["object"]
-            email = (
-                (session.get("customer_details") or {}).get("email")
-                or session.get("customer_email")
-            )
-            if not email and session.get("customer"):
-                try:
-                    customer = stripe.Customer.retrieve(session["customer"])
-                    email = customer.get("email")
-                except Exception as e:
-                    print("Erro ao buscar e-mail do customer:", e)
+            session = event["data"]["object"]            
 
             try:
                 line_items = stripe.checkout.Session.list_line_items(session["id"])
+            except Exception as e:
+                print(f"[WEBHOOK] Erro ao listar line_items: {e}")
+                line_items = {"data": []}
+
+            try:
+                email = (
+                    (session.get("customer_details") or {}).get("email")
+                    or session.get("customer_email")
+                )
+                if not email and session.get("customer"):
+                    try:
+                        customer = stripe.Customer.retrieve(session["customer"])
+                        email = customer.get("email")
+                    except Exception as e:
+                        print("Erro ao buscar e-mail do customer:", e)
 
                 should_send = False
                 matched_products = []
@@ -124,57 +195,107 @@ def stripe_webhook():
                     print(f"Item: {desc} | product_id={product_id} | qty={qty} | total={total}")
 
                     if product_id in PRODUCTS_ALLOWED:
-                        print(f"{product_id} é VÁLIDO para envio de e-mail")
                         should_send = True
                         matched_products.append(product_id)
-                    else:
-                        print(f" {product_id} NÃO é válido — e-mail não será enviado")
-                if should_send:
-                    if email:
-                        try:
-                            send_pdf(email)
-                            print(f" E-mail enviado para {email} | products={matched_products}")
-                        except Exception as e:
-                            print(f" Falha ao enviar e-mail: {e}")
-                    else:
-                        print(" Nenhum e-mail encontrado no checkout. Não foi possível enviar.")
-                else:
-                    print("Nenhum product_id permitido encontrado. E-mail NÃO enviado.")
-            except Exception as e:
-                print("Erro ao listar produtos:", e)
-        elif etype == "payment_intent.succeeded":
 
+                if should_send and email:
+                    send_pdf(email)
+                    print(f"[WEBHOOK] E-mail enviado para {email} | products={matched_products}")
+                else:
+                    print("[WEBHOOK] Nenhum produto permitido encontrado — e-mail não enviado.")
+            except Exception as e:
+                print(f"[WEBHOOK] Falha ao processar e-mail: {e}")        
+        
+        elif etype == "payment_intent.succeeded":
             pi = event["data"]["object"]
             email = (
                 pi.get("receipt_email")
                 or ((pi.get("charges", {}).get("data") or [{}])[0]
                     .get("billing_details") or {}).get("email")
             )
-            if not email and pi.get("latest_charge"):
+            charge = None
+            charges_list = (pi.get("charges") or {}).get("data") or []
+            if charges_list:
+                charge = charges_list[0]
+
+            if not charge and pi.get("latest_charge"):
                 try:
-                    ch = stripe.Charge.retrieve(pi["latest_charge"])
-                    email = (ch.get("billing_details") or {}).get("email") or email
+                    charge = stripe.Charge.retrieve(pi["latest_charge"])
                 except Exception as e:
                     print("[WEBHOOK] retrieve charge falhou:", repr(e), flush=True)
+                    charge = {}
+
+            billing = (charge.get("billing_details") or {}) if charge else {}
+            if not email:
+                email = (billing.get("email") or email)
                     
             md = pi.get("metadata") or {}
             product_id = md.get("product_id")
             price_id   = md.get("price_id")
 
             print("[WEBHOOK] PI metadata:", {"product_id": product_id, "price_id": price_id, "email": email}, flush=True)
+            try:
+                items = []
+                i = 1
+                while md.get(f"item_{i}_sku"):
+                    items.append({
+                        "item": md.get(f"item_{i}_sku"),
+                        "quantity": int(md.get(f"item_{i}_qty", 1)),
+                    })
+                    i += 1
+
+                ship = (charge.get("shipping") or {}) if charge else {}
+                addr = (ship.get("address") or {})
+                billing = (charge.get("billing_details") or {}) if charge else {}
+
+                raw_name = (
+                    ship.get("name")
+                    or billing.get("name")
+                    or (email.split("@")[0] if email else None)
+                )
+                ship_company = raw_name or "Cliente Superment"
+                #NEW
+                if not items:
+                    base = PRODUCT_ITEM_MAP.get(product_id)
+                    if base:
+                        items = [{
+                            "item": base["sku"],
+                            "quantity": base["qty"],
+                        }]
+                    else:
+                        items = [{
+                            "item": product_id or "UNKNOWN",
+                            "quantity": 1,
+                        }]
+
+                order_payload = {
+                    "cust_ref": pi["id"],
+                    "ship_company": ship_company,
+                    "ship_address_1": addr.get("line1"),
+                    "ship_address_2": addr.get("line2"),
+                    "ship_city": addr.get("city"),
+                    "ship_state": addr.get("state"),
+                    "ship_zip": addr.get("postal_code"),
+                    "ship_country": addr.get("country"),
+                    "ship_is_billing": True,
+                    "items": items,
+                }
+
+                print("[WEBHOOK] order_payload montado:", order_payload, flush=True)
+                send_order_to_cartrover(order_payload)
+
+            except Exception as e:
+                print(f"[WEBHOOK] Falha ao criar pedido CartRover a partir do PI: {e}")
+                traceback.print_exc()
 
             if product_id in PRODUCTS_ALLOWED and email:
                 send_pdf(email)
                 print(f"[WEBHOOK] SENT via PI: {email} product={product_id}", flush=True)
             else:
                 print("[WEBHOOK] SKIP PI:", {"email": bool(email), "product_id": product_id}, flush=True)
-
         else:
-            # ignore outros tipos
             pass
-
         return jsonify({"ok": True})
     except Exception as e:
-
         print("[WEBHOOK] Erro inesperado (evitando 500):", repr(e))
         return "", 200
