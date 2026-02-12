@@ -14,11 +14,21 @@
     opacity: 1;
     pointer-events: all;
 }
+#rdstation-bricks-embeddable-form-bricks-component-Jg5DRxbwkxsu_0PO48Z3-w .bricks-form__label{
+    margin-bottom: 20px !important;
+}
+#rdstation-bricks-embeddable-form-bricks-component-Jg5DRxbwkxsu_0PO48Z3-w .bricks-form__fieldset{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
 #rd-form-mi3dqt9h input[type="email"]::placeholder {
     color: #AAA !important;
     font-size: 16px !important;
     opacity: 1 !important;
     content: "email@example.com" !important;
+}
+#rdstation-bricks-embeddable-form-bricks-component-Jg5DRxbwkxsu_0PO48Z3-w .bricks-form{
+    padding: 0 !important;
 }
 
 #rd-form-mi3dqt9h .bricks-form__label{
@@ -63,12 +73,17 @@
     font-family: 'Gelasio', serif !important;
     font-style: italic !important;
     font-weight: 500 !important;
+    height: 40px !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
     margin-top: 0 !important;
 }
 #rd-form-mi3dqt9h .bricks-form__input{
     font-size: 13px !important;
     height: 36px !important;
     border-radius: 8px !important;
+    border: 0 !important;
+    box-shadow: 0 0 0 0.815px #E0E0E0, 0 1.63px 3.26px 0 rgba(0, 0, 0, 0.07), 0 0.815px 1.222px 0 rgba(0, 0, 0, 0.05) !important;
 }
 #formulario-checkout-ea4341fed34534484b7c form {
     display: flex !important;
@@ -78,12 +93,36 @@
 
 @media (min-width: 700px) {
     .rd-modal {
-        max-width: 1200px;
+        max-width: 920px;
+        max-height: 492px;
     }
     #rd-form-mi3dqt9h .bricks-form__label{
         font-family: 'Crossfit', sans-serif !important;
         color: #370F1E !important;
-        font-size: 76px !important;
+        font-size: 56px !important;
 
+    }
+    #rd-form-mi3dqt9h .bricks-form__input{
+        height: 85px !important;
+        font-size: 32px !important;
+        border-radius: 25px !important;
+    }
+    #rd-button-mi3dqt9k.bricks--component-button{
+        height: 94px !important;
+        font-size: 40px !important;
+    }
+    #rd-column-mi3dqt9g > div {
+        padding-right: 60px !important;
+        padding-left: 60px !important;
+    }
+    #rd-form-mi3dqt9h {
+        margin-bottom: 50px !important;
+        margin-top: 50px !important;
+    }
+    .bricks-form__field{
+        gap: 38px !important;
+    }
+    #formulario-checkout-ea4341fed34534484b7c form {
+        gap: 52px !important;   
     }
 }

@@ -19,29 +19,17 @@
     <link rel="manifest" href="/manifest.json">
    
     <!-- PAYPAL -->
-    <!-- <script src="https://www.paypal.com/sdk/js?client-id=AeZ9yBxMBC2XfCIxJ139ggps5l9glYZwI_W-ehLRp1TUVfksZ0cuRhdc1tkIOg9W5a-clc8AXxzyeAus&currency=BRL"></script>
-        <script>
-        const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-        window.API_BASE = isLocal
-            ? "http://localhost:5003"     
-            : "https://checkout.superment.co";
+    <!-- <script 
+        src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ product_currency|upper }}&intent=capture">
+    </script> -->
+    <script>
+        window.productCurrency = "{{ product_currency|upper }}";
     </script>
-    <script type="module" src="/static/js/paypal.js"></script>
-     -->
     <!-- END PAYPAL -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/email-cap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}">
     <link rel="icon" href="/static/img/favicon.webp">
     <!-- Google Tag Manager -->
-    <script>(function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-T6Z2ZN9H');</script>
-    <!-- End Google Tag Manager -->
-      <!-- Google Tag Manager2 -->
       <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -56,10 +44,19 @@
         <div class="total-modal">                    
             <div class="modal-card">                    
                 <img src="/static/img/timer_2.webp"></img>
+                <svg class="svg-nerve" xmlns="http://www.w3.org/2000/svg" width="46" height="47" viewBox="0 0 46 47" fill="none">
+                    <path d="M20.7746 42.4462C22.0351 42.4462 23.2907 42.3273 24.5318 42.0945C28.4587 47.4894 35.9199 48.604 41.1994 44.5913C46.4789 40.5786 47.5697 32.9544 43.6428 27.5595C42.9496 26.6084 42.1302 25.7711 41.1994 25.0627C43.2744 13.5348 35.8084 2.47257 24.527 0.352269C13.2456 -1.76308 2.41987 5.86605 0.344906 17.394C-1.72521 28.9219 5.73593 39.9841 17.0173 42.1044C18.2536 42.3373 19.5141 42.4561 20.7697 42.4561L20.7746 42.4462ZM34.0679 25.6027C39.042 25.6027 43.0708 29.7195 43.0708 34.8022C43.0708 39.885 39.042 44.0018 34.0679 44.0018C29.0987 44.0018 25.07 39.89 25.0651 34.8122C25.07 29.7294 29.0987 25.6126 34.0728 25.6077H34.0679V25.6027ZM12.4699 20.0988H18.6657C19.1456 20.0988 19.5383 19.6976 19.5383 19.2071V8.6056C19.5383 8.11516 19.931 7.71388 20.411 7.71388H21.5745C22.0545 7.71388 22.4472 8.11516 22.4472 8.6056V22.1795C22.4472 22.67 22.0545 23.0712 21.5745 23.0712H12.4699C11.9899 23.0712 11.5972 22.67 11.5972 22.1795V20.9906C11.5972 20.5001 11.9899 20.0988 12.4699 20.0988Z" fill="#FF0000"/>
+                    <path d="M34.6545 28.4314H33.491C33.0091 28.4314 32.6184 28.8307 32.6184 29.3231V36.8284C32.6184 37.3209 33.0091 37.7201 33.491 37.7201H34.6545C35.1365 37.7201 35.5272 37.3209 35.5272 36.8284V29.3231C35.5272 28.8307 35.1365 28.4314 34.6545 28.4314Z" fill="#FF0000"/>
+                    <path d="M34.6545 39.3302H33.491C33.0091 39.3302 32.6184 39.7294 32.6184 40.2219V40.7916C32.6184 41.2841 33.0091 41.6833 33.491 41.6833H34.6545C35.1365 41.6833 35.5272 41.2841 35.5272 40.7916V40.2219C35.5272 39.7294 35.1365 39.3302 34.6545 39.3302Z" fill="#FF0000"/>
+                </svg>
                     <div class="modal-text">
                         <div class="top-modal">                        
                             <h3>Almost gone!</h3>
                             <p>Refresh now to secure your order at this price.</p>
+                        </div>
+                        <div class="top-modal-nerve"> 
+                            <h3>Your checkout session<br> has expired.</h3>
+                            <p>Refresh now to continue and secure your order at this price.</p>
                         </div>
                     </div>        
                 <button id="refresh-btn">Refresh</button>                 
@@ -89,6 +86,23 @@
         </div>
         </div>
     </header>
+    <div class="desk-header">
+        <a id="backBtnDesk" class="back-button" href="#" aria-label="Back"
+            onclick="history.back(); return false;">
+            <div class="back-content">
+                <div class="circle-arrow">
+                    <div class="arrow-left"></div>
+                </div>                                                                           
+            </div>
+        </a>
+        <div class="logo-desk">
+            <span class="logo-superment">                      
+                <span class="superment">Superment</span>
+            </span>
+            <span class="voltar">Back</span>   
+        </div>   
+    </div>
+     
     <div class="scroll-animation" aria-hidden="true">
         <div class="scroll-text-wrapper">
         </div>
@@ -171,7 +185,7 @@
                         </div>                                                
                     </div> 
                 </div>
-                <div class="desk-header">
+                <!-- <div class="desk-header">
                     <a id="backBtnDesk" class="back-button" href="#" aria-label="Back"
                         onclick="history.back(); return false;">
                         <div class="back-content">
@@ -180,14 +194,59 @@
                             </div>                                                                           
                         </div>
                     </a>
-                </div>
+                </div> -->
                 <!-- HERO MOBILE  -->
-                 <div class="logo-desk">
+                 <!-- <div class="logo-desk">
                     <span class="logo-superment">                      
                         <span class="superment">Superment</span>
                     </span>
                     <span class="voltar">Back</span>   
-                </div>              
+                </div>    -->
+               
+                <div class="hero-mobile-nerve">
+                    <div class="hero-nerve2">
+                        <div class="hero-nerve3">
+                            <div>
+                                <img src="{{ product.images[0] }}" alt="{{ product.name }}">
+                            </div>
+                            <div class="hero-text">
+                                <h2>Super Nerve</h2>                  
+                            </div>
+                        </div>
+                        
+                        <div class="custom-rating">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="62" height="9" viewBox="0 0 62 9" fill="none">
+                            <path d="M4.94858 0.316055L5.80201 2.93819H8.56639C9.00933 2.93819 9.19486 3.5047 8.8354 3.76368L6.59978 5.38459L7.45321 8.00673C7.59004 8.42757 7.10767 8.77672 6.74821 8.51775L4.51259 6.89683L2.27697 8.51775C1.91751 8.77672 1.43514 8.42757 1.57196 8.00673L2.42539 5.38459L0.189775 3.76368C-0.169686 3.5047 0.0158422 2.93819 0.458791 2.93819H3.22317L4.0766 0.316055C4.21342 -0.104782 4.80943 -0.104782 4.94626 0.316055H4.94858Z" fill="#FFDB05"/>
+                            <path d="M17.974 0.315628L18.8274 2.93776H21.5918C22.0347 2.93776 22.2203 3.50427 21.8608 3.76325L19.6252 5.38417L20.4786 8.0063C20.6154 8.42714 20.1331 8.77629 19.7736 8.51732L17.538 6.8964L15.3024 8.51732C14.9429 8.77629 14.4605 8.42714 14.5974 8.0063L15.4508 5.38417L13.2152 3.76325C12.8557 3.50427 13.0412 2.93776 13.4842 2.93776H16.2486L17.102 0.315628C17.2388 -0.105209 17.8348 -0.105209 17.9717 0.315628H17.974Z" fill="#FFDB05"/>
+                            <path d="M30.9994 0.315627L31.8528 2.93776H34.6172C35.0601 2.93776 35.2456 3.50427 34.8862 3.76325L32.6506 5.38417L33.504 8.0063C33.6408 8.42714 33.1584 8.77629 32.799 8.51732L30.5634 6.8964L28.3278 8.51732C27.9683 8.77629 27.4859 8.42714 27.6227 8.0063L28.4762 5.38417L26.2406 3.76325C25.8811 3.50427 26.0666 2.93776 26.5096 2.93776H29.2739L30.1274 0.315627C30.2642 -0.105209 30.8602 -0.105209 30.997 0.315627H30.9994Z" fill="#FFDB05"/>
+                            <path d="M44.0248 0.315627L44.8782 2.93776H47.6426C48.0855 2.93776 48.271 3.50427 47.9116 3.76325L45.676 5.38417L46.5294 8.0063C46.6662 8.42714 46.1838 8.77629 45.8244 8.51732L43.5888 6.8964L41.3531 8.51732C40.9937 8.77629 40.5113 8.42714 40.6481 8.0063L41.5016 5.38417L39.2659 3.76325C38.9065 3.50427 39.092 2.93776 39.535 2.93776H42.2993L43.1528 0.315627C43.2896 -0.105209 43.8856 -0.105209 44.0224 0.315627H44.0248Z" fill="#FFDB05"/>
+                            <path d="M57.0501 0.332961L57.9036 2.9551H60.6679C61.1109 2.9551 61.2964 3.52161 60.937 3.78058L58.7013 5.4015L59.5548 8.02364C59.6916 8.44447 59.2092 8.79363 58.8498 8.53465L56.6142 6.91374L54.3785 8.53465C54.0191 8.79363 53.5367 8.44447 53.6735 8.02364L54.527 5.4015L52.2913 3.78058C51.9319 3.52161 52.1174 2.9551 52.5604 2.9551H55.3247L56.1782 0.332961C56.315 -0.0878752 56.911 -0.0878752 57.0478 0.332961H57.0501Z" fill="#FFDB05"/>
+                            </svg>
+                            <p>4.96 Customer Rating</p>
+                        </div>                 
+                    </div>   
+                   
+                    <div class="selos-hero">
+                        <div>
+                            <img src="../static/img/hero-selos.webp" alt="">
+                        </div>
+                        <div class="one-time">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 16 15" fill="none">
+                            <g clip-path="url(#clip0_1151_1727)">
+                                <path d="M8 0.625L2 3.125V6.875C2 10.3438 4.56 13.5875 8 14.375C11.44 13.5875 14 10.3438 14 6.875V3.125L8 0.625ZM6.66667 10.625L4 8.125L4.94 7.24375L6.66667 8.85625L11.06 4.7375L12 5.625L6.66667 10.625Z" fill="black"/>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1151_1727">
+                                <rect width="16" height="15" fill="white"/>
+                                </clipPath>
+                            </defs>
+                            </svg>
+                            <p>
+                                One-Time Fee, No Autoship
+                            </p>
+                        </div>                        
+                    </div>
+                </div>
                 <div class="mobile-hero" aria-hidden="true" style="background-image: url('{{ product.images[0] }}');">                   
                 </div>  
             </div>
@@ -247,7 +306,8 @@
                     </div>                    
                     <div class="guarantees-coupon">
                         <div class="img-guarantess">
-                            <img src="../static/img/Group 54.png" alt="checkout-guarantes">           
+                            <img src="../static/img/Group 54.png" alt="checkout-guarantes" class="checkout-guarantes">  
+                            <img src="../static/img/guarantes_nerve.webp" alt="checkout-guarantes-nerve" class="checkout-guarantes-nerve">         
                         </div>                        
                     </div>
                     <div class="details-trigger">
@@ -268,9 +328,10 @@
                 </div>
                 <div class="testimonials-desktop">
                     <div class="satisfaction-desktop">
-                        <span>Rated 4.9/5.0  <span class="divider">|</span>  98% <span class="ligth">satisfaction</span></p>
+                        <span>Rated 4.9/5.0 </span>
+                        <br>  98% <span class="ligth">satisfaction</span></p>
+                        <p>(71.134 reviews)</p>
                         <span class="stars">★ ★ ★ ★ ★</span>
-                        <p>All real and fresh reviews:</p>
                     </div>
                     <div class="dep-container">
                         <div class="dep-track">
@@ -325,10 +386,19 @@
                 <div class="footer-desk">
                     <div class="tagline">
                         <img src="/static/img/escudo.webp" alt="escudo">
-                        <h1>Made in the USA in <br>FDA & GMP-registered facilities.</h1>
+                        <h1>Made in the USA in FDA-registered and GMP-certified facilities.</h1>
+                    </div>
+                    <div class="footer-nerve">
+                        <img src="/static/img/escudo-nerve.webp" width="51px" height="62px" alt="escudo">
+                        <h1>Made in the USA in FDA-registered and GMP-certified facilities.</h1>
                     </div>
                     <div class="tagline-yellow-desk">
                         <h1>Hurry! This offer ends soon ;)</h1>
+                    </div>
+                    <div class="tagline-red-desk">
+                        <h1>Limited stock available.
+                            <p>Order now.</p>
+                        </h1>
                     </div>
                 </div>
             </div>
@@ -336,7 +406,12 @@
         <!-- PAYMENT -->
         <div class="checkout-right">
             <div class="timer">
-                <img src="/static/img/timer.webp"></img>
+                <img class="timer-default" src="/static/img/timer.webp"></img>
+                <svg class="timer-nerve" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M8.89746 17.7904C9.43731 17.7904 9.97509 17.7406 10.5066 17.643C12.1885 19.9041 15.384 20.3713 17.6451 18.6895C19.9063 17.0076 20.3734 13.8121 18.6916 11.551C18.3947 11.1523 18.0438 10.8014 17.6451 10.5045C18.5338 5.67282 15.3362 1.03632 10.5046 0.147646C5.67289 -0.738956 1.0364 2.45862 0.147718 7.29029C-0.738883 12.122 2.45662 16.7585 7.28829 17.6471C7.81776 17.7447 8.35761 17.7945 8.89538 17.7945L8.89746 17.7904ZM14.5908 10.7308C16.7211 10.7308 18.4466 12.4563 18.4466 14.5866C18.4466 16.7169 16.7211 18.4424 14.5908 18.4424C12.4626 18.4424 10.7371 16.719 10.735 14.5907C10.7371 12.4604 12.4626 10.735 14.5929 10.7329H14.5908V10.7308ZM5.34067 8.42398H7.99425C8.19981 8.42398 8.36799 8.2558 8.36799 8.05024V3.60685C8.36799 3.40129 8.53617 3.2331 8.74173 3.2331H9.24006C9.44562 3.2331 9.6138 3.40129 9.6138 3.60685V9.29605C9.6138 9.50161 9.44562 9.66979 9.24006 9.66979H5.34067C5.13511 9.66979 4.96693 9.50161 4.96693 9.29605V8.79772C4.96693 8.59216 5.13511 8.42398 5.34067 8.42398Z" fill="#FF0000"/>
+                    <path d="M14.8421 11.9164H14.3437C14.1373 11.9164 13.97 12.0837 13.97 12.2901V15.4358C13.97 15.6422 14.1373 15.8096 14.3437 15.8096H14.8421C15.0485 15.8096 15.2158 15.6422 15.2158 15.4358V12.2901C15.2158 12.0837 15.0485 11.9164 14.8421 11.9164Z" fill="#FF0000"/>
+                    <path d="M14.8421 16.4844H14.3437C14.1373 16.4844 13.97 16.6517 13.97 16.8581V17.0969C13.97 17.3033 14.1373 17.4706 14.3437 17.4706H14.8421C15.0485 17.4706 15.2158 17.3033 15.2158 17.0969V16.8581C15.2158 16.6517 15.0485 16.4844 14.8421 16.4844Z" fill="#FF0000"/>
+                </svg>
                 Session expires in 
                 <span id="countdown"></span>
             </div>            
@@ -344,21 +419,31 @@
                 <div id="express-checkout-element" class="google-pay-details "></div>   
                      
             </div>
-            <div class="custom-divider"><span>or</span></div>    
-            <!-- <div id="paypalbtn">    
-                <div id="paypal-button"
-                    data-currency="{{ product_currency|upper }}"
-                    data-description="{{ product.name }}"
-                    data-value="{{ '%.2f' | format((product_amount) / 100) }}">
-                </div>               
-            </div>                             
-            -->
+            <div class="custom-divider"><span>or</span></div>   
+
+            <!-- <div id="paypal-button-container"></div>
+            <p id="paypal-status" style="margin-top:8px;font-size:13px;color:#555;"></p>           -->
+
             <form id="payment-form">                
                 <div class="title3"> Shipping address</div>
                 <div class="email-form">
                     <label class="title" for="email">Email</label>
                     <input id="email" class="input-field" name="email" type="email" placeholder="email@exemple.com"
                         required />
+                </div>
+                <div class="field">
+                    <label class="title" for="phone">Phone</label>
+                    <input
+                        id="phone"
+                        name="phone"
+                        class="input-field"
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        required
+                        autocomplete="tel"
+                        inputmode="numeric"
+                        pattern="^\+1\s?\(\d{3}\)\s?\d{3}-\d{4}$"
+                    />
                 </div>
                 <label class="title">Delivery address</label>
                 <div class="groupShipping">
@@ -457,15 +542,16 @@
                                 address manually</a>
                         </div>
                     </div>
-                </div>
+                </div>                
                 <div id="payment-buttons">
                     <div id="payment-message" style="color: red; margin-top: 10px;"></div>
-                    <button class="btn-pay" type="submit" id="submit">Pay</button>
+                    <button class="btn-pay" type="submit" id="submit">Complete Checkout</button>
                 </div>
            
             </form>
             <div class="infos-cards">
-                <img src="/static/img/stripe_2.webp" alt="flags">
+                <img class="cards-sleep" src="/static/img/stripe_2.webp" alt="flags">
+                <img class="cards-nerve" src="/static/img/stripe_nerve90.webp" alt="flags">
             </div>            
         </div>
         <div class="testimonials">
@@ -521,13 +607,30 @@
             </div>   
             <span class="real">All real and fresh reviews.</span>  
         </div>
+        <div class="bar-money-back">
+            <img class="" src="/static/img/money-back-selo.webp" alt="money-back-selp">
+            <p>90-Day Money-Back Guarantee</p>
+            <p>Try Super Nerve with confidence. If you’re not satisfied within 90 days, email us for a full refund. No questions asked.</p>
+        </div>
         <div class="footer">
             <div class="tagline">
                 <img src="/static/img/escudo.webp" alt="escudo">
-                <h1>Made in the USA in <br>FDA & GMP-registered facilities.</h1>
+                <h1>Made in the USA in FDA-registered<br> and GMP-certified facilities.</h1>
+            </div>
+            <div class="tagline-blue">
+                <img src="/static/img/escudo.webp" alt="escudo">
+                <h1>Made in the USA in FDA-registered<br> and GMP-certified facilities.</h1>
+            </div>
+            <div class="footer-nerve">
+                <img src="/static/img/escudo-nerve.webp" alt="escudo">
+                <h1>Made in the USA in FDA-registered<br> and GMP-certified facilities.</h1>
             </div>
             <div class="tagline-yellow">
                 <h1>Hurry! This offer ends soon ;)</h1>
+            </div>
+            <div class="tagline-red">
+                <h1>Limited stock available. Order now.
+                </h1>
             </div>
         </div>
     </div>
@@ -744,8 +847,9 @@
     {% set button_text = "SLEEP20" %}   
     {% include "retention_modal.html" %}
     <script defer src="{{ url_for('static', filename='js/retention-modal.js') }}"></script> -->
+
     <script defer src="{{ url_for('static', filename='js/email-cap.js') }}"></script>
-    {% include "email-cap.html" %}
+    <!-- {% include "email-cap.html" %} -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var ref = document.referrer && document.referrer !== location.href ? document.referrer : '';
@@ -763,10 +867,10 @@
             });
         });
     </script>
-    <noscript>
+    <!-- <noscript>
       <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T6Z2ZN9H"
               height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
+    </noscript> -->
     <!-- Google Tag Manager2 (noscript) -->
       <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMKKCTK3"

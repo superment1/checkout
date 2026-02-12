@@ -7,6 +7,9 @@ from email.message import EmailMessage
 import base64
 import requests
 import traceback
+from dotenv import load_dotenv
+
+load_dotenv()
 
 stripe_bp = Blueprint("stripe_bp", __name__)
 
@@ -235,8 +238,12 @@ def stripe_webhook():
 
             print("[WEBHOOK] PI metadata:", {"product_id": product_id, "price_id": price_id, "email": email}, flush=True)
             try:
+                print("[WEBHOOK] PI metadata bruto:", md, flush=True)
+                print("[WEBHOOK] product_id recebido:", repr(product_id), flush=True)
                 items = []
                 i = 1
+                print("[WEBHOOK] items vindos do metadata:", items, flush=True)
+
                 while md.get(f"item_{i}_sku"):
                     items.append({
                         "item": md.get(f"item_{i}_sku"),
@@ -257,6 +264,9 @@ def stripe_webhook():
                 #NEW
                 if not items:
                     base = PRODUCT_ITEM_MAP.get(product_id)
+
+                    print("[WEBHOOK] base no PRODUCT_ITEM_MAP:", base, flush=True)
+
                     if base:
                         items = [{
                             "item": base["sku"],
@@ -267,6 +277,8 @@ def stripe_webhook():
                             "item": product_id or "UNKNOWN",
                             "quantity": 1,
                         }]
+            
+                print("[WEBHOOK] items finais para CartRover:", items, flush=True)
 
                 order_payload = {
                     "cust_ref": pi["id"],

@@ -23,7 +23,9 @@
         form.querySelector("input[type='email']");
         if (emailField && !emailField.dataset.placeholderSet) {
         emailField.setAttribute("placeholder", "email@example.com");
+        emailField.style.fontSize = "28px";
         emailField.dataset.placeholderSet = "1";
+        
         }
     }
     function injectHiddenFields(form) {
@@ -83,6 +85,10 @@
         console.warn("[RD-SYNC] form RD ainda não está no DOM");
         return;
         }
+        const label = document.querySelector('label[for="rd-email_field-mi3e4icz"]');
+        if (label) {
+            label.textContent = label.textContent.replace("*", "").trim();
+        }
         setEmailPlaceholder(form);
         injectHiddenFields(form);
         if (form.dataset.rdSyncAttached === "1") {
@@ -110,8 +116,6 @@
                 closeRdModal();
             }, 100);
         });
-
-        console.log("[RD-SYNC] listener de submit anexado ao form RD.");
     }
 
     function waitForRdForm() {
@@ -119,7 +123,10 @@
         const maxAttempts = 20;
         const interval = setInterval(function () {
         attempts += 1;
-        attachSubmitListenerToRdForm();
+
+        // AQUI 
+        // attachSubmitListenerToRdForm();
+        
         const container = document.getElementById(RD_CONTAINER_ID);
         const form = container && container.querySelector("form");
 

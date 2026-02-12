@@ -8,6 +8,32 @@ from auth import require_api_key
 import ipaddress, requests
 from app_paypal import paypal_bp
 from app_stripe_webhook import stripe_bp
+import re
+
+# STRIPE N8N
+ATTR_KEYS = ["utm_id", 
+             "utm_source", 
+             "utm_medium", 
+             "utm_campaign", 
+             "utm_content", 
+             "utm_term", 
+             "vid_id", 
+             "sck", 
+             "currency"]
+
+def _clean_meta(v, max_len=120):
+    if not v:
+        return ""
+    v = str(v).strip()
+    v = re.sub(r"[^a-zA-Z0-9_\-.:@/ ]", "", v)
+    return v[:max_len]
+def _get_meta_from_args(args):
+    meta = {}
+    for k in ATTR_KEYS:
+        val = _clean_meta(args.get(k))
+        if val:
+            meta[k] = val
+    return meta
 
 
 load_dotenv()
@@ -18,6 +44,7 @@ PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:5003")
 MAPS_API_KEY = os.getenv("MAPS_API_KEY", "")
 ENV_NAME = os.getenv("ENV_NAME", "development")
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 
 regex_superment = re.compile(r"^https://([a-z0-9-]+\.)*superment\.co$")
 
@@ -87,21 +114,12 @@ def get_public_config():
         "mapsApiKey": MAPS_API_KEY,
         "env": ENV_NAME,
         "baseUrl": BASE_URL,
+        "paypalClientId": PAYPAL_CLIENT_ID,
     })
 
 @app.route("/")
 def home():
     return "Checkout API is running", 200
-# @app.route('/')
-# def index():
-#     return render_template(
-#         'teste.html',
-#         # publishable_key=PUBLISHABLE_KEY,
-#         # maps_key=MAPS_API_KEY,
-#         # google_maps_key=os.getenv("MAPS_API_KEY")
-#         # product=None,
-#         # price=None
-#     )
 
 @app.route('/manifest.json')
 def manifest():
@@ -123,14 +141,14 @@ def get_client_secret():
     except Exception as e:
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
 
-
 @app.route("/checkout")
 def checkout():
     price_id   = request.args.get("price_id")
-    product_id = request.args.get("product_id")  # opcional
-    want_cur   = (request.args.get("currency") or "").lower()  # opcional
+    product_id = request.args.get("product_id")  
+    want_cur   = (request.args.get("currency") or "").lower() 
+    try:       
+        attr_meta = _get_meta_from_args(request.args)
 
-    try:
         if not want_cur or want_cur not in {"usd","brl","eur","gbp","cad"}:
             ip = _client_ip()
             try:
@@ -192,9 +210,11 @@ def checkout():
             metadata={
                 "authorized": "true",
                 "product_id": product.id,
-                "price_id": chosen_price.id
+                "price_id": chosen_price.id,
+                **attr_meta, 
             }
-        )
+        )        
+        # print("METADATA ENVIADA:", intent.metadata, flush=True)
         return render_template(
             "index.html",
             price=chosen_price,
@@ -204,87 +224,53 @@ def checkout():
             payment_intent_id=intent.id,
             product_amount=amount_for_view,      
             product_currency=currency_for_view,
+            PAYPAL_CLIENT_ID=PAYPAL_CLIENT_ID,
         )
     except Exception:
         app.logger.exception("checkout failed")
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
-
-    # price_id = request.args.get("price_id")
-    # product_id = request.args.get("product_id")
-    # want_currency = (request.args.get("currency") or "").lower()
-
-    # try:
-    #     if not price_id:
-    #         if not product_id:
-    #             return "price_id or product_id required", 400
-    #         prices = stripe.Price.list(product=product_id, active=True, limit=100)
-    #         chosen = None
-    #         if want_currency:
-    #             for p in prices.auto_paging_iter():
-    #                 if p.currency.lower() == want_currency:
-    #                     chosen = p
-    #                     break
-    #         if not chosen:
-    #             if not prices.data:
-    #                 return "no active prices", 404
-    #             chosen = prices.data[0]
-    #         price_id = chosen.id
-
-    #     price = stripe.Price.retrieve(price_id)
-    #     product = stripe.Product.retrieve(price.product)
-
-    #     intent = stripe.PaymentIntent.create(
-    #         amount=price.unit_amount,
-    #         currency=price.currency,
-    #         automatic_payment_methods={"enabled": True},
-    #         metadata={
-    #             "authorized": "true",
-    #             "product_id": product.id,
-    #             "price_id": price.id
-    #         }
-    #     )
-    #     return render_template(
-    #         "index.html",
-    #         price=price,
-    #         product=product,
-    #         publishable_key=PUBLISHABLE_KEY,
-    #         maps_key=MAPS_API_KEY,
-    #         payment_intent_id=intent.id
-    #     )
-    # except Exception:
-    #     return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
-
-
-# def checkout():
     
-#     price_id = request.args.get("price_id")
-#     if not price_id:
-#         return "price_id missing", 400
-#     try:
-#         price = stripe.Price.retrieve(price_id)
-#         product = stripe.Product.retrieve(price.product)
 
-#         intent = stripe.PaymentIntent.create(
-#             amount=price.unit_amount,
-#             currency=price.currency,
-#             automatic_payment_methods={"enabled": True},
-#             metadata={
-#                 "authorized": "true",
-#                 "product_id": product.id,
-#                 "price_id": price.id   
-#             } 
-#         )
-#         return render_template(
-#             "index.html", 
-#             price=price,
-#             product=product,
-#             publishable_key=PUBLISHABLE_KEY,
-#             maps_key=MAPS_API_KEY,
-#             payment_intent_id=intent.id
-#         )
-#     except Exception as e:
-#         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
-    
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+def _clean(v, max_len=120):
+    if not v:
+        return ""
+    v = str(v).strip()
+    return v[:max_len]
+
+@app.post("/api/checkout/update-intent")
+def update_intent():
+    data = request.get_json(force=True)
+    pi_id = data["payment_intent_id"]
+
+    email   = _clean(data.get("email"), 120).lower()
+    name    = _clean(data.get("name"), 120)
+    phone   = _clean(data.get("phone"), 20)
+    address1 = _clean(data.get("address1"), 120)
+    address2 = _clean(data.get("address2"), 120)
+    city    = _clean(data.get("city"), 80)
+    state   = _clean(data.get("state"), 40)
+    zipc    = _clean(data.get("zip"), 20)
+    country = _clean(data.get("country"), 2).upper()
+    stripe.PaymentIntent.modify(
+        pi_id,
+        receipt_email=email if email else None,
+        metadata={
+            "email": email,
+            "name": name,
+            "phone": phone,
+            "address1": address1,
+            "address2": address2, 
+            "city":city,
+            "state": state,
+            "zip" : zipc,
+            "country": country,
+        }
+    )
+    return jsonify({"ok": True})
+
+
 @app.route("/products", methods=["GET"])
 @require_api_key()
 def list_products():
@@ -324,6 +310,7 @@ def get_price_id():
     if not product_id:
         return jsonify({"error": "product_id is required"}), 400
     try:
+        
         prices = stripe.Price.list(product=product_id, active=True, limit=100, expand=["data.product"])
         if not prices.data:
             return jsonify({"error": "No active prices found"}), 404
@@ -358,9 +345,11 @@ def get_price_id():
 @app.route("/payment-intent", methods=["POST"])
 def create_payment():
     try:
+
         data = request.get_json()
         price_id = data.get("price_id")
         email = data.get("email")
+        phone = data.get("phone")
         shipping = data.get("shipping")
 
         if not price_id:
@@ -376,7 +365,10 @@ def create_payment():
             receipt_email=email,
             shipping=shipping,
             automatic_payment_methods={"enabled": True},
-            metadata={"authorized": "true"}
+            metadata={
+                "authorized": "true",  
+                "phone": phone,
+                }
         )
         return jsonify(clientSecret=intent.client_secret)
     except Exception as e:
@@ -387,6 +379,7 @@ def update_payment_intent():
     try:
         data = request.get_json(silent=True) or {}
         price_id = data.get("price_id")
+        phone = (data.get("phone"))
 
         if not price_id:
             return jsonify({"error": "price_id is required"}), 400
@@ -402,7 +395,8 @@ def update_payment_intent():
             metadata={
                 "base_amount": str(amount),
                 "price_id": price_id,    
-                "product_id": price.product if isinstance(price.product, str) else price.product.get("id", "")
+                "product_id": price.product if isinstance(price.product, str) else price.product.get("id", ""),
+                "phone": phone,
                 }
         )
 
@@ -410,23 +404,6 @@ def update_payment_intent():
     except Exception as e:
         app.logger.exception("update-payment-intent failed")
         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
-
-# @app.route("/update-payment-intent", methods=["POST"])
-# def update_payment_intent():
-#     try:
-#         data = request.get_json()
-#         intent_id = data.get("payment_intent_id")
-#         email = data.get("email")
-#         shipping = data.get("shipping")
-
-#         intent = stripe.PaymentIntent.modify(
-#             intent_id,
-#             receipt_email=email,
-#             shipping=shipping
-#         )
-#         return jsonify(success=True)
-#     except Exception as e:
-#         return jsonify({"error": "Erro interno. Tente novamente mais tarde."}), 500
     
 @app.route("/validate-coupon", methods=["POST"])
 def validate_coupon():

@@ -529,44 +529,70 @@ document.addEventListener("DOMContentLoaded", async () => {
       eur: 35400,
       gbp: 35400,
       cad: 59400
-    }
+    },
+     //  — 1 Bottle (NERVE)
+    'prod_TuFehfI1uqTzG0': {
+      usd: 17900,
+      // brl: 35800,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
+    'prod_Tp4T3evPktZjZi': {
+      usd: 35800,
+      // brl: 35800,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
+      //  — 3 Bottles (NERVE)
+    'prod_TrDMndGLn9fzNo': {
+      usd: 53700,
+      // brl: 107400,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
+    // Nerve — 6 Bottles (NERVE)
+    'prod_TrDOD1z7f4quxJ': {
+      usd: 107400,
+      // brl: 53700,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
+
   };
   (function setOldPrice(){
     const pid = window.productId;
     const cur = (window.MARKET?.cur || window.productCurrency || 'usd').toLowerCase();
-    const cents = OLD_PRICE_CENTS[pid]?.[cur];
+
+    const productPrices = OLD_PRICE_CENTS[pid];
+    if (!productPrices) return;
+
+    // tenta moeda atual, senão cai para USD
+    const cents =
+      productPrices[cur] ??
+      productPrices.usd;
 
     if (typeof cents !== 'number') return;
 
-    const sym =
-      cur === 'brl' ? 'R$' :
-      cur === 'cad' ? 'CA$' :
-      cur === 'gbp' ? '£' :
-      cur === 'eur' ? '€' : 'US$';
+    // símbolo acompanha a moeda exibida
+    const displayCur = productPrices[cur] ? cur : 'usd';
 
-    const text = `${sym} ${(cents/100).toFixed(2)}`;
+    const sym =
+      displayCur === 'brl' ? 'R$' :
+      displayCur === 'cad' ? 'CA$' :
+      displayCur === 'gbp' ? '£' :
+      displayCur === 'eur' ? '€' : 'US$';
+
+    const text = `${sym} ${(cents / 100).toFixed(2)}`;
 
     document.querySelectorAll('.price-old').forEach(el => {
       el.textContent = text;
     });
   })();
-  // const OLD_PRICE_CENTS_BY_ID = {
-  //   'prod_SbKYsQrxStW8wB':  6000, 
-  //   'prod_SbKa8ag01A2TGX':  18000,   
-  //   'prod_SbKaRuJpDVBEzx':  36000, 
-  // };
-  // (function setOldPrice(){
-  //   const cents = OLD_PRICE_CENTS_BY_ID[window.productId];
-  //   if (typeof cents !== 'number') return;
-
-  //   const sym = (window.productCurrency || '').toLowerCase() === 'brl' ? 'R$' : 'US$';
-  //   const text = `${sym} ${(cents/100).toFixed(2)}`;
-
-  //   document.querySelectorAll('.price-old').forEach(el => {
-  //     el.textContent = text;
-  //   });
-  // })();
-
+  
   // === QUANTITY (mínimo) ===
   const TARGET_PRODUCT_IDS = [
     "prod_SbKYsQrxStW8wB",
@@ -816,6 +842,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         text: "I wasn’t expecting much, but I’m sleeping better and waking up with more energy."
       }
     ]
+    const nerveTestimonials = [
+      {
+        img: "/static/img/linda_1.webp",
+        name: "Linda P. - AZ",
+        location: "",
+        text: "“The burning and tingling in my feet have decreased significantly. I can finally sleep through the night.”"
+      },
+      {
+        img: "/static/img/robert_1.webp",
+        name: "Robert H. - SC",
+        location: "",
+        text: "“I can walk and get through my day without that constant burning sensation. Super Nerve changed my life.”"
+      },
+      {
+        img: "/static/img/patricia_m_1.webp",
+        name: "Patricia M. - OR",
+        location: "",
+        text: "“With Super Nerve, I was able to travel again without discomfort in my feet. Regaining that freedom made all the difference.”"
+      },
+      {
+        img: "/static/img/thomas_k_1.webp",
+        name: "Thomas K. - FL",
+        location: "",
+        text: "“The electric shocks in my legs stopped waking me up at night. I wake up feeling rested. All it takes is two Super Nerve capsules at night.”"
+      },      
+    ] 
   
   const sleepIds = [
     "prod_SbKa8ag01A2TGX",
@@ -827,9 +879,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     "prod_T2jOmiPYB2SrZd",
     "prod_T2jPp4I1S0cfol",
   ];
+  const nerveIds = [
+    "prod_TuFehfI1uqTzG0",
+    "prod_Tp4T3evPktZjZi",
+    "prod_TrDMndGLn9fzNo",
+    "prod_TrDOD1z7f4quxJ",
+  ];
 
   for (let i = 0; i < sleepIds.length; i++) testimonials[sleepIds[i]] = sleepTestimonials;
   for (let i = 0; i < relaxIds.length; i++) testimonials[relaxIds[i]] = relaxTestimonials;
+  for (let i = 0; i < nerveIds.length; i++) testimonials[nerveIds[i]] = nerveTestimonials;
 
   const DEFAULT_ID = "prod_SbKYsQrxStW8wB";
 
@@ -838,6 +897,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const srcByTheme = {
       sleep:   '/static/img/sleep-logo1.webp',
       relax:   '/static/img/relax-logo1.webp',
+      nerve:    '/static/img/logo-nerve.webp',
       default: '/static/img/sleep-logo1.webp'
     };
     document.querySelectorAll('.logo-superment').forEach((el) => {
@@ -855,6 +915,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     default: '#222',
     sleep:   '#fff',
     relax:   '#370F1E',
+    nerve:   '#370F1E',
   };
   const VERIFIED_COLORS = {
     default: { bg: '#4DBCB6', fg: '#fff' },
@@ -869,7 +930,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function verifiedSVG(theme){    
     const c = VERIFIED_COLORS[theme] || VERIFIED_COLORS.default;
     return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="${c.bg}">
+    <svg class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="${c.bg}">
       <path d="M5.26674 9.08511C5.26674 6.94071 6.97818 5.18825 9.12198 5.13748L12.522 5.05696C14.8222 5.00248 16.6914 6.89999 16.6024 9.19912C16.5195 11.3406 14.7594 13.0338 12.6164 13.0338H9.21547C7.03465 13.0338 5.26674 11.2659 5.26674 9.08511Z" fill="${c.bg}"/>
       <path d="M18.8948 10.9421C18.6347 10.4426 18.6347 9.84938 18.8948 9.34985L19.3683 8.44707C19.8132 7.60152 19.4724 6.55564 18.6164 6.13157L17.7032 5.68148C17.1985 5.43172 16.8499 4.9504 16.7666 4.39364L16.6209 3.38419C16.4831 2.43978 15.5933 1.79456 14.6515 1.95326L13.6472 2.12497C13.0905 2.22124 12.5259 2.03652 12.133 1.63326L11.4202 0.904784C10.7541 0.220541 9.65363 0.220541 8.98759 0.904784L8.27473 1.63326C7.88188 2.03652 7.31731 2.22124 6.76055 2.12497L5.7563 1.95326C4.81449 1.79456 3.92471 2.43978 3.78682 3.38419L3.63853 4.39364C3.55787 4.9504 3.20925 5.43172 2.70452 5.68148L1.79133 6.13157C0.935373 6.55564 0.594552 7.60152 1.03944 8.44707L1.51295 9.34985C1.77312 9.84938 1.77312 10.4426 1.51295 10.9421L1.03944 11.8449C0.594552 12.6904 0.935373 13.7363 1.79133 14.1604L2.70452 14.6105C3.20925 14.8602 3.55787 15.3415 3.63853 15.8983L3.78682 16.9078C3.92471 17.8522 4.81449 18.4974 5.7563 18.3387L6.76055 18.167C7.31731 18.0707 7.88188 18.2554 8.27473 18.6587L8.98759 19.3872C9.65363 20.0714 10.7541 20.0714 11.4202 19.3872L12.133 18.6587C12.5259 18.2554 13.0905 18.0707 13.6472 18.167L14.6515 18.3387C15.5933 18.4974 16.4831 17.8522 16.6209 16.9078L16.7666 15.8983C16.8499 15.3415 17.1985 14.8602 17.7032 14.6105L18.6164 14.1604C19.4724 13.7363 19.8132 12.6904 19.3683 11.8449L18.8948 10.9421ZM15.7468 7.31534C13.8323 9.42103 10.4732 12.9482 9.38977 13.03C9.37412 13.0312 9.35972 13.0338 9.34403 13.0338C8.20709 13.0338 6.54201 10.4842 5.64703 8.957C5.50133 8.70724 5.58459 8.38983 5.83175 8.24414C6.07891 8.09844 6.39892 8.1817 6.54461 8.42886C7.59829 10.224 8.5635 11.8449 9.34403 11.9995C9.91466 12.1126 12.7548 9.05847 14.9767 6.61548C15.1718 6.40214 15.4996 6.38654 15.713 6.58166C15.9263 6.77419 15.9419 7.1046 15.7468 7.31534Z" fill="${c.fg}"/>
     </svg>
@@ -880,14 +941,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     var textClass = isDesktop ? 'depoiments-desk' : 'depoiments';
     var nameStyle = ' style="color:' + (NAME_COLOR[theme] || NAME_COLOR.default) + ';"';
     var verifieldStyle  = ' style="color:' + (VERIFIED_NAME_COLORS[theme] || NAME_COLOR.default) + ';"';
-    
+    var stars = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="15" viewBox="0 0 100 15" fill="none">
+                    <path d="M8.21805 0.523841L9.63534 4.87373H14.2261C14.9617 4.87373 15.2698 5.81352 14.6729 6.24313L10.9602 8.93209L12.3775 13.282C12.6047 13.9801 11.8036 14.5593 11.2067 14.1297L7.49401 11.4407L3.78134 14.1297C3.18439 14.5593 2.38331 13.9801 2.61054 13.282L4.02782 8.93209L0.315157 6.24313C-0.281796 5.81352 0.0263089 4.87373 0.76191 4.87373H5.35268L6.76996 0.523841C6.99719 -0.174288 7.98697 -0.174288 8.2142 0.523841H8.21805Z" fill="#370F1E"/>
+                    <path d="M29.4005 0.523597L30.8178 4.87348H35.4085C36.1441 4.87348 36.4522 5.81327 35.8553 6.24289L32.1426 8.93184L33.5599 13.2817C33.7871 13.9799 32.9861 14.5591 32.3891 14.1295L28.6764 11.4405L24.9638 14.1295C24.3668 14.5591 23.5657 13.9799 23.793 13.2817L25.2103 8.93184L21.4976 6.24289C20.9006 5.81327 21.2087 4.87348 21.9443 4.87348H26.5351L27.9524 0.523597C28.1796 -0.174532 29.1694 -0.174532 29.3966 0.523597H29.4005Z" fill="#370F1E"/>
+                    <path d="M50.5824 0.523597L51.9997 4.87348H56.5905C57.3261 4.87348 57.6342 5.81327 57.0372 6.24289L53.3246 8.93184L54.7419 13.2817C54.9691 13.9799 54.168 14.5591 53.5711 14.1295L49.8584 11.4405L46.1457 14.1295C45.5488 14.5591 44.7477 13.9799 44.9749 13.2817L46.3922 8.93184L42.6795 6.24289C42.0826 5.81327 42.3907 4.87348 43.1263 4.87348H47.7171L49.1343 0.523597C49.3616 -0.174532 50.3514 -0.174532 50.5786 0.523597H50.5824Z" fill="#370F1E"/>
+                    <path d="M71.7647 0.523597L73.182 4.87348H77.7728C78.5084 4.87348 78.8165 5.81327 78.2195 6.24289L74.5069 8.93184L75.9242 13.2817C76.1514 13.9799 75.3503 14.5591 74.7534 14.1295L71.0407 11.4405L67.328 14.1295C66.7311 14.5591 65.93 13.9799 66.1572 13.2817L67.5745 8.93184L63.8618 6.24289C63.2649 5.81327 63.573 4.87348 64.3086 4.87348H68.8994L70.3167 0.523597C70.5439 -0.174532 71.5337 -0.174532 71.7609 0.523597H71.7647Z" fill="#370F1E"/>
+                    <path d="M92.9471 0.523597L94.3644 4.87348H98.9552C99.6908 4.87348 99.9989 5.81327 99.4019 6.24289L95.6893 8.93184L97.1065 13.2817C97.3338 13.9799 96.5327 14.5591 95.9357 14.1295L92.2231 11.4405L88.5104 14.1295C87.9135 14.5591 87.1124 13.9799 87.3396 13.2817L88.7569 8.93184L85.0442 6.24289C84.4473 5.81327 84.7554 4.87348 85.491 4.87348H90.0817L91.499 0.523597C91.7263 -0.174532 92.716 -0.174532 92.9433 0.523597H92.9471Z" fill="#370F1E"/>
+                  </svg>`
+    var imageHTML = dep.img
+    ? '<div class="dep-avatar"><img src="' + dep.img + '" alt="' + dep.name + '"></div>'
+    : '';
+
     return (
         '<div class="dep">' +
-        '<div class="title-dep">' +
-          '<h1' + nameStyle + '>' + dep.name + '</h1>' +
-          verifiedSVG(theme) + 
-          '<p' + verifieldStyle +'>Verified Customer</p>' +
-        '</div>' +
+          '<div class="dep-header">' +   
+            imageHTML +
+            '<div class="title-dep">' +
+              '<h1' + nameStyle + '>' + dep.name + '</h1>' +
+              '<div class="stars">' + stars + '</div>' + 
+                verifiedSVG(theme) + 
+                '<p' + verifieldStyle +'>Verified Customer</p>' +
+              '</div>' +
+          '</div>' +
         '<p' + locClass + '>' + dep.location + '</p>' +
         '<span class="' + textClass + '">' + dep.text + '</span>' +
       '</div>'
@@ -938,6 +1013,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   const ThemeById = {};
   sleepIds.forEach(id => ThemeById[id] = "sleep");
+  nerveIds.forEach(id => ThemeById[id] = "nerve");
   relaxIds.forEach(id => ThemeById[id] = "relax");
 
   function getCurrentProductId() {
@@ -1018,7 +1094,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         'Gluten, Soy & Dairy-Free',
         'Made in the USA',
         'GMP-Certified Facility',
+      ],
+      "prod_TuFehfI1uqTzG0": [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
+      ],
+      "prod_Tp4T3evPktZjZi" : [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
+      ],
+      "prod_TrDMndGLn9fzNo" : [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'     
+      ],
+      "prod_TrDOD1z7f4quxJ": [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
       ]
+  
     };
 
   function buildMarqueeLine(items) {
@@ -1031,20 +1124,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function applyMarquee(){
     const id = window.productId || document.documentElement.dataset.product;
-    const texts = marqueeTexts[id] || marqueeTexts["prod_SbKYsQrxStW8wB"]; 
-    const wrapper = document.querySelector(".scroll-text-wrapper");
-    if (!wrapper) return;
-    try { if (document.fonts?.ready) await document.fonts.ready; } catch {}
-    const line = buildMarqueeLine(texts);
-    wrapper.innerHTML = line + line;
-    const pxPerSecond = 60;
-    const halfWidth = wrapper.scrollWidth / 2;   // metade do total
-    if (halfWidth > 0){
-      const dur = Math.max(halfWidth / pxPerSecond, 10); // mínimo 10s
-      wrapper.style.animationDuration = `${dur}s`;
-    }
-    restart(wrapper);
+    const texts = marqueeTexts[id] || marqueeTexts["prod_SbKYsQrxStW8wB"];
+
+    const wrappers = document.querySelectorAll(".scroll-text-wrapper");
+    if (!wrappers.length) return;
+
+    try {
+      if (document.fonts?.ready) await document.fonts.ready;
+    } catch {}
+
+    wrappers.forEach(wrapper => {
+      const line = buildMarqueeLine(texts);
+      wrapper.innerHTML = line + line;
+      wrapper.getBoundingClientRect();
+      const pxPerSecond = 60;
+      const halfWidth = wrapper.scrollWidth / 2;
+
+      wrapper.style.setProperty("--marquee-distance", `${halfWidth}px`);
+      
+      if (halfWidth > 0){
+        const dur = Math.max(halfWidth / pxPerSecond, 10);
+        wrapper.style.animationDuration = `${dur}s`;
+      }
+
+      restart(wrapper);
+    });
   }
+  // async function applyMarquee(){
+  //   const id = window.productId || document.documentElement.dataset.product;
+  //   const texts = marqueeTexts[id] || marqueeTexts["prod_SbKYsQrxStW8wB"]; 
+
+  //   const wrapper = document.querySelectorAll(".scroll-text-wrapper");
+  //   if (!wrapper) return;
+
+  //   try { if (document.fonts?.ready) await document.fonts.ready; } catch {}
+  //   const line = buildMarqueeLine(texts);
+  //   wrapper.innerHTML = line + line;
+  //   const pxPerSecond = 60;
+  //   const halfWidth = wrapper.scrollWidth / 2;  
+
+  //   if (halfWidth > 0){
+  //     const dur = Math.max(halfWidth / pxPerSecond, 10); 
+  //     wrapper.style.animationDuration = `${dur}s`;
+  //   }
+  //   restart(wrapper);
+  // }
   applyMarquee();
   function expandShippingAddressFields() {
     if (shippingExtraFields && shippingToggleLink) {
@@ -1077,14 +1201,207 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("Erro ao obter preço.");
     }
   }
-  // async function goToCheckout(productId) {
-  // const res = await fetch(`/get-price-id?product_id=${productId}`);
-  // const data = await res.json();
-  
-  //   if (data.price_id) {
-  //     window.location.href = `/checkout?price_id=${data.price_id}`;
-  //   } else {
-  //     alert("Erro ao obter preço.");
+  // Dados do carrinho abandonado
+  const emailInput = document.getElementById("email")
+  const nameInput  = document.querySelector("#name")
+
+  const addr1Input   = document.getElementById("shippingAddressLine1")
+  const addr2Input   = document.getElementById("shippingAddressLine2")
+  const cityInput    = document.getElementById("shippingLocality")
+  const stateInput   = document.getElementById("shippingAdministrativeArea")
+  const zipInput     = document.getElementById("shippingPostalCode")
+  const countryInput = document.getElementById("country")
+  const phoneInput = document.getElementById("phone")
+
+  let debounceTimer
+
+  function payloadFromForm() {
+    return {
+      payment_intent_id: window.paymentIntentId,
+      email: (emailInput?.value || "").trim(),
+      phone: (phoneInput?.value || "").trim(),
+      name: (nameInput?.value || "").trim(),
+      address1: (addr1Input?.value || "").trim(),
+      address2: (addr2Input?.value || "").trim(),
+      city: (cityInput?.value || "").trim(),
+      state: (stateInput?.value || "").trim(),
+      zip: (zipInput?.value || "").trim(),
+      country: (countryInput?.value || "").trim(),
+    }
+  }
+
+  function hasAnyValue(p) {
+    return Object.entries(p).some(([k, v]) => k !== "payment_intent_id" && v)
+  }
+
+  function updateIntent() {
+    const p = payloadFromForm()
+    if (!hasAnyValue(p)) return
+
+    fetch("/api/checkout/update-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(p),
+    })
+  }
+
+  const fields = [
+    emailInput, nameInput, phoneInput,
+    addr1Input, addr2Input, cityInput, stateInput, zipInput, countryInput
+  ].filter(Boolean)
+
+  fields.forEach(el => el.addEventListener("blur", updateIntent))
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") updateIntent()
+  })
+  window.addEventListener("beforeunload", updateIntent)
+
+  phoneInput.addEventListener("input", () => {
+    let digits = phoneInput.value.replace(/\D/g, "");
+    if (digits.startsWith("1")) {
+      digits = digits.slice(1);
+    }
+    digits = digits.slice(0, 10); 
+    let formatted = "+1";
+      if (digits.length <= 3) {
+      formatted += " (" + digits;
+    } else if (digits.length <= 6) {
+      formatted += " (" + digits.slice(0, 3) + ") " + digits.slice(3);
+    } else {
+      formatted +=
+        " (" +
+        digits.slice(0, 3) +
+        ") " +
+        digits.slice(3, 6) +
+        "-" +
+        digits.slice(6);
+    }
+    phoneInput.value = formatted;
+  });
+
+  phoneInput.addEventListener("keypress", (e) => {
+    if (!/[0-9]/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+ //PAYPAL FUNCIONANDO
+
+  // function setupPaypalButton() {
+  //   // console.log("productPrice:", window.productPrice);
+  //   // console.log("productCurrency:", window.productCurrency);
+  //   // console.log("productName:", window.productName);
+  //   // console.log("paymentIntentId:", window.paymentIntentId);
+  //   // console.log("priceId:", window.priceId);
+  //   // console.log("productId:", window.productId);
+  //   if (!window.paypal) {
+  //     console.warn("PayPal SDK não disponível");
+  //     return;
   //   }
+
+  //   const container = document.getElementById("paypal-button-container");
+  //   const statusEl  = document.getElementById("paypal-status");
+  //   if (!container) return;
+
+  //   const productCurrency = (window.productCurrency).toUpperCase();
+  //   const productAmount = (window.productPrice / 100).toFixed(2);
+  //   const productName     = window.productName ;
+
+  //   paypal.Buttons({
+  //     style: {
+  //       layout: 'horizontal',
+  //       color:  'gold',
+  //       shape:  'rect',
+  //       label:  'paypal'
+  //     },
+
+  //     createOrder: function () {
+  //       statusEl.textContent = "";
+  //       return fetch("/api/paypal/create-order-client", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           currency: productCurrency,
+  //           value: productAmount,
+  //           description: productName
+  //         })
+  //       })
+  //         .then(res => res.json())
+  //         .then(data => {
+  //           if (!data.id) {
+  //             console.error("Erro ao criar order PayPal:", data);
+  //             throw new Error("Erro ao criar pedido PayPal");
+  //           }
+  //           console.log("PayPal order criada:", data.id);
+  //           return data.id;
+  //         });
+  //     },
+
+  //     onApprove: function (data) {
+  //       statusEl.textContent = "Capturando pagamento via PayPal...";
+
+  //       return fetch(`/api/paypal/capture/${data.orderID}`, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" }
+  //       })
+  //         .then(res => res.json())
+  //         .then(details => {
+  //           console.log("PayPal capture:", details);
+  //           statusEl.textContent = "Pagamento aprovado!";
+
+  //           // aqui você faz o mesmo que no sucesso do Stripe:
+  //           window.location.href = "/thanks";
+  //         })
+  //         .catch(err => {
+  //           console.error("Erro na captura PayPal:", err);
+  //           statusEl.textContent = "Erro ao capturar pagamento.";
+  //         });
+  //     },
+
+  //     onError: function (err) {
+  //       console.error("Erro no botão PayPal:", err);
+  //       statusEl.textContent = "Erro no PayPal: " + err.message;
+  //     }
+  //   }).render("#paypal-button-container");
   // }
-})
+  // setupPaypalButton();
+
+
+
+  // function setupPaymentMethodToggle() {
+  //   const stripeSection = document.getElementById("card-elements");
+  //   const paypalSection = document.getElementById("paypal-section");
+
+  //   const btnPaypal = document.getElementById("btn-paypal");
+  //   const btnStripe = document.getElementById("btn-stripe");
+
+  //   let paypalInitialized = false;
+
+  //   function setStripeMode() {
+  //     stripeSection.style.display = "";
+  //     paypalSection.style.display = "none";
+
+  //     btnPaypal.style.display = "block";  // mostrar botão PayPal
+  //     btnStripe.style.display = "none";   // esconder botão Stripe
+  //   }
+
+  //   function setPaypalMode() {
+  //     stripeSection.style.display = "none";
+  //     paypalSection.style.display = "";
+
+  //     btnPaypal.style.display = "none";   // esconder botão PayPal
+  //     btnStripe.style.display = "block";  // mostrar botão Stripe
+
+  //     if (!paypalInitialized) {
+  //       paypalInitialized = true;
+  //     }
+  //   }
+
+  //   btnPaypal?.addEventListener("click", setPaypalMode);
+  //   btnStripe?.addEventListener("click", setStripeMode);
+
+  //   // estado inicial: Stripe
+  //   setStripeMode();
+  // }
+  // setupPaymentMethodToggle();
+});
