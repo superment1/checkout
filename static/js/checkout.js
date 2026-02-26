@@ -561,6 +561,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       gbp: 35400,
       cad: 59400
     },
+    // Nerve — 1 Bottle (NERVE) DESCONTO
+    'prod_TyLfigSHT7gYPv': {
+      usd: 17900,
+      // brl: 35800,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
+    // Nerve — 3 Bottles (NERVE) DESCONTO
+    'prod_TyLiGfy1GnRLox': {
+      usd: 53700,
+      // brl: 107400,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    }, 
+     // Nerve — 6 Bottles (NERVE) DESCONTO
+    'prod_TyLjK2PblFYDp2': {
+       usd: 107400,
+      // brl: 53700,
+      eur: 35400,
+      gbp: 35400,
+      cad: 59400
+    },
 
   };
   (function setOldPrice(){
@@ -884,7 +908,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     "prod_Tp4T3evPktZjZi",
     "prod_TrDMndGLn9fzNo",
     "prod_TrDOD1z7f4quxJ",
+    "prod_TyLfigSHT7gYPv",
+    "prod_TyLiGfy1GnRLox",
+    "prod_TyLjK2PblFYDp2",
   ];
+
 
   for (let i = 0; i < sleepIds.length; i++) testimonials[sleepIds[i]] = sleepTestimonials;
   for (let i = 0; i < relaxIds.length; i++) testimonials[relaxIds[i]] = relaxTestimonials;
@@ -1108,6 +1136,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         '🔥 High demand today • Limited stock available • Selling fast • Order now'     
       ],
       "prod_TrDOD1z7f4quxJ": [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
+      ],
+      "prod_TyLfigSHT7gYPv": [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
+      ],
+      "prod_TyLiGfy1GnRLox": [
+        '🔥 High demand today • Limited stock available • Selling fast • Order now',
+        '🔥 High demand today • Limited stock available • Selling fast • Order now'
+      ],
+      "prod_TyLjK2PblFYDp2": [
         '🔥 High demand today • Limited stock available • Selling fast • Order now',
         '🔥 High demand today • Limited stock available • Selling fast • Order now'
       ]
