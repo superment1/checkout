@@ -30,15 +30,36 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/retention-modal.css') }}">
     <link rel="icon" href="/static/img/favicon.webp">
     <!-- Google Tag Manager -->
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      <!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-TMKKCTK3');</script>
-    <!-- End Google Tag Manager2 -->
+      })(window,document,'script','dataLayer','GTM-TMKKCTK3');</script> -->
+    <!-- End Google Tag Manager -->
 </head>
 
 <body>
+     <header>
+        <div style="height: 30px;">
+            <a id="backBtn" class="back-button-1" href="#" aria-label="Back">
+                <div class="circle-arrow">
+                    <div class="arrow-left"></div>
+                </div>
+                <span class="logo-superment"></span>
+                <span class="superment checkout-text-font-family">Superment</span>
+                <span class="voltar">Back</span>
+            </a>
+        </div>
+        <div class="details-trigger">
+            <span>Details</span>
+            <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"
+                style="display:inline; vertical-align:middle; margin-left:4px">
+                <path d="M1 1L5 5L9 1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </div>
+        </div>
+    </header>
     <div id="expired-modal" class="modal" aria-hidden="true">
         <div class="modal-backdrop" data-close></div>
         <div class="total-modal">                    
@@ -63,32 +84,10 @@
             </div>
         </div>                                      
     </div>
-    <header>
-        <div>
-            <a id="backBtn" class="back-button" href="#" aria-label="Back">
-                <div class="circle-arrow">
-                    <div class="arrow-left"></div>
-                </div>               
-                    <span class="logo-superment">
-                        <span class="superment checkout-text-font-family">Superment</span>
-                    </span>
-                </div> 
-                <span class="voltar">Back</span>
-            </a>
-        </div>
-        <div class="details-trigger">
-            <span>Details</span>
-            <svg class="details-icon" width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"
-                style="display:inline; vertical-align:middle; margin-left:4px">
-                <path d="M1 1L5 5L9 1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"
-                    stroke-linejoin="round" />
-            </svg>
-        </div>
-        </div>
-    </header>
+   
     <div class="new-header">
         <div class="desk-header">
-            <a id="backBtnDesk" class="back-button" href="#" aria-label="Back"
+            <a id="backBtnDesk" class="back-button-2" href="#" aria-label="Back"
                 onclick="history.back(); return false;">
                 <div class="back-content">
                     <div class="circle-arrow">
@@ -110,7 +109,17 @@
         </div>
     </div>
     <div class="checkout-container">
+        <a id="backBtn" class="back-button-3" href="#" aria-label="Back">
+                <div class="circle-arrow">
+                    <div class="arrow-left"></div>
+                </div>
+            </a>
         <div class="checkout-left">
+            <div class="logo-desk-sleep">
+                <span class="logo-superment"></span>
+                <span class="superment checkout-text-font-family">Superment</span>
+                <span class="voltar">Back</span>
+            </div>
             <div class="product-summary">
                 <!-- ACCORDION -->
                 <div class="accordion-overlay" id="accordionOverlay">
@@ -878,15 +887,11 @@
             });
         });
     </script>
-    <!-- <noscript>
-      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T6Z2ZN9H"
-              height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript> -->
     <!-- Google Tag Manager2 (noscript) -->
       <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMKKCTK3"
       height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
-    <!-- End Google Tag Manager2 (noscript) -->
+    <!-- End Google Tag Manager (noscript) -->
 </body>
 </html>
