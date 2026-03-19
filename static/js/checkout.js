@@ -532,7 +532,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
      //  — 1 Bottle (NERVE)
     'prod_TuFehfI1uqTzG0': {
-      usd: 17900,
+      usd: 10500,
       // brl: 35800,
       eur: 35400,
       gbp: 35400,
@@ -547,7 +547,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
       //  — 3 Bottles (NERVE)
     'prod_TrDMndGLn9fzNo': {
-      usd: 53700,
+      usd: 31500,
       // brl: 107400,
       eur: 35400,
       gbp: 35400,
@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     // Nerve — 1 Bottle (NERVE) DESCONTO
     'prod_TyLfigSHT7gYPv': {
-      usd: 17900,
+      usd: 10500,
       // brl: 35800,
       eur: 35400,
       gbp: 35400,
@@ -571,7 +571,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     // Nerve — 3 Bottles (NERVE) DESCONTO
     'prod_TyLiGfy1GnRLox': {
-      usd: 53700,
+      usd: 31500,
       // brl: 107400,
       eur: 35400,
       gbp: 35400,
@@ -579,7 +579,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 
      // Nerve — 6 Bottles (NERVE) DESCONTO
     'prod_TyLjK2PblFYDp2': {
-       usd: 107400,
+      usd: 63000,
       // brl: 53700,
       eur: 35400,
       gbp: 35400,
@@ -620,7 +620,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // === QUANTITY (mínimo) ===
   const TARGET_PRODUCT_IDS = [
     "prod_SbKYsQrxStW8wB",
-    "prod_T2jNgj5cCjXcvG"
+    "prod_T2jNgj5cCjXcvG",
+    "prod_TyLfigSHT7gYPv"
   ];
   const qtyWrapper = document.querySelectorAll('#qty-wrapper, #qty-wrapper-accordion'); 
 
@@ -1325,6 +1326,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
     }
   });
+  let time = 600;
+
+  setInterval(() => {
+
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    document.getElementById("timer-header").innerText =
+      `${minutes}:${seconds < 10 ? "0"+seconds : seconds}`;
+
+    if(time > 0) time--;
+
+  }, 1000);
+
+
+  window.addEventListener("scroll", function(){
+
+    const bar = document.getElementById("offer-bar");
+    if(window.scrollY > 80){
+      bar.classList.add("show");
+    } else {
+      bar.classList.remove("show");
+    }
+  });
+
  //PAYPAL FUNCIONANDO
 
   // function setupPaypalButton() {
