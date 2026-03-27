@@ -1,0 +1,20 @@
+<div id="rd-modal-bg" class="rd-modal-bg"></div>
+<div id="rd-modal" class="rd-modal">
+    <div role="main" id="formulario-checkout-ea4341fed34534484b7c"></div>
+</div>
+<script src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"></script>
+<script>
+    new RDStationForms('formulario-checkout-ea4341fed34534484b7c', 'null').createForm();
+    document.addEventListener("DOMContentLoaded", () => {
+        const alreadyFilled = localStorage.getItem("customer_email");
+
+        if (alreadyFilled) {
+            console.log("[RD-MODAL] Email já preenchido — modal não será exibido.");
+            return;
+        }
+        setTimeout(() => {
+            document.getElementById("rd-modal").classList.add("active");
+            document.getElementById("rd-modal-bg").classList.add("active");
+        }, 500);
+    });
+</script>

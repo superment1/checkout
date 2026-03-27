@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="/static/img/favicon.webp">
+  <title>Superment | Thanks</title>
+  <style>
+    @font-face {
+        font-family: 'Gelasio';
+        src: url('/static/fonts/Fontes/Gelasio/Gelasio-VariableFont_wght.ttf') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'Gelasio';
+        src: url('/static/fonts/Fontes/Gelasio/Gelasio-Italic-VariableFont_wght.ttf') format('woff2');
+        font-style: italic;
+        font-weight: 100 900;
+    }
+       @font-face {
+        font-family: 'Crossfit';
+        src: url('/static/fonts/Fontes/Crossfit-Black/Crossfit-Black.otf') format('woff2');
+        font-style: italic;
+        font-weight: 100 900;
+    }
+     @font-face {
+        font-family: 'Crossfit';
+        src: url('/static/fonts/Fontes/Crossfit-Black/Crossfit-Black.otf') format('woff2');
+        font-style: normal;
+        font-weight: 100 900;
+    }
+    body, html {
+        padding: 0;
+        height: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        font-family: 'Crossfit', serif;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        background-color: #FDF9F0;
+    }
+    :root{
+        --header-height: 80px;
+    }
+
+    header {
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--header-height);
+        background: rgb(55, 15, 30);
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    main {
+        flex: 1;
+        background-color: #FDF9F0;
+        padding-bottom: 80px; 
+        box-sizing: border-box;
+        margin: 0 11%;
+        margin-top: var(--header-height);
+    }
+    
+    main.thanks-body {
+        flex: 1;
+        margin-top: var(--header-height);
+        padding: 0px 40px 140px; 
+        text-align: left;
+        align-items: flex-start;
+        max-width: 800px;
+        box-sizing: border-box;
+    }
+    footer {
+        width: 100%;
+        height: 160px;
+        background-color: rgb(55, 15, 30);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Crossfit', serif;       
+    }
+    img{
+        max-width: 100%;    
+    }
+    .container img{
+        max-width: 150px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    h1 {
+        font-family: 'Crossfit', serif;
+        font-weight: 500;
+        font-size: 60px;
+        color: #370F1E;
+        margin: 0;
+        line-height: 1;
+    }
+    .highlight {
+        color: #FFDC03;
+    }
+    p {
+      font-size: 28px;
+      color: rgb(55, 15, 30);
+    }
+
+    footer p{
+        color: #fef9f1 !important;
+        font-style: italic;
+        font-family: 'Gelasio', serif;
+        margin: 0;
+        font-size: 0.8rem;
+    }
+    footer h1{
+        margin: 0;
+        color: #fef9f1;
+    }
+    .thanks-body{
+        align-items: center;
+        text-align: start;
+        padding-left: 25px;
+        flex-grow: 1;
+        display: flex;
+        margin-top: 50px;
+        max-width: 980px;
+    }
+    .container {
+        height: auto;
+    }
+  
+    .thanks-text p{
+        font-family: 'Gelasio', serif;
+    }
+    .foot{
+        align-items: center;
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        width: 100%;
+    }
+    .text-aux{
+        margin-bottom: 5px;
+        margin-top: 52px;
+    }   
+    .text{
+        margin-top: 10px;
+        margin-bottom: 80px;
+        padding-bottom: 40px;
+        border-bottom: 2px solid #370F1E;
+    }
+    @media (max-width: 768px) {    
+        :root{
+            --header-height: 53px
+        }
+        .text{
+            margin-top: 10px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #370F1E;
+        }
+        main{
+            margin-right: 50px;
+            margin-left: 50px;
+            margin-top: var(--header-height);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .thanks-body {
+            margin: 0;
+            padding: 25px 0 0 0;
+            align-items: flex-start;
+        }
+        body {
+            width: 100%
+        }
+        .container{
+            margin: 0;
+        }
+        .container img{
+            max-width: 100px;
+
+        }
+        .text-aux2{
+            margin-top: 30px;
+        }
+        header{
+            padding-top: 5px;
+            height: var(--header-height);
+        }
+        h1 {
+            font-size: 42px;
+            line-height: 38px;
+        }
+        .text-aux{
+            margin-bottom: 5px;
+            margin-top: 35px;
+        }   
+        p {
+            font-size: 16px;
+        }
+        .thanks-body img{
+            max-width: 80px;
+        }
+        footer{
+            height: 87px;
+        }
+    }
+  </style>
+   <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-T6Z2ZN9H');</script>
+    <!-- End Google Tag Manager -->
+      <!-- Google Tag Manager2 -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-TMKKCTK3');</script>
+    <!-- End Google Tag Manager2 -->
+</head>
+<body>
+    <header>
+        <div class="container">
+            <span class="logo-superment">
+            <svg xmlns="http://www.w3.org/2000/svg" width="161" height="31" viewBox="0 0 161 31" fill="none">
+                <path d="M7.6009 0C11.8203 0 15.0223 1.31669 15.0223 6.64331V7.3615C15.0223 9.03729 14.8427 9.69564 13.7355 9.69564H9.93504C9.06722 9.69564 8.52857 9.51609 8.52857 8.16947V6.25429C8.52857 5.35654 8.34902 4.72812 7.45128 4.72812C6.49368 4.72812 6.34406 5.38647 6.34406 6.13459V7.30165C6.34406 9.60587 7.6009 10.5934 8.61835 11.4313L11.162 13.5559C14.2143 15.9799 15.2617 18.3738 15.2617 22.683C15.2617 27.3812 13.8851 30.1941 7.98993 30.1941C2.87278 30.1941 0.389023 28.1892 0.389023 23.2815V22.294C0.389023 20.678 0.568571 19.9898 1.64586 19.9898H5.47624C6.58346 19.9898 6.85278 20.4985 6.85278 21.7254V23.9399C6.85278 24.9274 7.03233 25.466 7.93008 25.466C8.7979 25.466 8.97744 24.9274 8.97744 24.0296V22.4436C8.97744 20.6182 8.4388 19.8402 6.76301 18.4337L3.95008 16.0696C1.04737 13.6756 0 11.6408 0 8.01985C0 2.60346 2.33414 0 7.6009 0Z" fill="#FDF9F0"/>
+                <path d="M16.5486 2.60333C16.5486 0.837761 17.1172 0.418814 19.152 0.418814H20.768C22.4737 0.418814 23.4014 0.508588 23.4014 2.60333V23.012C23.4014 24.5083 23.6108 24.9871 24.5086 24.9871C25.4063 24.9871 25.6457 24.5382 25.6457 23.012V2.60333C25.6457 0.568438 26.0347 0.418814 28.309 0.418814H29.895C31.9599 0.418814 32.4985 0.807836 32.4985 2.60333V22.5033C32.4985 28.4284 29.895 30.194 24.5385 30.194C19.182 30.194 16.5486 28.4284 16.5486 22.5033V2.60333Z" fill="#FDF9F0"/>
+                <path d="M34.324 2.6034C34.324 0.658284 35.0721 0.418885 37.0172 0.418885H42.1942C49.1368 0.32911 50.5732 3.35152 50.5432 11.3714C50.5432 19.3014 48.7478 21.9648 42.4635 21.9648H41.1468V27.3811C41.1468 29.0569 40.7578 29.835 39.3214 29.835H35.9399C34.6532 29.835 34.2941 28.9971 34.2941 27.1717V2.6034H34.324ZM41.6556 17.6257C43.062 17.6257 43.4511 16.6681 43.4511 13.8851V8.64821C43.4511 6.16445 42.9723 5.20686 41.6256 5.20686H41.1768V17.6257H41.6556Z" fill="#FDF9F0"/>
+                <path d="M51.9495 2.60333C51.9495 1.10708 52.4283 0.418814 53.6552 0.418814H63.1713C63.8296 0.418814 64.3683 1.07716 64.3683 1.79536V5.92498C64.3683 6.70302 63.7997 7.30152 63.1713 7.30152H58.8322V11.7304H62.7822C63.4406 11.7304 63.9792 12.3289 63.9792 13.077V16.7877C63.9792 17.5358 63.4107 18.1642 62.7822 18.1642H58.8322V22.8624H63.1713C63.8296 22.8624 64.3683 23.4908 64.3683 24.239V28.3985C64.3683 29.1466 63.7997 29.7451 63.1713 29.7451H53.6552C52.4582 29.7451 51.9495 29.0868 51.9495 27.6205V2.60333Z" fill="#FDF9F0"/>
+                <path d="M65.9543 2.60344C65.9543 0.65833 66.7025 0.418931 68.6476 0.418931H73.8246C80.7671 0.329156 82.2035 3.29171 82.2035 8.61833C82.2035 12.718 81.3058 14.9624 78.9417 15.92L81.9043 25.9448C82.5327 28.0096 81.9641 29.8051 80.4978 29.8051H77.4156C76.3682 29.8051 75.8595 29.0271 75.5901 27.6505L73.8545 19.1519L73.6151 16.8477H72.8071V27.3213C72.8071 28.9971 72.4181 29.7752 70.9817 29.7752H67.6301C66.3134 29.7752 65.9543 28.9373 65.9543 27.1119V2.60344ZM73.2859 12.5385C74.3931 12.5385 75.1413 11.7006 75.1413 9.69562V7.84028C75.1413 6.01487 74.4829 5.2069 73.256 5.2069H72.8071V12.5385H73.2859Z" fill="#FDF9F0"/>
+                <path d="M110.034 2.60333C110.034 1.10708 110.512 0.418814 111.739 0.418814H121.255C121.914 0.418814 122.452 1.07716 122.452 1.79536V5.92498C122.452 6.70302 121.884 7.30152 121.255 7.30152H116.916V11.7304H120.866C121.525 11.7304 122.063 12.3289 122.063 13.077V16.7877C122.063 17.5358 121.495 18.1642 120.866 18.1642H116.916V22.8624H121.255C121.914 22.8624 122.452 23.4908 122.452 24.239V28.3985C122.452 29.1466 121.884 29.7451 121.255 29.7451H111.739C110.542 29.7451 110.034 29.0868 110.034 27.6205V2.60333Z" fill="#FDF9F0"/>
+                <path d="M124.038 2.69302C124.038 0.68806 124.846 0.448662 126.792 0.448662H128.976C130.532 0.448662 131.28 0.987309 131.699 2.69302L134.003 11.1917L134.632 14.2739C134.632 14.2739 134.662 14.4236 134.722 14.4236H134.781C134.781 14.4236 134.841 14.3936 134.841 14.3039L134.452 2.57332C134.333 0.658136 135.2 0.448662 137.086 0.448662H138.552C140.617 0.448662 141.155 0.957384 141.155 2.63317V27.2613C141.155 29.0568 140.707 29.8648 139.21 29.8648H136.038C134.781 29.8648 134.243 28.9969 133.734 27.1416L131.131 18.5532L130.502 15.83C130.502 15.83 130.472 15.7103 130.412 15.7103H130.353C130.353 15.7103 130.293 15.7402 130.293 15.9497L130.682 27.4109C130.772 29.0867 130.293 29.8648 128.856 29.8648H125.684C124.398 29.8648 124.038 29.0269 124.038 27.2014V2.69302Z" fill="#FDF9F0"/>
+                <path d="M142.562 5.95483V1.8252C142.562 1.07708 143.101 0.448662 143.729 0.448662H157.315C157.973 0.448662 158.482 1.10701 158.482 1.8252V5.95483C158.482 6.73287 157.943 7.33137 157.315 7.33137H153.933V27.7401C153.933 29.1765 153.484 29.8348 152.317 29.8348H148.726C147.559 29.8348 147.11 29.1765 147.11 27.7401V7.33137H143.729C143.071 7.33137 142.562 6.70295 142.562 5.95483Z" fill="#FDF9F0"/>
+                <path d="M84.4179 3.11197C84.4777 0.628211 85.5849 0.448662 86.9016 0.448662H90.5225C92.4976 0.448662 93.2756 0.68806 93.6048 2.69302L95.6995 17.2664C95.7295 17.4759 95.7594 17.5357 95.8491 17.5357H95.9689C95.9689 17.5357 96.1185 17.446 96.1484 17.2664L98.1833 2.69302C98.4825 0.717985 99.2606 0.448662 101.206 0.448662H104.827C106.143 0.448662 107.221 0.658135 107.31 3.11197L108.328 27.1715C108.388 28.9969 107.969 29.8348 106.682 29.8348H103.36C101.954 29.8348 101.505 29.0568 101.535 27.381L101.625 12.3887C101.625 12.0894 101.625 11.9996 101.505 11.9996H101.445C101.445 11.9996 101.295 12.0894 101.266 12.3587L99.1409 28.0693C98.9314 29.5655 98.4825 29.8049 96.8367 29.8049H94.9813C93.3055 29.8049 92.8866 29.5655 92.6771 28.0693L90.5525 12.2989C90.5225 12.0595 90.4926 12.0296 90.4028 12.0296H90.343C90.343 12.0296 90.2233 12.1193 90.2233 12.3587L90.2831 27.381C90.3131 29.0568 89.8941 29.8348 88.4278 29.8348H85.166C83.8792 29.8348 83.4304 28.9969 83.4902 27.1715L84.4777 3.11197H84.4179Z" fill="#FDF9F0"/>
+                <path d="M158.422 29.8352C157.045 29.8352 155.938 28.7279 155.938 27.3514C155.938 25.9749 157.045 24.8676 158.422 24.8676C159.799 24.8676 160.906 25.9749 160.906 27.3514C160.906 28.7279 159.799 29.8352 158.422 29.8352ZM158.422 25.4661C157.375 25.4661 156.537 26.304 156.537 27.3514C156.537 28.3988 157.375 29.2367 158.422 29.2367C159.469 29.2367 160.307 28.3988 160.307 27.3514C160.307 26.304 159.469 25.4661 158.422 25.4661Z" fill="#FDF9F0"/>
+                <path d="M158.422 26.0643C158.781 26.0643 159.021 26.1242 159.2 26.2738C159.38 26.4234 159.469 26.6329 159.469 26.9321C159.469 27.3212 159.29 27.5606 158.931 27.6803L159.469 28.4284C159.469 28.4284 159.469 28.4882 159.469 28.5181C159.469 28.5181 159.439 28.5481 159.38 28.5481H158.961C158.961 28.5481 158.841 28.5481 158.811 28.4583L158.332 27.7401H158.063V28.4284C158.063 28.4284 158.033 28.5181 157.973 28.5181H157.584C157.584 28.5181 157.494 28.4882 157.494 28.4284V26.1541C157.494 26.1541 157.524 26.0643 157.584 26.0643H158.422ZM158.422 27.2912C158.572 27.2912 158.691 27.2912 158.781 27.2015C158.841 27.1416 158.871 27.0518 158.871 26.9321C158.871 26.8124 158.841 26.7227 158.781 26.6628C158.721 26.603 158.602 26.573 158.422 26.573H158.093V27.2613H158.422V27.2912Z" fill="#FDF9F0"/>
+            </svg>
+        </span>
+
+        </div>
+
+    </header>
+    <main>
+        <div class="thanks-body">                          
+            <div class="thanks-text">    
+                <span>
+                   <img src="/static/video/icon-hands.gif" alt="Icon hands" />
+                </span>
+                <div class="text">
+                    <h1>THANK YOU FOR TRUSTING <span class="highlight">SUPERMENT!</span></h1>
+                    <p class="text-aux">We’re so happy to welcome you to the Superment family.</p>
+                    <p>You didn’t just place an order — you chose a partner that helps you feel better, live calmer, and show up as your best self, every single day.</p>
+                </div>
+                <div>
+                    <h1>WHAT'S NEXT?</h1>
+                    <p class="text-aux2">
+                        We’re preparing your order right now!
+                    </p>
+                    <p> 
+                        Watch your inbox for the tracking link — and get ready to meet your most balanced, recharged self.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="foot">
+        </div>
+    </footer> 
+</body>
+</html>

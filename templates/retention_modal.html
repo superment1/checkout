@@ -1,0 +1,34 @@
+<div id="retention-modal" class="rm-overlay" aria-modal="true" role="dialog" hidden>
+  <div class="rm-dialog" role="document" tabindex="-1" aria-label="Ofer special">
+    <button class="rm-close" aria-label="Fechar">
+      <svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-label="close">
+        <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M9 9l6 6M15 9l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div class="rm-head">
+      <svg  class="rm-ico rm-ico--drop" xmlns="http://www.w3.org/2000/svg" width="62" height="64" viewBox="0 0 62 64" fill="none">
+        <path d="M27.9926 57.1939C29.691 57.1939 31.3829 57.0337 33.0552 56.72C38.3465 63.9893 48.4 65.4912 55.5139 60.0843C62.6277 54.6774 64.0975 44.4042 58.8062 37.1349C57.8721 35.8533 56.7681 34.7252 55.5139 33.7706C58.3098 18.2374 48.2498 3.33165 33.0487 0.474663C17.8477 -2.37565 3.26064 7.90417 0.464742 23.4374C-2.32462 38.9706 7.72885 53.8763 22.9299 56.7333C24.5957 57.0471 26.2941 57.2073 27.986 57.2073L27.9926 57.1939ZM45.9046 34.4982C52.6069 34.4982 58.0354 40.0453 58.0354 46.8941C58.0354 53.7428 52.6069 59.2899 45.9046 59.2899C39.2088 59.2899 33.7803 53.7495 33.7738 46.9074C33.7803 40.0587 39.2088 34.5116 45.9111 34.5049H45.9046V34.4982ZM16.8025 27.0821H25.151C25.7977 27.0821 26.3268 26.5414 26.3268 25.8805V11.5956C26.3268 10.9347 26.8559 10.394 27.5026 10.394H29.0704C29.7172 10.394 30.2463 10.9347 30.2463 11.5956V29.8856C30.2463 30.5465 29.7172 31.0872 29.0704 31.0872H16.8025C16.1557 31.0872 15.6266 30.5465 15.6266 29.8856V28.2836C15.6266 27.6227 16.1557 27.0821 16.8025 27.0821Z" fill="#E1DCCD"/>
+        <path d="M46.695 38.3098H45.1273C44.4779 38.3098 43.9514 38.8477 43.9514 39.5113V49.6242C43.9514 50.2878 44.4779 50.8258 45.1273 50.8258H46.695C47.3444 50.8258 47.8709 50.2878 47.8709 49.6242V39.5113C47.8709 38.8477 47.3444 38.3098 46.695 38.3098Z" fill="#E1DCCD"/>
+        <path d="M46.695 52.9952H45.1273C44.4779 52.9952 43.9514 53.5332 43.9514 54.1968V54.9644C43.9514 55.628 44.4779 56.1659 45.1273 56.1659H46.695C47.3444 56.1659 47.8709 55.628 47.8709 54.9644V54.1968C47.8709 53.5332 47.3444 52.9952 46.695 52.9952Z" fill="#E1DCCD"/>
+    </svg>
+
+      <div class="rm-titles">
+        <div class="rm-title">{{ title or 'ESPERE! TEM UM MIMO PRA VOCÊ' }}</div>
+        <div class="rm-subtitle">{{ subtitle or 'Ative 10% OFF agora' }}</div>
+        <div class="rm-message">
+          {% if message %}
+            {{ message|safe }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="rm-actions">
+        <button class="rm-btn-primary rm-btn-tag" id="rm-primary" data-coupon="SLEEP20">
+            <span class="rm-btn-tag__text">{{ button_text or 'SLEEP20' }}</span>
+        </button>
+    </div>
+    <div class="rm-toast" id="rm-copied" role="status" aria-live="polite" hidden>Copy!</div>
+  </div>
+</div>
